@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best of Cup - Admin</title>
+	<link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        .login-container, .dashboard-container {
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        .hidden { display: none; }
+        
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        button:hover { background-color: var(--accent-color); }
+
+        /* Button Farben */
+        .btn-green { background-color: #2e7d32; } /* Speichern */
+        .btn-blue { background-color: #1976D2; }  /* Update */
+        .btn-red { background-color: #c62828; width: auto; padding: 5px 10px; font-size: 0.8rem; margin-left: 5px;}
+        .btn-edit { background-color: #FF9800; width: auto; padding: 5px 10px; font-size: 0.8rem;}
+
+        .score-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-input-group input { width: 60px; text-align: center; }
+        label { display: block; text-align: left; font-weight: bold; margin-top: 15px;}
+
+        /* Liste der Spiele */
+        .game-list {
+            margin-top: 30px;
+            text-align: left;
+        }
+        .game-item {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .game-info { font-size: 0.9rem; }
+        .game-actions { display: flex; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+        </a>        
+        <nav>
+            <ul>
+                <li><a href="index.html">Zurück zur Seite</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="login-section" class="card login-container">
+            <h2>🔐 Admin Login</h2>
+            <input type="email" id="email" placeholder="E-Mail Adresse">
+            <input type="password" id="password" placeholder="Passwort">
+            <button onclick="login()">Einloggen</button>
+            <p id="login-error" style="color: red;"></p>
+        </div>
+
+        <div id="dashboard-section" class="card dashboard-container hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Ergebnisverwaltung</h2>
+                <button onclick="logout()" style="width:auto; background:#333;">Logout</button>
+            </div>
+            
+            <hr style="margin: 20px 0;">
+
+            <input type="hidden" id="editGameId">
+
+            <h3 id="form-title">Neues Ergebnis eintragen</h3>
+            
+            <label>Heimteam</label>
+            <select id="teamHome">
+                <option value="SV Lohausen">SV Lohausen</option>
+                <option value="SF Vorst">SF Vorst</option>
+                <option value="SG Unterrath">SG Unterrath</option>
+                <option value="1. FC MG">1. FC MG</option>
+            </select>
+
+            <label>Auswärtsteam</label>
+            <select id="teamAway">
+                <option value="SF Vorst">SF Vorst</option>
+                <option value="SV Lohausen">SV Lohausen</option>
+                <option value="SG Unterrath">SG Unterrath</option>
+                <option value="1. FC MG">1. FC MG</option>
+            </select>
+
+            <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
+
+            <h4>Teil 1: Das 8+1 (Endergebnis Tore)</h4>
+            <div class="score-input-group">
+                <input type="number" id="scoreHome81" placeholder="0">
+                <span>:</span>
+                <input type="number" id="scoreAway81" placeholder="0">
+            </div>
+
+            <h4>Teil 2: Das 4+1 (Anzahl Siege)</h4>
+            <div class="score-input-group">
+                <input type="number" id="scoreHome41" placeholder="0">
+                <span>:</span>
+                <input type="number" id="scoreAway41" placeholder="0">
+            </div>
+
+            <button id="saveBtn" onclick="saveResult()" class="btn-green">Ergebnis Speichern</button>
+            <button id="cancelBtn" onclick="resetForm()" style="background:#777; display:none;">Abbrechen</button>
+
+            <div class="game-list">
+                <h3>Bereits eingetragen:</h3>
+                <div id="games-container">
+                    <p style="text-align:center; color:#999;">Lade Daten...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --------------------------------------------------------------
+        // DEIN ECHTER API KEY
+        // --------------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
+            authDomain: "best-of-cup.firebaseapp.com",
+            projectId: "best-of-cup",
+            storageBucket: "best-of-cup.firebasestorage.app",
+            messagingSenderId: "188725945748",
+            appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
+            measurementId: "G-HGCM4M029D"
+        };
+        // --------------------------------------------------------------
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // WICHTIG: Hier speichern wir alle Spiele für den Duplikat-Check
+        let allGamesData = [];
+
+        // 1. Auth Logic
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                loadGames(); // Liste laden sobald eingeloggt
+            } else {
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('dashboard-section').classList.add('hidden');
+            }
+        });
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(email, pass).catch(e => document.getElementById('login-error').innerText = e.message);
+        }
+        function logout() { auth.signOut(); }
+
+        // 2. Liste laden (Live-Update)
+        function loadGames() {
+            // Sortiert nach Datum (neueste zuerst)
+            db.collection("spiele").orderBy("datum", "desc").onSnapshot(snapshot => {
+                const container = document.getElementById("games-container");
+                container.innerHTML = "";
+                allGamesData = []; // Liste leeren beim Neuladen
+
+                if(snapshot.empty) {
+                    container.innerHTML = "<p>Noch keine Spiele eingetragen.</p>";
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const game = doc.data();
+                    const id = doc.id;
+                    
+                    // WICHTIG: Spiel in die Liste für den Check aufnehmen
+                    allGamesData.push({ id: id, ...game });
+                    
+                    // Daten für Javascript vorbereiten (zum Bearbeiten)
+                    const dataString = JSON.stringify({
+                        id: id,
+                        h: game.heim, a: game.gast,
+                        h81: game.ergebnis81[0], a81: game.ergebnis81[1],
+                        h41: game.ergebnis41[0], a41: game.ergebnis41[1]
+                    }).replace(/"/g, '&quot;');
+
+                    const html = `
+                        <div class="game-item">
+                            <div class="game-info">
+                                <strong>${game.heim} vs ${game.gast}</strong><br>
+                                8+1: ${game.ergebnis81[0]}:${game.ergebnis81[1]} | 
+                                4+1: ${game.ergebnis41[0]}:${game.ergebnis41[1]}
+                            </div>
+                            <div class="game-actions">
+                                <button class="btn-edit" onclick="editGame(${dataString})">✏️</button>
+                                <button class="btn-red" onclick="deleteGame('${id}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+            });
+        }
+
+        // 3. Bearbeiten starten
+        function editGame(data) {
+            // Werte in die Felder schreiben
+            document.getElementById('editGameId').value = data.id;
+            document.getElementById('teamHome').value = data.h;
+            document.getElementById('teamAway').value = data.a;
+            
+            document.getElementById('scoreHome81').value = data.h81;
+            document.getElementById('scoreAway81').value = data.a81;
+            
+            document.getElementById('scoreHome41').value = data.h41;
+            document.getElementById('scoreAway41').value = data.a41;
+
+            // Design ändern (damit man merkt, dass man bearbeitet)
+            document.getElementById('saveBtn').innerText = "Änderung speichern";
+            document.getElementById('saveBtn').className = "btn-blue"; // Blau statt Grün
+            document.getElementById('form-title').innerText = "Spiel bearbeiten";
+            document.getElementById('cancelBtn').style.display = "inline-block";
+            
+            // Nach oben scrollen
+            document.getElementById('dashboard-section').scrollIntoView({behavior: "smooth"});
+        }
+
+        // 4. Formular zurücksetzen
+        function resetForm() {
+            document.getElementById('editGameId').value = ""; // ID löschen
+            document.getElementById('scoreHome81').value = "";
+            document.getElementById('scoreAway81').value = "";
+            document.getElementById('scoreHome41').value = "";
+            document.getElementById('scoreAway41').value = "";
+            
+            // Design zurücksetzen
+            document.getElementById('saveBtn').innerText = "Ergebnis Speichern";
+            document.getElementById('saveBtn').className = "btn-green";
+            document.getElementById('form-title').innerText = "Neues Ergebnis eintragen";
+            document.getElementById('cancelBtn').style.display = "none";
+        }
+
+        // 5. Löschen
+        function deleteGame(id) {
+            if(confirm("Möchtest du dieses Spiel wirklich löschen?")) {
+                db.collection("spiele").doc(id).delete()
+                    .then(() => alert("Gelöscht!"))
+                    .catch(e => alert("Fehler: " + e.message));
+            }
+        }
+
+        // 6. Speichern (MIT DUPLIKAT CHECK)
+        function saveResult() {
+            const editId = document.getElementById('editGameId').value;
+            const home = document.getElementById('teamHome').value;
+            const away = document.getElementById('teamAway').value;
+            
+            const h81 = parseInt(document.getElementById('scoreHome81').value) || 0;
+            const a81 = parseInt(document.getElementById('scoreAway81').value) || 0;
+            const h41 = parseInt(document.getElementById('scoreHome41').value) || 0;
+            const a41 = parseInt(document.getElementById('scoreAway41').value) || 0;
+
+            if(home === away) {
+                alert("Heim und Auswärts darf nicht gleich sein!");
+                return;
+            }
+            if(h41 === 0 && a41 === 0) {
+                alert("Fehler im 4+1: Ein 0:0 ist bei 8 Spielen nicht möglich.");
+                return;
+            }
+
+            // --- NEU: CHECK AUF DOPPELTE PAARUNG ---
+            const duplicate = allGamesData.find(g => g.heim === home && g.gast === away && g.id !== editId);
+            
+            if(duplicate) {
+                alert("STOP: Dieses Spiel (" + home + " vs " + away + ") existiert bereits! Bitte bearbeite das vorhandene Spiel unten in der Liste, statt es neu anzulegen.");
+                return;
+            }
+            // ----------------------------------------
+
+            const gameData = {
+                datum: new Date(),
+                heim: home,
+                gast: away,
+                ergebnis81: [h81, a81],
+                ergebnis41: [h41, a41]
+            };
+
+            if (editId) {
+                db.collection("spiele").doc(editId).update(gameData)
+                    .then(() => { alert("Erfolgreich geändert! ✅"); resetForm(); })
+                    .catch(e => alert("Fehler: " + e.message));
+            } else {
+                db.collection("spiele").add(gameData)
+                    .then(() => { alert("Gespeichert! ⚽"); resetForm(); })
+                    .catch(e => alert("Fehler: " + e.message));
+            }
+        }
+    </script>
+</body>
+</html>

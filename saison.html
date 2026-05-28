@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best of Cup - Saison 25/26</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <header>
+        <a href="index.html"><img src="logo.jpg" alt="Logo" class="nav-logo"></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Startseite</a></li>
+                <li><a href="saison.html" class="active">Saison</a></li>
+                <li><a href="regeln.html">Regeln</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <img src="logo.jpg" alt="Best of Cup Logo" class="page-header-logo">
+            <h1>Best of Cup - Saison 25/26</h1>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-btn active" onclick="updateTable('gesamt', this)">Tabelle</button>
+            <button class="filter-btn" onclick="updateTable('heim', this)">Heim</button>
+            <button class="filter-btn" onclick="updateTable('auswaerts', this)">Auswärts</button>
+            <button class="filter-btn" onclick="updateTable('hinrunde', this)">Hinrunde</button>
+            <button class="filter-btn" onclick="updateTable('rueckrunde', this)">Rückrunde</button>
+        </div>
+
+        <table class="bundesliga-table">
+            <thead>
+                <tr>
+                    <th class="th-rank">Pl.</th>
+                    <th class="th-team">Team</th>
+                    <th class="th-points">Pkte.</th> <th class="th-matches">Sp.</th>
+                    <th class="th-goals">Tore</th>
+                    <th class="th-diff">Diff.</th>
+                </tr>
+            </thead>
+            <tbody id="tabelle-body"></tbody>
+        </table>
+
+        <div class="matchday-selector-bar">
+            <button class="matchday-nav-btn" id="btn-prev" onclick="changeMatchday(-1)">&#10094;</button>
+            <select id="matchday-select" class="matchday-select" onchange="renderSchedule()"></select>
+            <button class="matchday-nav-btn" id="btn-next" onclick="changeMatchday(1)">&#10095;</button>
+        </div>
+
+        <div id="schedule-list" class="match-list"></div>     
+     
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Best of Cup</p>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
+            authDomain: "best-of-cup.firebaseapp.com",
+            projectId: "best-of-cup",
+            storageBucket: "best-of-cup.firebasestorage.app",
+            messagingSenderId: "188725945748",
+            appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
+            measurementId: "G-HGCM4M029D"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const teamLogos = {
+            "SV Lohausen": "wappen-lohausen.png",
+            "SF Vorst": "wappen-vorst.png",
+            "SG Unterrath": "wappen-unterrath.png",
+            "1. FC MG": "wappen-1fcmg.png"
+        };
+
+        const schedule = [
+            // HINRUNDE
+            { name: "1. Spieltag", matches: [ ["SV Lohausen", "SF Vorst"], ["1. FC MG", "SG Unterrath"] ] },
+            { name: "2. Spieltag", matches: [ ["SG Unterrath", "SF Vorst"], ["SV Lohausen", "1. FC MG"] ] },
+            { name: "3. Spieltag", matches: [ ["SF Vorst", "1. FC MG"], ["SG Unterrath", "SV Lohausen"] ] },
+            // RÜCKRUNDE
+            { name: "4. Spieltag", matches: [ ["SG Unterrath", "1. FC MG"], ["SF Vorst", "SV Lohausen"] ] },
+            { name: "5. Spieltag", matches: [ ["SF Vorst", "SG Unterrath"], ["1. FC MG", "SV Lohausen"] ] },
+            { name: "6. Spieltag", matches: [ ["1. FC MG", "SF Vorst"], ["SV Lohausen", "SG Unterrath"] ] }
+        ];
+
+        let allResults = {};
+        let currentFilter = 'gesamt';
+
+        window.onload = function() {
+            const select = document.getElementById('matchday-select');
+            schedule.forEach((day, index) => {
+                let opt = document.createElement('option');
+                opt.value = index;
+                opt.innerHTML = day.name;
+                select.appendChild(opt);
+            });
+            loadData();
+        };
+
+        function loadData() {
+            db.collection("spiele").get().then((querySnapshot) => {
+                allResults = {};
+                querySnapshot.forEach((doc) => {
+                    const game = doc.data();
+                    const h = game.heim;
+                    const a = game.gast;
+                    allResults[`${h}_${a}`] = {
+                        gH_81: parseInt(game.ergebnis81[0]),
+                        gA_81: parseInt(game.ergebnis81[1]),
+                        gH_41: parseInt(game.ergebnis41[0]),
+                        gA_41: parseInt(game.ergebnis41[1])
+                    };
+                });
+                calculateTable(currentFilter);
+                renderSchedule();
+            });
+        }
+
+        function updateTable(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            calculateTable(filter);
+        }
+
+        function calculateTable(filter) {
+            let stats = {};
+            for(let t in teamLogos) { stats[t] = { name: t, p: 0, g: 0, a: 0, m: 0, logo: teamLogos[t] }; }
+
+            schedule.forEach((day, dayIndex) => {
+                const isHinrunde = dayIndex < 3;
+                const isRueckrunde = dayIndex >= 3;
+                if (filter === 'hinrunde' && !isHinrunde) return;
+                if (filter === 'rueckrunde' && !isRueckrunde) return;
+
+                day.matches.forEach(match => {
+                    const h = match[0];
+                    const a = match[1];
+                    if(!a) return;
+
+                    const res = allResults[`${h}_${a}`];
+                    if(res) {
+                        let p_h = 0, p_a = 0;
+                        if(res.gH_81 > res.gA_81) p_h += 3; else if(res.gA_81 > res.gH_81) p_a += 3; else { p_h += 1; p_a += 1; }
+                        if(res.gH_41 > res.gA_41) p_h += 3; else if(res.gA_41 > res.gH_41) p_a += 3; else { p_h += 1; p_a += 1; }
+
+                        const totalGoalsH = res.gH_81 + res.gH_41;
+                        const totalGoalsA = res.gA_81 + res.gA_41;
+
+                        if (filter !== 'auswaerts') {
+                            stats[h].m += 1; stats[h].p += p_h; stats[h].g += totalGoalsH; stats[h].a += totalGoalsA;
+                        }
+                        if (filter !== 'heim') {
+                            stats[a].m += 1; stats[a].p += p_a; stats[a].g += totalGoalsA; stats[a].a += totalGoalsH;
+                        }
+                    }
+                });
+            });
+
+            let tableArray = Object.values(stats);
+            tableArray.sort((a, b) => {
+                if (b.p !== a.p) return b.p - a.p; 
+                return (b.g - b.a) - (a.g - a.a); 
+            });
+
+            const tbody = document.getElementById("tabelle-body");
+            tbody.innerHTML = "";
+            
+            tableArray.forEach((t, i) => {
+                let diff = t.g - t.a;
+                let diffSign = diff > 0 ? "+" : "";
+                
+                // HIER WIRD DIE HTML-ZEILE GEBAUT: PUNKTE JETZT AN STELLE 3!
+                let row = `
+                    <tr>
+                        <td class="td-rank">${i+1}</td>
+                        <td class="td-team"><img src="${t.logo}">${t.name}</td>
+                        <td class="td-points">${t.p}</td>
+                        <td class="td-matches">${t.m}</td>
+                        <td class="td-goals">${t.g}:${t.a}</td>
+                        <td class="td-diff">${diffSign}${diff}</td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function changeMatchday(delta) {
+            const select = document.getElementById('matchday-select');
+            let newVal = parseInt(select.value) + delta;
+            if(newVal >= 0 && newVal < schedule.length) {
+                select.value = newVal;
+                renderSchedule();
+            }
+        }
+
+        function renderSchedule() {
+            const select = document.getElementById('matchday-select');
+            const dayIndex = parseInt(select.value);
+            const day = schedule[dayIndex];
+            const list = document.getElementById('schedule-list');
+            list.innerHTML = "";
+
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+
+            if (dayIndex === 0) btnPrev.style.visibility = 'hidden'; else btnPrev.style.visibility = 'visible';
+            if (dayIndex === schedule.length - 1) btnNext.style.visibility = 'hidden'; else btnNext.style.visibility = 'visible';
+
+            day.matches.forEach(match => {
+                const h = match[0];
+                const a = match[1];
+                const dateFixed = match[2];
+
+                if(!a) {
+                    list.innerHTML += `<div class="match-row" style="color:#666; justify-content:center;">${h} hat Spielfrei</div>`;
+                    return;
+                }
+
+                const res = allResults[`${h}_${a}`];
+                let centerHtml = "";
+
+                if(dateFixed) centerHtml += `<div class="match-date-label">${dateFixed}</div>`;
+
+                if(res) {
+                    centerHtml += `
+                        <div class="match-score-box">
+                            <div class="score-line-main">8+1: ${res.gH_81}:${res.gA_81}</div>
+                            <div class="score-line-sub">4+1: ${res.gH_41}:${res.gA_41}</div>
+                        </div>`;
+                } else {
+                    centerHtml += `<div class="match-vs">vs</div>`;
+                }
+
+                let row = `
+                    <div class="match-row">
+                        <div class="match-team home">
+                            ${h} <img src="${teamLogos[h]}">
+                        </div>
+                        <div class="match-center">
+                            ${centerHtml}
+                        </div>
+                        <div class="match-team away">
+                            <img src="${teamLogos[a]}"> ${a}
+                        </div>
+                    </div>`;
+                list.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
