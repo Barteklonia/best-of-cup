@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best of Cup - Home</title>
-	<link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <header>
@@ -28,15 +30,18 @@
         <div class="card">
             <h2>🔥 Die nächsten Spiele</h2>
             <div id="upcoming-games-container">
-                </div>
-            <p id="no-games-msg" style="display:none; color:#666; font-style:italic;">Aktuell keine kommenden Spiele geplant.</p>
+            </div>
+            <p id="no-games-msg" style="display:none; color:#666; font-style:italic;">Aktuell keine kommenden Spiele
+                geplant.</p>
         </div>
 
         <div class="card">
             <h2>🏆 Unsere "Europa League"</h2>
-            <p>Hallo zusammen! Herzlich willkommen auf der offiziellen Seite des <strong>Best of Cup</strong>. Dies ist unser überregionales Turnierformat für ambitionierte Jugendteams.</p>
+            <p>Hallo zusammen! Herzlich willkommen auf der offiziellen Seite des <strong>Best of Cup</strong>. Dies ist
+                unser überregionales Turnierformat für ambitionierte Jugendteams.</p>
             <br>
-            <p>Hier finden spannende Begegnungen statt, bei denen der Spaß, die Entwicklung der Kinder und fairer Wettbewerb im Vordergrund stehen.</p>
+            <p>Hier finden spannende Begegnungen statt, bei denen der Spaß, die Entwicklung der Kinder und fairer
+                Wettbewerb im Vordergrund stehen.</p>
         </div>
 
         <div class="card">
@@ -53,7 +58,7 @@
                 <li>
                     <img src="wappen-unterrath.png" alt="SG Unterrath" class="team-logo-small">
                     SG Unterrath
-                </li>             
+                </li>
                 <li>
                     <img src="wappen-1fcmg.png" alt="1. FC MG" class="team-logo-small">
                     1. FC Mönchengladbach
@@ -71,24 +76,14 @@
         // Liste der geplanten Spiele (Format: JJJJ-MM-TT)
         const upcomingGames = [
             {
-                date: "2025-11-30", // Datum für den Computer
-                displayDate: "Samstag, 30.11.", // Text für den Menschen
-                match: "SG Unterrath vs SV Lohausen"
-            },       
-            {
-                date: "2026-01-10", // Achtung: Neues Jahr 2026
-                displayDate: "Freitag, 10.01.",
-                match: "SF Vorst vs 1. FC MG"
-            },
-            {
-                date: "2026-02-08",
-                displayDate: "Samstag, 08.02.",
-                match: "1. FC MG vs SF Vorst"
-            },
-            {
-                date: "2026-02-14",
-                displayDate: "Freitag, 14.02.",
+                date: "2026-05-31", // Datum für den Computer
+                displayDate: "Sonntag, 31.05, 10:00 Uhr", // Text für den Menschen
                 match: "SF Vorst vs SV Lohausen"
+            },
+            {
+                date: "2026-06-14", // Achtung: Neues Jahr 2026
+                displayDate: "Sonntag, 14.06, 15:00 Uhr",
+                match: "1. FC MG vs SV Lohausen"
             }
         ];
 
@@ -96,7 +91,7 @@
         function renderGames() {
             const container = document.getElementById('upcoming-games-container');
             const noGamesMsg = document.getElementById('no-games-msg');
-            
+
             // Heutiges Datum holen (Uhrzeit auf 0 setzen, damit Spiele vom heutigen Tag noch angezeigt werden)
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -106,11 +101,11 @@
             upcomingGames.forEach(game => {
                 // Spiel-Datum umwandeln
                 const gameDate = new Date(game.date);
-                
+
                 // Wenn das Spiel-Datum heute oder in der Zukunft ist
                 if (gameDate >= today) {
                     visibleGamesCount++;
-                    
+
                     const html = `
                         <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
                             <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">${game.displayDate}</div>
@@ -134,4 +129,5 @@
     </script>
 
 </body>
+
 </html>
