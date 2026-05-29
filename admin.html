@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best of Cup - Admin</title>
-	<link rel="icon" type="image/jpeg" href="logo.jpg">
-    <link rel="stylesheet" href="style.css">
+	<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css">
     
+    <script src="js/config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -75,7 +76,7 @@
 
     <header>
         <a href="index.html">
-            <img src="logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
         </a>        
         <nav>
             <ul>
@@ -101,24 +102,30 @@
             
             <hr style="margin: 20px 0;">
 
+            <!-- Selectors for Season and Yeargang -->
+            <div style="display:flex; gap:15px; flex-wrap:wrap; margin:20px 0; padding:15px; background:#f5f5f5; border-radius:4px; border:1px solid #ddd; text-align:left;">
+                <div style="flex:1; min-width:120px;">
+                    <label style="margin-top:0; font-size:0.85rem; color:#555;">Saison filtern/eintragen</label>
+                    <select id="season-select" onchange="onAdminSeasonChange()"></select>
+                </div>
+                <div style="flex:1; min-width:120px;">
+                    <label style="margin-top:0; font-size:0.85rem; color:#555;">Jahrgang filtern/eintragen</label>
+                    <select id="age-select" onchange="onAdminAgeGroupChange()"></select>
+                </div>
+            </div>
+
             <input type="hidden" id="editGameId">
 
             <h3 id="form-title">Neues Ergebnis eintragen</h3>
             
             <label>Heimteam</label>
             <select id="teamHome">
-                <option value="SV Lohausen">SV Lohausen</option>
-                <option value="SF Vorst">SF Vorst</option>
-                <option value="SG Unterrath">SG Unterrath</option>
-                <option value="1. FC MG">1. FC MG</option>
+                <!-- Dynamically populated -->
             </select>
 
             <label>Auswärtsteam</label>
             <select id="teamAway">
-                <option value="SF Vorst">SF Vorst</option>
-                <option value="SV Lohausen">SV Lohausen</option>
-                <option value="SG Unterrath">SG Unterrath</option>
-                <option value="1. FC MG">1. FC MG</option>
+                <!-- Dynamically populated -->
             </select>
 
             <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
@@ -150,9 +157,6 @@
     </main>
 
     <script>
-        // --------------------------------------------------------------
-        // DEIN ECHTER API KEY
-        // --------------------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
             authDomain: "best-of-cup.firebaseapp.com",
@@ -162,8 +166,6 @@
             appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
             measurementId: "G-HGCM4M029D"
         };
-        // --------------------------------------------------------------
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -171,12 +173,16 @@
         // WICHTIG: Hier speichern wir alle Spiele für den Duplikat-Check
         let allGamesData = [];
 
+        let selectedSeason = "";
+        let selectedAgeGroup = "";
+        let activeConfig = null;
+
         // 1. Auth Logic
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('dashboard-section').classList.remove('hidden');
-                loadGames(); // Liste laden sobald eingeloggt
+                initAdminSelectors(); // Initialise dropdowns and load games
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('dashboard-section').classList.add('hidden');
@@ -190,6 +196,82 @@
         }
         function logout() { auth.signOut(); }
 
+        // Dropdown initialization
+        function initAdminSelectors() {
+            const seasonSelect = document.getElementById('season-select');
+            seasonSelect.innerHTML = "";
+            const seasons = Object.keys(CUP_DATA.seasons);
+            seasons.forEach(key => {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerHTML = CUP_DATA.seasons[key].displayName;
+                seasonSelect.appendChild(opt);
+            });
+            // Default to Saison 25/26 if available, otherwise fall back to the first season
+            selectedSeason = seasons.includes("2025_2026") ? "2025_2026" : seasons[0];
+            seasonSelect.value = selectedSeason;
+
+            updateAdminAgeGroupSelector();
+        }
+
+        function updateAdminAgeGroupSelector() {
+            const ageSelect = document.getElementById('age-select');
+            ageSelect.innerHTML = "";
+            const ageGroups = Object.keys(CUP_DATA.seasons[selectedSeason].ageGroups);
+            ageGroups.forEach(key => {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerHTML = CUP_DATA.seasons[selectedSeason].ageGroups[key].displayName;
+                ageSelect.appendChild(opt);
+            });
+            selectedAgeGroup = ageGroups[0];
+            ageSelect.value = selectedAgeGroup;
+
+            updateAdminActiveConfig();
+        }
+
+        function updateAdminActiveConfig() {
+            activeConfig = CUP_DATA.seasons[selectedSeason].ageGroups[selectedAgeGroup];
+            populateTeams();
+            loadGames(); // Refresh the list of games
+        }
+
+        function populateTeams() {
+            const homeSelect = document.getElementById('teamHome');
+            const awaySelect = document.getElementById('teamAway');
+            homeSelect.innerHTML = "";
+            awaySelect.innerHTML = "";
+
+            const teams = Object.keys(activeConfig.teams);
+            
+            teams.forEach(team => {
+                let optHome = document.createElement('option');
+                optHome.value = team;
+                optHome.innerHTML = team;
+                homeSelect.appendChild(optHome);
+
+                let optAway = document.createElement('option');
+                optAway.value = team;
+                optAway.innerHTML = team;
+                awaySelect.appendChild(optAway);
+            });
+
+            // Set default away team to second team if possible
+            if (teams.length > 1) {
+                awaySelect.value = teams[1];
+            }
+        }
+
+        function onAdminSeasonChange() {
+            selectedSeason = document.getElementById('season-select').value;
+            updateAdminAgeGroupSelector();
+        }
+
+        function onAdminAgeGroupChange() {
+            selectedAgeGroup = document.getElementById('age-select').value;
+            updateAdminActiveConfig();
+        }
+
         // 2. Liste laden (Live-Update)
         function loadGames() {
             // Sortiert nach Datum (neueste zuerst)
@@ -199,45 +281,82 @@
                 allGamesData = []; // Liste leeren beim Neuladen
 
                 if(snapshot.empty) {
-                    container.innerHTML = "<p>Noch keine Spiele eingetragen.</p>";
+                    container.innerHTML = "<p style='text-align:center; color:#999;'>Noch keine Spiele eingetragen.</p>";
                     return;
                 }
+
+                let gameCount = 0;
 
                 snapshot.forEach(doc => {
                     const game = doc.data();
                     const id = doc.id;
                     
-                    // WICHTIG: Spiel in die Liste für den Check aufnehmen
-                    allGamesData.push({ id: id, ...game });
-                    
-                    // Daten für Javascript vorbereiten (zum Bearbeiten)
-                    const dataString = JSON.stringify({
-                        id: id,
-                        h: game.heim, a: game.gast,
-                        h81: game.ergebnis81[0], a81: game.ergebnis81[1],
-                        h41: game.ergebnis41[0], a41: game.ergebnis41[1]
-                    }).replace(/"/g, '&quot;');
+                    const s = game.saison || "2025_2026";
+                    const j = game.jahrgang || "2014";
 
-                    const html = `
-                        <div class="game-item">
-                            <div class="game-info">
-                                <strong>${game.heim} vs ${game.gast}</strong><br>
-                                8+1: ${game.ergebnis81[0]}:${game.ergebnis81[1]} | 
-                                4+1: ${game.ergebnis41[0]}:${game.ergebnis41[1]}
+                    // WICHTIG: Spiel in die Liste für den Check aufnehmen
+                    allGamesData.push({ id: id, ...game, saison: s, jahrgang: j });
+                    
+                    // Nur anzeigen, wenn es zur ausgewählten Saison/Jahrgang passt
+                    if (s === selectedSeason && j === selectedAgeGroup) {
+                        gameCount++;
+
+                        // Daten für Javascript vorbereiten (zum Bearbeiten)
+                        const dataString = JSON.stringify({
+                            id: id,
+                            saison: s,
+                            jahrgang: j,
+                            h: game.heim, a: game.gast,
+                            h81: game.ergebnis81[0], a81: game.ergebnis81[1],
+                            h41: game.ergebnis41[0], a41: game.ergebnis41[1]
+                        }).replace(/"/g, '&quot;');
+
+                        const html = `
+                            <div class="game-item">
+                                <div class="game-info">
+                                    <strong>${game.heim} vs ${game.gast}</strong><br>
+                                    8+1: ${game.ergebnis81[0]}:${game.ergebnis81[1]} | 
+                                    4+1: ${game.ergebnis41[0]}:${game.ergebnis41[1]}
+                                </div>
+                                <div class="game-actions">
+                                    <button class="btn-edit" onclick="editGame(${dataString})">✏️</button>
+                                    <button class="btn-red" onclick="deleteGame('${id}')">🗑️</button>
+                                </div>
                             </div>
-                            <div class="game-actions">
-                                <button class="btn-edit" onclick="editGame(${dataString})">✏️</button>
-                                <button class="btn-red" onclick="deleteGame('${id}')">🗑️</button>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += html;
+                        `;
+                        container.innerHTML += html;
+                    }
                 });
+
+                if (gameCount === 0) {
+                    container.innerHTML = "<p style='text-align:center; color:#999; font-style:italic;'>Noch keine Spiele für diesen Jahrgang/Saison eingetragen.</p>";
+                }
             });
         }
 
         // 3. Bearbeiten starten
         function editGame(data) {
+            // Zuerst Filter-Dropdowns auf die Werte dieses Spiels einstellen
+            selectedSeason = data.saison || "2025_2026";
+            document.getElementById('season-select').value = selectedSeason;
+
+            // Re-populate and select the correct age group
+            const ageSelect = document.getElementById('age-select');
+            ageSelect.innerHTML = "";
+            const ageGroups = Object.keys(CUP_DATA.seasons[selectedSeason].ageGroups);
+            ageGroups.forEach(key => {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerHTML = CUP_DATA.seasons[selectedSeason].ageGroups[key].displayName;
+                ageSelect.appendChild(opt);
+            });
+            selectedAgeGroup = data.jahrgang || "2014";
+            ageSelect.value = selectedAgeGroup;
+
+            // Active Config und Teamlisten updaten
+            activeConfig = CUP_DATA.seasons[selectedSeason].ageGroups[selectedAgeGroup];
+            populateTeams();
+
             // Werte in die Felder schreiben
             document.getElementById('editGameId').value = data.id;
             document.getElementById('teamHome').value = data.h;
@@ -303,17 +422,19 @@
                 return;
             }
 
-            // --- NEU: CHECK AUF DOPPELTE PAARUNG ---
-            const duplicate = allGamesData.find(g => g.heim === home && g.gast === away && g.id !== editId);
+            // --- DUPLIKAT CHECK (nur innerhalb derselben Saison und desselben Jahrgangs) ---
+            const duplicate = allGamesData.find(g => g.heim === home && g.gast === away && g.saison === selectedSeason && g.jahrgang === selectedAgeGroup && g.id !== editId);
             
             if(duplicate) {
-                alert("STOP: Dieses Spiel (" + home + " vs " + away + ") existiert bereits! Bitte bearbeite das vorhandene Spiel unten in der Liste, statt es neu anzulegen.");
+                alert("STOP: Dieses Spiel (" + home + " vs " + away + ") existiert bereits in dieser Division! Bitte bearbeite das vorhandene Spiel unten in der Liste, statt es neu anzulegen.");
                 return;
             }
-            // ----------------------------------------
+            // ---------------------------------------------------------------------------------
 
             const gameData = {
                 datum: new Date(),
+                saison: selectedSeason,
+                jahrgang: selectedAgeGroup,
                 heim: home,
                 gast: away,
                 ergebnis81: [h81, a81],

@@ -5,15 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best of Cup - Home</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
     <header>
         <a href="index.html">
-            <img src="logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
         </a>
         <nav>
             <ul>
@@ -48,19 +48,19 @@
             <h2>👥 Die Teilnehmer</h2>
             <ul class="team-list">
                 <li>
-                    <img src="wappen-vorst.png" alt="SF Vorst" class="team-logo-small">
+                    <img src="assets/wappen-vorst.png" alt="SF Vorst" class="team-logo-small">
                     SF Vorst
                 </li>
                 <li>
-                    <img src="wappen-lohausen.png" alt="SV Lohausen" class="team-logo-small">
+                    <img src="assets/wappen-lohausen.png" alt="SV Lohausen" class="team-logo-small">
                     SV Lohausen
                 </li>
                 <li>
-                    <img src="wappen-unterrath.png" alt="SG Unterrath" class="team-logo-small">
+                    <img src="assets/wappen-unterrath.png" alt="SG Unterrath" class="team-logo-small">
                     SG Unterrath
                 </li>
                 <li>
-                    <img src="wappen-1fcmg.png" alt="1. FC MG" class="team-logo-small">
+                    <img src="assets/wappen-1fcmg.png" alt="1. FC MG" class="team-logo-small">
                     1. FC Mönchengladbach
                 </li>
             </ul>
@@ -91,6 +91,7 @@
         function renderGames() {
             const container = document.getElementById('upcoming-games-container');
             const noGamesMsg = document.getElementById('no-games-msg');
+            container.innerHTML = "";
 
             // Heutiges Datum holen (Uhrzeit auf 0 setzen, damit Spiele vom heutigen Tag noch angezeigt werden)
             const today = new Date();

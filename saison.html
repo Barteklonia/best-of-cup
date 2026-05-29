@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Best of Cup - Saison 25/26</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
-    <link rel="stylesheet" href="style.css">
+    <title>Best of Cup</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css">
     
+    <script src="js/config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
     <header>
-        <a href="index.html"><img src="logo.jpg" alt="Logo" class="nav-logo"></a>
+        <a href="index.html"><img src="assets/logo.jpg" alt="Logo" class="nav-logo"></a>
         <nav>
             <ul>
                 <li><a href="index.html">Startseite</a></li>
@@ -25,8 +26,19 @@
 
     <main>
         <div class="page-header">
-            <img src="logo.jpg" alt="Best of Cup Logo" class="page-header-logo">
-            <h1>Best of Cup - Saison 25/26</h1>
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="page-header-logo">
+            <h1 id="page-title">Best of Cup</h1>
+        </div>
+
+        <div class="filter-container card" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center;">
+            <div style="display: flex; flex-direction: column; flex: 1; min-width: 150px;">
+                <label for="season-select" style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Saison</label>
+                <select id="season-select" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; background: white;" onchange="onSeasonChange()"></select>
+            </div>
+            <div style="display: flex; flex-direction: column; flex: 1; min-width: 150px;">
+                <label for="age-select" style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Jahrgang</label>
+                <select id="age-select" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; background: white;" onchange="onAgeGroupChange()"></select>
+            </div>
         </div>
 
         <div class="filter-tabs">
@@ -77,51 +89,113 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const teamLogos = {
-            "SV Lohausen": "wappen-lohausen.png",
-            "SF Vorst": "wappen-vorst.png",
-            "SG Unterrath": "wappen-unterrath.png",
-            "1. FC MG": "wappen-1fcmg.png"
-        };
-
-        const schedule = [
-            // HINRUNDE
-            { name: "1. Spieltag", matches: [ ["SV Lohausen", "SF Vorst"], ["1. FC MG", "SG Unterrath"] ] },
-            { name: "2. Spieltag", matches: [ ["SG Unterrath", "SF Vorst"], ["SV Lohausen", "1. FC MG"] ] },
-            { name: "3. Spieltag", matches: [ ["SF Vorst", "1. FC MG"], ["SG Unterrath", "SV Lohausen"] ] },
-            // RÜCKRUNDE
-            { name: "4. Spieltag", matches: [ ["SG Unterrath", "1. FC MG"], ["SF Vorst", "SV Lohausen"] ] },
-            { name: "5. Spieltag", matches: [ ["SF Vorst", "SG Unterrath"], ["1. FC MG", "SV Lohausen"] ] },
-            { name: "6. Spieltag", matches: [ ["1. FC MG", "SF Vorst"], ["SV Lohausen", "SG Unterrath"] ] }
-        ];
+        let selectedSeason = "";
+        let selectedAgeGroup = "";
+        let activeConfig = null;
+        let schedule = [];
+        let teamLogos = {};
 
         let allResults = {};
         let currentFilter = 'gesamt';
 
         window.onload = function() {
+            initSelectors();
+        };
+
+        function initSelectors() {
+            const seasonSelect = document.getElementById('season-select');
+            seasonSelect.innerHTML = "";
+            
+            const seasons = Object.keys(CUP_DATA.seasons);
+            seasons.forEach(key => {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerHTML = CUP_DATA.seasons[key].displayName;
+                seasonSelect.appendChild(opt);
+            });
+
+            // Default to Saison 25/26 if available, otherwise fall back to the first season
+            selectedSeason = seasons.includes("2025_2026") ? "2025_2026" : seasons[0];
+            seasonSelect.value = selectedSeason;
+
+            updateAgeGroupSelector();
+        }
+
+        function updateAgeGroupSelector() {
+            const ageSelect = document.getElementById('age-select');
+            ageSelect.innerHTML = "";
+
+            const ageGroups = Object.keys(CUP_DATA.seasons[selectedSeason].ageGroups);
+            ageGroups.forEach(key => {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerHTML = CUP_DATA.seasons[selectedSeason].ageGroups[key].displayName;
+                ageSelect.appendChild(opt);
+            });
+
+            selectedAgeGroup = ageGroups[0];
+            ageSelect.value = selectedAgeGroup;
+
+            updateActiveConfig();
+        }
+
+        function updateActiveConfig() {
+            activeConfig = CUP_DATA.seasons[selectedSeason].ageGroups[selectedAgeGroup];
+            schedule = activeConfig.schedule;
+            
+            // Build teamLogos mapping
+            teamLogos = {};
+            for (let t in activeConfig.teams) {
+                teamLogos[t] = activeConfig.teams[t].logo;
+            }
+
+            // Update header title dynamically
+            document.getElementById('page-title').innerHTML = `Best of Cup - ${CUP_DATA.seasons[selectedSeason].displayName}`;
+
+            // Rebuild matchday selector
             const select = document.getElementById('matchday-select');
+            select.innerHTML = "";
             schedule.forEach((day, index) => {
                 let opt = document.createElement('option');
                 opt.value = index;
                 opt.innerHTML = day.name;
                 select.appendChild(opt);
             });
+            select.value = 0; // Reset to first matchday
+
             loadData();
-        };
+        }
+
+        function onSeasonChange() {
+            selectedSeason = document.getElementById('season-select').value;
+            updateAgeGroupSelector();
+        }
+
+        function onAgeGroupChange() {
+            selectedAgeGroup = document.getElementById('age-select').value;
+            updateActiveConfig();
+        }
 
         function loadData() {
             db.collection("spiele").get().then((querySnapshot) => {
                 allResults = {};
                 querySnapshot.forEach((doc) => {
                     const game = doc.data();
-                    const h = game.heim;
-                    const a = game.gast;
-                    allResults[`${h}_${a}`] = {
-                        gH_81: parseInt(game.ergebnis81[0]),
-                        gA_81: parseInt(game.ergebnis81[1]),
-                        gH_41: parseInt(game.ergebnis41[0]),
-                        gA_41: parseInt(game.ergebnis41[1])
-                    };
+                    
+                    // Filter by selected season and age group (defaulting to 25/26 and 2014 for legacy games)
+                    const s = game.saison || "2025_2026";
+                    const j = game.jahrgang || "2014";
+
+                    if (s === selectedSeason && j === selectedAgeGroup) {
+                        const h = game.heim;
+                        const a = game.gast;
+                        allResults[`${h}_${a}`] = {
+                            gH_81: parseInt(game.ergebnis81[0]),
+                            gA_81: parseInt(game.ergebnis81[1]),
+                            gH_41: parseInt(game.ergebnis41[0]),
+                            gA_41: parseInt(game.ergebnis41[1])
+                        };
+                    }
                 });
                 calculateTable(currentFilter);
                 renderSchedule();
@@ -211,6 +285,8 @@
             const day = schedule[dayIndex];
             const list = document.getElementById('schedule-list');
             list.innerHTML = "";
+
+            if (!day) return; // Prevent errors during active config load/transitions
 
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
