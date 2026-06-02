@@ -284,17 +284,23 @@ select:focus {
 }
 
 /* --- STANDINGS TABLE --- */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 2.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
 .bundesliga-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 0.95rem;
-    margin-bottom: 2.5rem;
     background: var(--bg-card);
-    box-shadow: var(--shadow-lg);
-    border-radius: var(--radius);
     overflow: hidden;
-    border: 1px solid var(--border-color);
 }
 
 .bundesliga-table thead th {
@@ -591,7 +597,7 @@ button:active {
 }
 
 /* --- MOBILE OPTIMIZATION --- */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     
     header {
         padding: 12px 15px;
@@ -601,6 +607,7 @@ button:active {
     }
     nav a {
         font-size: 0.8rem;
+        padding: 8px 6px;
     }
     
     .page-header-logo { display: none !important; }
@@ -627,6 +634,11 @@ button:active {
         background: transparent;
         color: var(--text-main);
         font-weight: 800;
+    }
+
+    .bundesliga-table td {
+        border-bottom: none;
+        padding: 6px 2px;
     }
 
     .th-rank { text-align: center; }

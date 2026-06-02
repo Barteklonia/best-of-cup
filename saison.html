@@ -54,23 +54,25 @@
             <button class="filter-btn" onclick="updateTable('rueckrunde', this)">Rückrunde</button>
         </div>
 
-        <table class="bundesliga-table">
-            <thead>
-                <tr>
-                    <th class="th-rank">Pl.</th>
-                    <th class="th-team">Team</th>
-                    <th>Sp.</th>
-                    <th class="hide-mobile">S</th>
-                    <th class="hide-mobile">U</th>
-                    <th class="hide-mobile">N</th>
-                    <th>Tore</th>
-                    <th>Diff.</th>
-                    <th class="th-points">Pkte.</th>
-                    <th class="hide-mobile">Form</th>
-                </tr>
-            </thead>
-            <tbody id="tabelle-body"></tbody>
-        </table>
+        <div class="table-container">
+            <table class="bundesliga-table">
+                <thead>
+                    <tr>
+                        <th class="th-rank">Pl.</th>
+                        <th class="th-team">Team</th>
+                        <th>Sp.</th>
+                        <th class="hide-mobile">S</th>
+                        <th class="hide-mobile">U</th>
+                        <th class="hide-mobile">N</th>
+                        <th>Tore</th>
+                        <th>Diff.</th>
+                        <th class="th-points">Pkte.</th>
+                        <th class="hide-mobile">Form</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelle-body"></tbody>
+            </table>
+        </div>
 
         <div class="matchday-selector-bar">
             <button class="matchday-nav-btn" id="btn-prev" onclick="changeMatchday(-1)">&#10094;</button>
