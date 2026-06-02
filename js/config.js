@@ -79,20 +79,20 @@ const CUP_DATA = {
                         "SG Unterrath": { logo: "assets/wappen-unterrath.png" },
                         "DSC Düsseldorf": { logo: "assets/wappen-duesseldorf-sc-99.png" },
                         "SV Straelen": { logo: "assets/wappen-sv_straelen.png" },
-                        "Gesucht 1": { logo: "assets/logo.jpg" },
+                        "SV Wersten 04": { logo: "assets/wappen-sv_wersten_04_duesseldorf.png" },
                         "Gesucht 2": { logo: "assets/logo.jpg" }
                     },
                     schedule: [
-                        { name: "1. Spieltag", matches: [["SF Vorst", "Gesucht 2"], ["SG Unterrath", "Gesucht 1"], ["DSC Düsseldorf", "SV Straelen"]] },
-                        { name: "2. Spieltag", matches: [["Gesucht 2", "SV Straelen"], ["Gesucht 1", "DSC Düsseldorf"], ["SF Vorst", "SG Unterrath"]] },
-                        { name: "3. Spieltag", matches: [["SG Unterrath", "Gesucht 2"], ["DSC Düsseldorf", "SF Vorst"], ["SV Straelen", "Gesucht 1"]] },
-                        { name: "4. Spieltag", matches: [["Gesucht 2", "Gesucht 1"], ["SF Vorst", "SV Straelen"], ["SG Unterrath", "DSC Düsseldorf"]] },
-                        { name: "5. Spieltag", matches: [["DSC Düsseldorf", "Gesucht 2"], ["SV Straelen", "SG Unterrath"], ["SF Vorst", "Gesucht 1"]] },
-                        { name: "6. Spieltag", matches: [["Gesucht 2", "SF Vorst"], ["Gesucht 1", "SG Unterrath"], ["SV Straelen", "DSC Düsseldorf"]] },
-                        { name: "7. Spieltag", matches: [["SV Straelen", "Gesucht 2"], ["DSC Düsseldorf", "Gesucht 1"], ["SG Unterrath", "SF Vorst"]] },
-                        { name: "8. Spieltag", matches: [["Gesucht 2", "SG Unterrath"], ["SF Vorst", "DSC Düsseldorf"], ["Gesucht 1", "SV Straelen"]] },
-                        { name: "9. Spieltag", matches: [["Gesucht 1", "Gesucht 2"], ["SV Straelen", "SF Vorst"], ["DSC Düsseldorf", "SG Unterrath"]] },
-                        { name: "10. Spieltag", matches: [["Gesucht 2", "DSC Düsseldorf"], ["SG Unterrath", "SV Straelen"], ["Gesucht 1", "SF Vorst"]] }
+                        { name: "1. Spieltag", matches: [["SF Vorst", "Gesucht 2"], ["SG Unterrath", "SV Wersten 04"], ["DSC Düsseldorf", "SV Straelen"]] },
+                        { name: "2. Spieltag", matches: [["Gesucht 2", "SV Straelen"], ["SV Wersten 04", "DSC Düsseldorf"], ["SF Vorst", "SG Unterrath"]] },
+                        { name: "3. Spieltag", matches: [["SG Unterrath", "Gesucht 2"], ["DSC Düsseldorf", "SF Vorst"], ["SV Straelen", "SV Wersten 04"]] },
+                        { name: "4. Spieltag", matches: [["Gesucht 2", "SV Wersten 04"], ["SF Vorst", "SV Straelen"], ["SG Unterrath", "DSC Düsseldorf"]] },
+                        { name: "5. Spieltag", matches: [["DSC Düsseldorf", "Gesucht 2"], ["SV Straelen", "SG Unterrath"], ["SF Vorst", "SV Wersten 04"]] },
+                        { name: "6. Spieltag", matches: [["Gesucht 2", "SF Vorst"], ["SV Wersten 04", "SG Unterrath"], ["SV Straelen", "DSC Düsseldorf"]] },
+                        { name: "7. Spieltag", matches: [["SV Straelen", "Gesucht 2"], ["DSC Düsseldorf", "SV Wersten 04"], ["SG Unterrath", "SF Vorst"]] },
+                        { name: "8. Spieltag", matches: [["Gesucht 2", "SG Unterrath"], ["SF Vorst", "DSC Düsseldorf"], ["SV Wersten 04", "SV Straelen"]] },
+                        { name: "9. Spieltag", matches: [["SV Wersten 04", "Gesucht 2"], ["SV Straelen", "SF Vorst"], ["DSC Düsseldorf", "SG Unterrath"]] },
+                        { name: "10. Spieltag", matches: [["Gesucht 2", "DSC Düsseldorf"], ["SG Unterrath", "SV Straelen"], ["SV Wersten 04", "SF Vorst"]] }
                     ]
                 },
                 "2016": {
@@ -106,7 +106,7 @@ const CUP_DATA = {
                         "TSV Meerbusch": { logo: "assets/wappen-tsv_meerbusch.png" },
                         "SF Vorst": { logo: "assets/wappen-vorst.png" },
                         "DSC 99 Düsseldorf": { logo: "assets/wappen-duesseldorf-sc-99.png" },
-                        "Gesucht 1": { logo: "assets/logo.jpg" },
+                        "VfB Hilden": { logo: "assets/wappen-vfb_hilden.png" },
                         "Gesucht 2": { logo: "assets/logo.jpg" }
                     },
                     schedule: [] // Generated programmatically below

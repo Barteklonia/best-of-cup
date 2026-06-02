@@ -33,12 +33,18 @@
         <div class="filter-container card" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center;">
             <div style="display: flex; flex-direction: column; flex: 1; min-width: 150px;">
                 <label for="season-select" style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Saison</label>
-                <select id="season-select" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; background: white;" onchange="onSeasonChange()"></select>
+                <select id="season-select" style="width: 100%; font-weight: bold; background-color: white;" onchange="onSeasonChange()"></select>
             </div>
             <div style="display: flex; flex-direction: column; flex: 1; min-width: 150px;">
                 <label for="age-select" style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Jahrgang</label>
-                <select id="age-select" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; background: white;" onchange="onAgeGroupChange()"></select>
+                <select id="age-select" style="width: 100%; font-weight: bold; background-color: white;" onchange="onAgeGroupChange()"></select>
             </div>
+        </div>
+
+        <div class="filter-tabs variant-tabs" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+            <button class="filter-btn active" onclick="updateVariant('gesamt', this)">Gesamtwertung</button>
+            <button class="filter-btn" id="btn-variant-81" onclick="updateVariant('81', this)">Feld (8+1)</button>
+            <button class="filter-btn" onclick="updateVariant('41', this)">Twin Games</button>
         </div>
 
         <div class="filter-tabs">
@@ -54,9 +60,14 @@
                 <tr>
                     <th class="th-rank">Pl.</th>
                     <th class="th-team">Team</th>
-                    <th class="th-points">Pkte.</th> <th class="th-matches">Sp.</th>
-                    <th class="th-goals">Tore</th>
-                    <th class="th-diff">Diff.</th>
+                    <th>Sp.</th>
+                    <th class="hide-mobile">S</th>
+                    <th class="hide-mobile">U</th>
+                    <th class="hide-mobile">N</th>
+                    <th>Tore</th>
+                    <th>Diff.</th>
+                    <th class="th-points">Pkte.</th>
+                    <th class="hide-mobile">Form</th>
                 </tr>
             </thead>
             <tbody id="tabelle-body"></tbody>
@@ -97,6 +108,7 @@
 
         let allResults = {};
         let currentFilter = 'gesamt';
+        let currentVariant = 'gesamt';
 
         window.onload = function() {
             initSelectors();
@@ -113,6 +125,12 @@
                 opt.innerHTML = CUP_DATA.seasons[key].displayName;
                 seasonSelect.appendChild(opt);
             });
+
+            if (seasons.length <= 1) {
+                seasonSelect.classList.add('no-arrow');
+            } else {
+                seasonSelect.classList.remove('no-arrow');
+            }
 
             // Default to Saison 25/26 if available, otherwise fall back to the first season
             selectedSeason = seasons.includes("2025_2026") ? "2025_2026" : seasons[0];
@@ -133,6 +151,12 @@
                 ageSelect.appendChild(opt);
             });
 
+            if (ageGroups.length <= 1) {
+                ageSelect.classList.add('no-arrow');
+            } else {
+                ageSelect.classList.remove('no-arrow');
+            }
+
             selectedAgeGroup = ageGroups[0];
             ageSelect.value = selectedAgeGroup;
 
@@ -147,6 +171,12 @@
             teamLogos = {};
             for (let t in activeConfig.teams) {
                 teamLogos[t] = activeConfig.teams[t].logo;
+            }
+
+            // Update 81 button text based on age group
+            const btn81 = document.getElementById('btn-variant-81');
+            if (btn81) {
+                btn81.innerText = selectedAgeGroup === "2016" ? "Feld (6+1)" : "Feld (8+1)";
             }
 
             // Update header title dynamically
@@ -193,7 +223,8 @@
                             gH_81: parseInt(game.ergebnis81[0]),
                             gA_81: parseInt(game.ergebnis81[1]),
                             gH_41: parseInt(game.ergebnis41[0]),
-                            gA_41: parseInt(game.ergebnis41[1])
+                            gA_41: parseInt(game.ergebnis41[1]),
+                            datum: game.datum ? (game.datum.toDate ? game.datum.toDate() : new Date(game.datum)) : new Date(0)
                         };
                     }
                 });
@@ -202,20 +233,41 @@
             });
         }
 
+        function updateVariant(variant, btn) {
+            currentVariant = variant;
+            document.querySelectorAll('.variant-tabs .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            calculateTable(currentFilter);
+        }
+
         function updateTable(filter, btn) {
             currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.filter-tabs:not(.variant-tabs) .filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             calculateTable(filter);
         }
 
         function calculateTable(filter) {
             let stats = {};
-            for(let t in teamLogos) { stats[t] = { name: t, p: 0, g: 0, a: 0, m: 0, logo: teamLogos[t] }; }
+            for(let t in teamLogos) {
+                stats[t] = {
+                    name: t,
+                    logo: teamLogos[t],
+                    m: 0,
+                    w: 0,
+                    d: 0,
+                    l: 0,
+                    g: 0,
+                    a: 0,
+                    p: 0,
+                    formGames: []
+                };
+            }
 
             schedule.forEach((day, dayIndex) => {
-                const isHinrunde = dayIndex < 3;
-                const isRueckrunde = dayIndex >= 3;
+                const halfLength = Math.ceil(schedule.length / 2);
+                const isHinrunde = dayIndex < halfLength;
+                const isRueckrunde = dayIndex >= halfLength;
                 if (filter === 'hinrunde' && !isHinrunde) return;
                 if (filter === 'rueckrunde' && !isRueckrunde) return;
 
@@ -226,18 +278,112 @@
 
                     const res = allResults[`${h}_${a}`];
                     if(res) {
-                        let p_h = 0, p_a = 0;
-                        if(res.gH_81 > res.gA_81) p_h += 3; else if(res.gA_81 > res.gH_81) p_a += 3; else { p_h += 1; p_a += 1; }
-                        if(res.gH_41 > res.gA_41) p_h += 3; else if(res.gA_41 > res.gH_41) p_a += 3; else { p_h += 1; p_a += 1; }
+                        const isHomeEligible = (filter !== 'auswaerts');
+                        const isAwayEligible = (filter !== 'heim');
 
-                        const totalGoalsH = res.gH_81 + res.gH_41;
-                        const totalGoalsA = res.gA_81 + res.gA_41;
-
-                        if (filter !== 'auswaerts') {
-                            stats[h].m += 1; stats[h].p += p_h; stats[h].g += totalGoalsH; stats[h].a += totalGoalsA;
+                        // 8+1 Results
+                        const goalsH_81 = res.gH_81;
+                        const goalsA_81 = res.gA_81;
+                        let pointsH_81 = 0, pointsA_81 = 0;
+                        let outcomeH_81 = 'U', outcomeA_81 = 'U';
+                        if (goalsH_81 > goalsA_81) {
+                            pointsH_81 = 3; outcomeH_81 = 'S'; outcomeA_81 = 'N';
+                        } else if (goalsA_81 > goalsH_81) {
+                            pointsA_81 = 3; outcomeH_81 = 'N'; outcomeA_81 = 'S';
+                        } else {
+                            pointsH_81 = 1; pointsA_81 = 1; outcomeH_81 = 'U'; outcomeA_81 = 'U';
                         }
-                        if (filter !== 'heim') {
-                            stats[a].m += 1; stats[a].p += p_a; stats[a].g += totalGoalsA; stats[a].a += totalGoalsH;
+
+                        // 4+1 Results
+                        const goalsH_41 = res.gH_41;
+                        const goalsA_41 = res.gA_41;
+                        let pointsH_41 = 0, pointsA_41 = 0;
+                        let outcomeH_41 = 'U', outcomeA_41 = 'U';
+                        if (goalsH_41 > goalsA_41) {
+                            pointsH_41 = 3; outcomeH_41 = 'S'; outcomeA_41 = 'N';
+                        } else if (goalsA_41 > goalsH_41) {
+                            pointsA_41 = 3; outcomeH_41 = 'N'; outcomeA_41 = 'S';
+                        } else {
+                            pointsH_41 = 1; pointsA_41 = 1; outcomeH_41 = 'U'; outcomeA_41 = 'U';
+                        }
+
+                        if (currentVariant === '81') {
+                            if (isHomeEligible) {
+                                stats[h].m += 1;
+                                stats[h].g += goalsH_81;
+                                stats[h].a += goalsA_81;
+                                stats[h].p += pointsH_81;
+                                if (outcomeH_81 === 'S') stats[h].w += 1;
+                                else if (outcomeH_81 === 'U') stats[h].d += 1;
+                                else stats[h].l += 1;
+                                stats[h].formGames.push({ outcome: outcomeH_81, date: res.datum });
+                            }
+                            if (isAwayEligible) {
+                                stats[a].m += 1;
+                                stats[a].g += goalsA_81;
+                                stats[a].a += goalsH_81;
+                                stats[a].p += pointsA_81;
+                                if (outcomeA_81 === 'S') stats[a].w += 1;
+                                else if (outcomeA_81 === 'U') stats[a].d += 1;
+                                else stats[a].l += 1;
+                                stats[a].formGames.push({ outcome: outcomeA_81, date: res.datum });
+                            }
+                        } else if (currentVariant === '41') {
+                            if (isHomeEligible) {
+                                stats[h].m += 1;
+                                stats[h].g += goalsH_41;
+                                stats[h].a += goalsA_41;
+                                stats[h].p += pointsH_41;
+                                if (outcomeH_41 === 'S') stats[h].w += 1;
+                                else if (outcomeH_41 === 'U') stats[h].d += 1;
+                                else stats[h].l += 1;
+                                stats[h].formGames.push({ outcome: outcomeH_41, date: res.datum });
+                            }
+                            if (isAwayEligible) {
+                                stats[a].m += 1;
+                                stats[a].g += goalsA_41;
+                                stats[a].a += goalsH_41;
+                                stats[a].p += pointsA_41;
+                                if (outcomeA_41 === 'S') stats[a].w += 1;
+                                else if (outcomeA_41 === 'U') stats[a].d += 1;
+                                else stats[a].l += 1;
+                                stats[a].formGames.push({ outcome: outcomeA_41, date: res.datum });
+                            }
+                        } else { // 'gesamt'
+                            if (isHomeEligible) {
+                                stats[h].m += 2; // plays both formats
+                                stats[h].g += (goalsH_81 + goalsH_41);
+                                stats[h].a += (goalsA_81 + goalsA_41);
+                                stats[h].p += (pointsH_81 + pointsH_41);
+                                
+                                if (outcomeH_81 === 'S') stats[h].w += 1;
+                                else if (outcomeH_81 === 'U') stats[h].d += 1;
+                                else stats[h].l += 1;
+                                
+                                if (outcomeH_41 === 'S') stats[h].w += 1;
+                                else if (outcomeH_41 === 'U') stats[h].d += 1;
+                                else stats[h].l += 1;
+
+                                stats[h].formGames.push({ outcome: outcomeH_81, date: res.datum });
+                                stats[h].formGames.push({ outcome: outcomeH_41, date: res.datum });
+                            }
+                            if (isAwayEligible) {
+                                stats[a].m += 2; // plays both formats
+                                stats[a].g += (goalsA_81 + goalsA_41);
+                                stats[a].a += (goalsH_81 + goalsH_41);
+                                stats[a].p += (pointsA_81 + pointsA_41);
+                                
+                                if (outcomeA_81 === 'S') stats[a].w += 1;
+                                else if (outcomeA_81 === 'U') stats[a].d += 1;
+                                else stats[a].l += 1;
+                                
+                                if (outcomeA_41 === 'S') stats[a].w += 1;
+                                else if (outcomeA_41 === 'U') stats[a].d += 1;
+                                else stats[a].l += 1;
+
+                                stats[a].formGames.push({ outcome: outcomeA_81, date: res.datum });
+                                stats[a].formGames.push({ outcome: outcomeA_41, date: res.datum });
+                            }
                         }
                     }
                 });
@@ -246,7 +392,10 @@
             let tableArray = Object.values(stats);
             tableArray.sort((a, b) => {
                 if (b.p !== a.p) return b.p - a.p; 
-                return (b.g - b.a) - (a.g - a.a); 
+                const diffA = a.g - a.a;
+                const diffB = b.g - b.a;
+                if (diffB !== diffA) return diffB - diffA;
+                return b.g - a.g;
             });
 
             const tbody = document.getElementById("tabelle-body");
@@ -256,15 +405,34 @@
                 let diff = t.g - t.a;
                 let diffSign = diff > 0 ? "+" : "";
                 
-                // HIER WIRD DIE HTML-ZEILE GEBAUT: PUNKTE JETZT AN STELLE 3!
+                let formHtml = "";
+                // Sort the played games chronologically by their database date
+                t.formGames.sort((x, y) => x.date - y.date);
+                // Show the last 5 individual outcomes in the form curve
+                const recentForm = t.formGames.slice(-5).map(g => g.outcome);
+                recentForm.forEach(outcome => {
+                    let badgeClass = "";
+                    if (outcome === 'S') badgeClass = "win";
+                    else if (outcome === 'U') badgeClass = "draw";
+                    else if (outcome === 'N') badgeClass = "loss";
+                    formHtml += `<span class="form-badge ${badgeClass}">${outcome}</span>`;
+                });
+                if (recentForm.length === 0) {
+                    formHtml = `<span style="color:#999; font-size:0.85rem; font-style:italic;">-</span>`;
+                }
+
                 let row = `
                     <tr>
                         <td class="td-rank">${i+1}</td>
                         <td class="td-team"><img src="${t.logo}">${t.name}</td>
-                        <td class="td-points">${t.p}</td>
                         <td class="td-matches">${t.m}</td>
+                        <td class="hide-mobile">${t.w}</td>
+                        <td class="hide-mobile">${t.d}</td>
+                        <td class="hide-mobile">${t.l}</td>
                         <td class="td-goals">${t.g}:${t.a}</td>
                         <td class="td-diff">${diffSign}${diff}</td>
+                        <td class="td-points">${t.p}</td>
+                        <td class="hide-mobile" style="text-align: center; white-space: nowrap;">${formHtml}</td>
                     </tr>`;
                 tbody.innerHTML += row;
             });
@@ -310,10 +478,11 @@
                 if(dateFixed) centerHtml += `<div class="match-date-label">${dateFixed}</div>`;
 
                 if(res) {
+                    const mainLabel = selectedAgeGroup === "2016" ? "6+1" : "8+1";
                     centerHtml += `
                         <div class="match-score-box">
-                            <div class="score-line-main">8+1: ${res.gH_81}:${res.gA_81}</div>
-                            <div class="score-line-sub">4+1: ${res.gH_41}:${res.gA_41}</div>
+                            <div class="score-line-main">${mainLabel}: ${res.gH_81}:${res.gA_81}</div>
+                            <div class="score-line-sub">TG: ${res.gH_41}:${res.gA_41}</div>
                         </div>`;
                 } else {
                     centerHtml += `<div class="match-vs">vs</div>`;
