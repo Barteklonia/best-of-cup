@@ -388,11 +388,7 @@ select:focus {
     font-size: 1.5rem; 
     cursor: pointer; 
     padding: 0 10px;
-    transition: transform 0.2s, color 0.2s;
-}
-.matchday-nav-btn:hover {
-    color: var(--accent-orange);
-    transform: scale(1.1);
+    flex-shrink: 0;
 }
 .matchday-nav-btn[style*="visibility: hidden"] { cursor: default; }
 
@@ -407,6 +403,9 @@ select:focus {
     appearance: none;
     background-image: none;
     padding-right: 0 !important;
+    flex: 1;
+    min-width: 0;
+    margin: 0 10px;
 }
 .matchday-select option { color: black; }
 
