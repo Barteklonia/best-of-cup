@@ -80,19 +80,19 @@ const CUP_DATA = {
                         "DSC Düsseldorf": { logo: "assets/wappen-duesseldorf-sc-99.png" },
                         "SV Straelen": { logo: "assets/wappen-sv_straelen.png" },
                         "SV Wersten 04": { logo: "assets/wappen-sv_wersten_04_duesseldorf.png" },
-                        "Gesucht 2": { logo: "assets/logo.jpg" }
+                        "SGS Essen": { logo: "assets/wappen-sgs_essen.png" }
                     },
                     schedule: [
-                        { name: "1. Spieltag", matches: [["SF Vorst", "Gesucht 2"], ["SG Unterrath", "SV Wersten 04"], ["DSC Düsseldorf", "SV Straelen"]] },
-                        { name: "2. Spieltag", matches: [["Gesucht 2", "SV Straelen"], ["SV Wersten 04", "DSC Düsseldorf"], ["SF Vorst", "SG Unterrath"]] },
-                        { name: "3. Spieltag", matches: [["SG Unterrath", "Gesucht 2"], ["DSC Düsseldorf", "SF Vorst"], ["SV Straelen", "SV Wersten 04"]] },
-                        { name: "4. Spieltag", matches: [["Gesucht 2", "SV Wersten 04"], ["SF Vorst", "SV Straelen"], ["SG Unterrath", "DSC Düsseldorf"]] },
-                        { name: "5. Spieltag", matches: [["DSC Düsseldorf", "Gesucht 2"], ["SV Straelen", "SG Unterrath"], ["SF Vorst", "SV Wersten 04"]] },
-                        { name: "6. Spieltag", matches: [["Gesucht 2", "SF Vorst"], ["SV Wersten 04", "SG Unterrath"], ["SV Straelen", "DSC Düsseldorf"]] },
-                        { name: "7. Spieltag", matches: [["SV Straelen", "Gesucht 2"], ["DSC Düsseldorf", "SV Wersten 04"], ["SG Unterrath", "SF Vorst"]] },
-                        { name: "8. Spieltag", matches: [["Gesucht 2", "SG Unterrath"], ["SF Vorst", "DSC Düsseldorf"], ["SV Wersten 04", "SV Straelen"]] },
-                        { name: "9. Spieltag", matches: [["SV Wersten 04", "Gesucht 2"], ["SV Straelen", "SF Vorst"], ["DSC Düsseldorf", "SG Unterrath"]] },
-                        { name: "10. Spieltag", matches: [["Gesucht 2", "DSC Düsseldorf"], ["SG Unterrath", "SV Straelen"], ["SV Wersten 04", "SF Vorst"]] }
+                        { name: "1. Spieltag", matches: [["SF Vorst", "SGS Essen"], ["SG Unterrath", "SV Wersten 04"], ["DSC Düsseldorf", "SV Straelen"]] },
+                        { name: "2. Spieltag", matches: [["SGS Essen", "SV Straelen"], ["SV Wersten 04", "DSC Düsseldorf"], ["SF Vorst", "SG Unterrath"]] },
+                        { name: "3. Spieltag", matches: [["SG Unterrath", "SGS Essen"], ["DSC Düsseldorf", "SF Vorst"], ["SV Straelen", "SV Wersten 04"]] },
+                        { name: "4. Spieltag", matches: [["SGS Essen", "SV Wersten 04"], ["SF Vorst", "SV Straelen"], ["SG Unterrath", "DSC Düsseldorf"]] },
+                        { name: "5. Spieltag", matches: [["DSC Düsseldorf", "SGS Essen"], ["SV Straelen", "SG Unterrath"], ["SF Vorst", "SV Wersten 04"]] },
+                        { name: "6. Spieltag", matches: [["SGS Essen", "SF Vorst"], ["SV Wersten 04", "SG Unterrath"], ["SV Straelen", "DSC Düsseldorf"]] },
+                        { name: "7. Spieltag", matches: [["SV Straelen", "SGS Essen"], ["DSC Düsseldorf", "SV Wersten 04"], ["SG Unterrath", "SF Vorst"]] },
+                        { name: "8. Spieltag", matches: [["SGS Essen", "SG Unterrath"], ["SF Vorst", "DSC Düsseldorf"], ["SV Wersten 04", "SV Straelen"]] },
+                        { name: "9. Spieltag", matches: [["SV Wersten 04", "SGS Essen"], ["SV Straelen", "SF Vorst"], ["DSC Düsseldorf", "SG Unterrath"]] },
+                        { name: "10. Spieltag", matches: [["SGS Essen", "DSC Düsseldorf"], ["SG Unterrath", "SV Straelen"], ["SV Wersten 04", "SF Vorst"]] }
                     ]
                 },
                 "2016": {
