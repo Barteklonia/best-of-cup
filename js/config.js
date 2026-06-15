@@ -107,7 +107,7 @@ const CUP_DATA = {
                         "SF Vorst": { logo: "assets/wappen-vorst.png" },
                         "DSC 99 Düsseldorf": { logo: "assets/wappen-duesseldorf-sc-99.png" },
                         "VfB Hilden": { logo: "assets/wappen-vfb_hilden.png" },
-                        "Gesucht 2": { logo: "assets/logo.jpg" }
+                        "GSG Duisburg": { logo: "assets/wappen-gsg_duisburg.png" }
                     },
                     schedule: [] // Generated programmatically below
                 }
