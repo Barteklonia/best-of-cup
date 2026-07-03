@@ -22,6 +22,7 @@
                 <li><a href="index.html" class="active">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
                 <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
             </ul>
         </nav>
     </header>
@@ -129,13 +130,17 @@
             const teams2014 = newSeasonData.ageGroups["2014"].teams;
             for (let teamName in teams2014) {
                 const team = teams2014[teamName];
-                const isPlaceholder = teamName.includes("Gesucht");
+                const isPlaceholder = teamName.includes("Gesucht") || teamName.includes("Offen");
                 const displayName = isPlaceholder ? "Noch offen" : teamName;
                 const cardClass = isPlaceholder ? "participant-card placeholder" : "participant-card";
                 
+                const logoHtml = isPlaceholder 
+                    ? `<a href="kontakt.html" title="Hier bewerben!"><img src="${team.logo}" alt="${displayName}" class="participant-logo" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`
+                    : `<img src="${team.logo}" alt="${displayName}" class="participant-logo">`;
+
                 p2014.innerHTML += `
                     <div class="${cardClass}">
-                        <img src="${team.logo}" alt="${displayName}" class="participant-logo">
+                        ${logoHtml}
                         <div class="participant-name">${displayName}</div>
                     </div>
                 `;
@@ -147,13 +152,17 @@
             const teams2016 = newSeasonData.ageGroups["2016"].teams;
             for (let teamName in teams2016) {
                 const team = teams2016[teamName];
-                const isPlaceholder = teamName.includes("Gesucht");
+                const isPlaceholder = teamName.includes("Gesucht") || teamName.includes("Offen");
                 const displayName = isPlaceholder ? "Noch offen" : teamName;
                 const cardClass = isPlaceholder ? "participant-card placeholder" : "participant-card";
                 
+                const logoHtml = isPlaceholder 
+                    ? `<a href="kontakt.html" title="Hier bewerben!"><img src="${team.logo}" alt="${displayName}" class="participant-logo" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`
+                    : `<img src="${team.logo}" alt="${displayName}" class="participant-logo">`;
+
                 p2016.innerHTML += `
                     <div class="${cardClass}">
-                        <img src="${team.logo}" alt="${displayName}" class="participant-logo">
+                        ${logoHtml}
                         <div class="participant-name">${displayName}</div>
                     </div>
                 `;

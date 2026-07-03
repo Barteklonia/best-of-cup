@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Best of Cup - Kontakt</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <script src="js/config.js"></script>
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 82, 163, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        .submit-btn {
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background: #003d7a;
+        }
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .form-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        .form-message.success {
+            display: block;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+        .form-message.error {
+            display: block;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg-main);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Startseite</a></li>
+                <li><a href="saison.html">Saison</a></li>
+                <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="kontakt.html" class="active">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Kontakt</h2>
+            <p style="margin-bottom: 20px;">Hast du Fragen zum Best of Cup oder möchtest ein Team anmelden? Schreib uns einfach eine Nachricht!</p>
+
+            <div class="contact-info">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="contact-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                </svg>
+                <div>
+                    <strong style="display: block; margin-bottom: 5px;">Direkt per E-Mail:</strong>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <a href="mailto:info@bestofcup.de" style="color: var(--accent); font-weight: bold; text-decoration: none;" id="contact-email">info@bestofcup.de</a>
+                        <button onclick="copyEmail()" style="background: none; border: none; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;" title="E-Mail kopieren" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='transparent'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                            </svg>
+                        </button>
+                        <span id="copy-feedback" style="font-size: 0.85rem; color: #2ecc71; opacity: 0; transition: opacity 0.3s; font-weight: bold;">Kopiert!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web3Forms Kontaktformular -->
+            <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+                <input type="hidden" name="access_key" value="93d15184-b79c-4cbe-8bfc-e798371b14a6">
+                
+                <!-- Spam-Schutz Honeypot (für Bots unsichtbar, wenn ausgefüllt, wird die Mail ignoriert) -->
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                <div class="form-group">
+                    <label for="name">Dein Name / Verein</label>
+                    <input type="text" id="name" name="name" required placeholder="Max Mustermann / SC Beispiel">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Deine E-Mail-Adresse</label>
+                    <input type="email" id="email" name="email" required pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Bitte gib eine gültige E-Mail-Adresse ein (z.B. beispiel@verein.de)" placeholder="beispiel@verein.de">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Deine Nachricht</label>
+                    <textarea id="message" name="message" required placeholder="Hallo, wir interessieren uns für die Teilnahme..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submit-btn">Nachricht absenden</button>
+                
+                <div id="result" class="form-message"></div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Best of Cup</p>
+        <p style="margin-top: 10px;">
+            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> | 
+            <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a>
+        </p>
+    </footer>
+
+    <!-- Web3Forms AJAX Submit Script -->
+    <script>
+        const form = document.getElementById('contact-form');
+        const result = document.getElementById('result');
+        const submitBtn = document.getElementById('submit-btn');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const object = Object.fromEntries(formData);
+            const json = JSON.stringify(object);
+
+            // Button deaktivieren während des Ladens
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird gesendet...';
+            result.className = 'form-message';
+            result.textContent = '';
+
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(async (response) => {
+                let json = await response.json();
+                if (response.status == 200) {
+                    result.classList.add('success');
+                    result.textContent = "Vielen Dank! Deine Nachricht wurde erfolgreich verschickt.";
+                    form.reset();
+                } else {
+                    console.log(response);
+                    result.classList.add('error');
+                    result.textContent = json.message || "Es gab ein Problem beim Senden deiner Nachricht.";
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                result.classList.add('error');
+                result.textContent = "Es ist ein Fehler aufgetreten. Bitte versuche es später noch einmal.";
+            })
+            .then(function() {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Nachricht absenden';
+            });
+        });
+
+        function copyEmail() {
+            navigator.clipboard.writeText("info@bestofcup.de").then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.style.opacity = '1';
+                setTimeout(() => {
+                    feedback.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Kopieren fehlgeschlagen', err);
+            });
+        }
+    </script>
+</body>
+
+</html>
