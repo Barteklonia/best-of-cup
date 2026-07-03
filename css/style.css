@@ -718,6 +718,54 @@ footer {
     font-weight: 500;
 }
 
+/* --- FAQ ACCORDION --- */
+.faq-section {
+    margin-top: 40px;
+}
+.faq-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.faq-item summary {
+    padding: 18px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--primary);
+    transition: background-color 0.2s;
+}
+.faq-item summary:hover {
+    background-color: #f8fafc;
+}
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+.faq-item summary::after {
+    content: '+';
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--accent);
+    transition: transform 0.3s;
+}
+.faq-item[open] summary::after {
+    transform: rotate(45deg);
+}
+.faq-item p {
+    padding: 0 20px 20px 20px;
+    color: var(--text-main);
+    border-top: 1px solid #f1f5f9;
+    margin-top: 10px;
+    padding-top: 15px;
+}
+
 /* Form Curve Badges */
 .form-badge {
     display: inline-flex;
