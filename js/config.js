@@ -102,7 +102,7 @@ const CUP_DATA = {
                         "SF Baumberg": { logo: "assets/wappen-sf_baumberg.png" },
                         "ETB Essen": { logo: "assets/wappen-etb_sw_essen.svg" },
                         "SC Velbert": { logo: "assets/wappen-sc_velbert.jpg" },
-                        "SC Köln West": { logo: "assets/wappen-sc_west_koeln.png" },
+                        "Offen": { logo: "assets/wappen-sc_west_koeln.png" },
                         "TSV Meerbusch": { logo: "assets/wappen-tsv_meerbusch.png" },
                         "SF Vorst": { logo: "assets/wappen-vorst.png" },
                         "DSC 99 Düsseldorf": { logo: "assets/wappen-duesseldorf-sc-99.png" },
