@@ -3,7 +3,14 @@
 // Dynamic Round Robin Schedule Generator (Berger-System / Circle Method)
 function generateSchedule(teamsObj) {
     const list = Object.keys(teamsObj);
-    const numTeams = list.length;
+    let numTeams = list.length;
+    
+    // Add a dummy team for odd number of teams to simulate "Spielfrei"
+    if (numTeams % 2 !== 0) {
+        list.push(null);
+        numTeams++;
+    }
+    
     const schedule = [];
 
     for (let round = 0; round < (numTeams - 1) * 2; round++) {
@@ -40,7 +47,14 @@ function generateSchedule(teamsObj) {
                 away = temp;
             }
 
-            matches.push([list[home], list[away]]);
+            // Handle dummy team for "Spielfrei"
+            if (list[home] === null) {
+                matches.push([list[away], null]);
+            } else if (list[away] === null) {
+                matches.push([list[home], null]);
+            } else {
+                matches.push([list[home], list[away]]);
+            }
         }
 
         schedule.push({
@@ -112,8 +126,7 @@ const CUP_DATA = {
                         "SF Vorst": { logo: "assets/wappen-vorst.png" },
                         "DSC 99 Düsseldorf": { logo: "assets/wappen-duesseldorf-sc-99.png" },
                         "VfB Hilden": { logo: "assets/wappen-vfb_hilden.png" },
-                        "GSG Duisburg": { logo: "assets/wappen-gsg_duisburg.png" },
-                        "Offen": { logo: "assets/logo.jpg" }
+                        "GSG Duisburg": { logo: "assets/wappen-gsg_duisburg.png" }
                     },
                     schedule: [] // Generated programmatically below
                 }
