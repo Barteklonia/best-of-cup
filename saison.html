@@ -132,6 +132,10 @@
         };
 
         function initSelectors() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSeason = urlParams.get('saison');
+            const urlAgeGroup = urlParams.get('jahrgang');
+
             const seasonSelect = document.getElementById('season-select');
             seasonSelect.innerHTML = "";
             
@@ -150,13 +154,17 @@
             }
 
             // Default to Saison 26/27 if available, otherwise fall back to the first season
-            selectedSeason = seasons.includes("2026_2027") ? "2026_2027" : seasons[0];
+            if (urlSeason && seasons.includes(urlSeason)) {
+                selectedSeason = urlSeason;
+            } else {
+                selectedSeason = seasons.includes("2026_2027") ? "2026_2027" : seasons[0];
+            }
             seasonSelect.value = selectedSeason;
 
-            updateAgeGroupSelector();
+            updateAgeGroupSelector(urlAgeGroup);
         }
 
-        function updateAgeGroupSelector() {
+        function updateAgeGroupSelector(urlAgeGroup) {
             const ageSelect = document.getElementById('age-select');
             ageSelect.innerHTML = "";
 
@@ -174,7 +182,11 @@
                 ageSelect.classList.remove('no-arrow');
             }
 
-            selectedAgeGroup = ageGroups[0];
+            if (urlAgeGroup && typeof urlAgeGroup === 'string' && ageGroups.includes(urlAgeGroup)) {
+                selectedAgeGroup = urlAgeGroup;
+            } else {
+                selectedAgeGroup = ageGroups[0];
+            }
             ageSelect.value = selectedAgeGroup;
 
             updateActiveConfig();
