@@ -62,7 +62,7 @@ async function scrapeAgeGroup(teams, keywords) {
                 }
             }
             
-            if (row.includes('Absetzung') || row.includes('Abgesagt')) continue;
+            if (row.includes('info-text">Absetzung') || row.includes('info-text">Abgesagt')) continue;
             
             let matchedKeywords = [];
             for (const keyword of keywords) {
@@ -85,7 +85,7 @@ async function scrapeAgeGroup(teams, keywords) {
                             const detailRes = await fetch(link);
                             const detailHtml = await detailRes.text();
                             const locMatch = detailHtml.match(/class="location">\s*([^<]+)\s*</);
-                            const location = locMatch ? locMatch[1].trim() : "Unknown";
+                            const location = locMatch ? locMatch[1].trim() : "";
                             
                             const team1 = matchedKeywords[0];
                             const team2 = matchedKeywords[1];
