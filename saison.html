@@ -135,6 +135,7 @@
         let activeConfig = null;
         let schedule = [];
         let teamLogos = {};
+    let allMatchDates = {};
 
         let allResults = {};
         let currentFilter = 'gesamt';
@@ -249,9 +250,12 @@
         }
 
         function loadData() {
-            db.collection("spiele").get().then((querySnapshot) => {
+            Promise.all([
+                db.collection("spiele").get(),
+                db.collection("match_dates").get()
+            ]).then(([spieleSnapshot, datesSnapshot]) => {
                 allResults = {};
-                querySnapshot.forEach((doc) => {
+                spieleSnapshot.forEach((doc) => {
                     const game = doc.data();
 
                     // Filter by selected season and age group (defaulting to 25/26 and 2014 for legacy games)
@@ -270,8 +274,19 @@
                         };
                     }
                 });
+
+                allMatchDates = {};
+                datesSnapshot.forEach((doc) => {
+                    const dateData = doc.data();
+                    if (dateData.ageGroup && dateData.ageGroup.toString() === selectedAgeGroup) {
+                        allMatchDates[doc.id] = dateData;
+                    }
+                });
+
                 calculateTable(currentFilter);
                 renderSchedule();
+            }).catch(error => {
+                console.error("Error loading data: ", error);
             });
         }
 
@@ -507,7 +522,14 @@
             day.matches.forEach(match => {
                 const h = match[0];
                 const a = match[1];
-                const dateFixed = match[2];
+                
+                let dateFixed = null;
+                if (h && a) {
+                    const matchId = [h, a].sort().join('_');
+                    if (allMatchDates[matchId]) {
+                        dateFixed = allMatchDates[matchId].date + ", " + allMatchDates[matchId].time;
+                    }
+                }
 
                 if (!a) {
                     list.innerHTML += `<div class="match-row" style="color:#666; justify-content:center;">${h} hat Spielfrei</div>`;

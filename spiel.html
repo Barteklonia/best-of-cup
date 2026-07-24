@@ -485,42 +485,45 @@
                     day.matches.forEach(match => {
                         if (match[0] === heim && match[1] === gast) {
                             matchdayName = day.name;
-                            if (match[2]) dateFixed = match[2];
-                            if (match[3]) matchLocation = match[3];
                         }
                     });
                 });
             }
 
             document.getElementById('match-date').innerText = matchdayName.toUpperCase();
+
+            const matchId = [heim, gast].sort().join('_');
             
-            const locationEl = document.getElementById('info-location');
-            locationEl.innerHTML = '';
-            if (matchLocation) {
-                const mapLink = document.createElement('a');
-                mapLink.innerText = matchLocation;
-                mapLink.target = '_blank';
-                mapLink.rel = 'noopener noreferrer';
-                mapLink.style.color = 'inherit';
-                mapLink.style.textDecoration = 'underline';
-                mapLink.style.textUnderlineOffset = '3px';
-                mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(matchLocation);
-                locationEl.appendChild(mapLink);
-            } else {
-                locationEl.innerText = 'Noch nicht bekannt';
-            }
+            Promise.all([
+                db.collection("spiele").where("saison", "==", saison).where("jahrgang", "==", jahrgang).where("heim", "==", heim).where("gast", "==", gast).get(),
+                db.collection("match_dates").doc(matchId).get()
+            ]).then(([spieleSnapshot, dateDoc]) => {
+                let matchFound = false;
+                
+                if (dateDoc.exists && dateDoc.data().ageGroup.toString() === jahrgang) {
+                    const dData = dateDoc.data();
+                    dateFixed = dData.date + ", " + dData.time;
+                    matchLocation = dData.location;
+                }
+                
+                const locationEl = document.getElementById('info-location');
+                locationEl.innerHTML = '';
+                if (matchLocation) {
+                    const mapLink = document.createElement('a');
+                    mapLink.innerText = matchLocation;
+                    mapLink.target = '_blank';
+                    mapLink.rel = 'noopener noreferrer';
+                    mapLink.style.color = 'inherit';
+                    mapLink.style.textDecoration = 'underline';
+                    mapLink.style.textUnderlineOffset = '3px';
+                    mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(matchLocation);
+                    locationEl.appendChild(mapLink);
+                } else {
+                    locationEl.innerText = 'Noch nicht bekannt';
+                }
 
-            db.collection("spiele")
-              .where("saison", "==", saison)
-              .where("jahrgang", "==", jahrgang)
-              .where("heim", "==", heim)
-              .where("gast", "==", gast)
-              .get()
-              .then((querySnapshot) => {
-                  let matchFound = false;
-
-                  querySnapshot.forEach((doc) => {
-                      matchFound = true;
+                spieleSnapshot.forEach((doc) => {
+                    matchFound = true;
                       const game = doc.data();
 
                       // Update Score

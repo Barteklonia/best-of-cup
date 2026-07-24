@@ -139,14 +139,7 @@ const CUP_DATA = {
 let schedule2016 = generateSchedule(CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams);
 
 // Manuelle Terminierungen eintragen
-schedule2016.forEach(day => {
-    day.matches.forEach(match => {
-        if (match[0] === "TSV Meerbusch" && match[1] === "SF Vorst") {
-            match[2] = "20.09.2026, 10:00";
-            match[3] = "Kunstrasenplatz, Sportplatz Lank, Nierster Str. 90, 40668 Meerbusch";
-        }
-    });
-});
+// Wird jetzt automatisch von Firebase Cloud Functions befüllt (Collection: match_dates)
 
 CUP_DATA.seasons["2026_2027"].ageGroups["2016"].schedule = schedule2016;
 
