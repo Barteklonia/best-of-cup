@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Logbuch | Best of Cup</title>
+    <meta name="description" content="Changelog und Neuigkeiten der Best of Cup Webseite.">
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .log-entry {
+            border-left: 3px solid var(--primary, #000000);
+            padding-left: 25px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .log-entry::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 2px;
+            width: 17px;
+            height: 17px;
+            background-color: var(--primary, #000000);
+            border-radius: 50%;
+            border: 3px solid var(--bg-body, #f4f4f4);
+            box-sizing: border-box;
+        }
+        
+        .log-date {
+            color: var(--text-muted, #666666);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .log-title {
+            margin: 0 0 12px 0;
+            color: var(--primary, #000000);
+            font-size: 1.3em;
+        }
+        
+        .log-list {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-main, #222222);
+            line-height: 1.7;
+        }
+        
+        .log-list li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html">
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Startseite</a></li>
+                <li><a href="saison.html">Saison</a></li>
+                <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 style="text-align: center; margin-bottom: 40px;">Logbuch (Changelog)</h1>
+            
+            <div class="log-entry">
+                <div class="log-date">24. Juli 2026</div>
+                <h3 class="log-title">Automatischer Spielplan & Detail-Fixes</h3>
+                <ul class="log-list">
+                    <li>Hinzugefügt: Ein automatischer Cloud-Scraper lädt nun im Hintergrund die Termine, Orte und Uhrzeiten der Spiele direkt von Fussball.de.</li>
+                    <li>Fehlerbehebung: Spiele, die bei Fussball.de als letztes in der Liste standen (z.B. Meerbusch vs Vorst), wurden fälschlicherweise als "abgesagt" markiert – dieser Bug wurde behoben.</li>
+                    <li>Fehlerbehebung: Die Zuweisung von Hin- und Rückspiel (z.B. Wersten vs Unterrath) wurde korrigiert, sodass der Spieltag exakt zum Heim/Gast-Recht passt.</li>
+                    <li>Verbesserung: Wenn Fussball.de noch keinen Spielort eingetragen hat, wird das Feld nun sauber leer gelassen anstatt "Unknown" anzuzeigen.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">16. Juli 2026</div>
+                <h3 class="log-title">Verbesserte Navigation</h3>
+                <ul class="log-list">
+                    <li>Verbesserung: Die Jahrgangs-Kacheln (2014 & 2016) auf der Startseite sind nun direkt klickbar und leiten sofort in den richtigen Spielplan.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">10. Juli 2026</div>
+                <h3 class="log-title">Admin & URL-Verbesserungen</h3>
+                <ul class="log-list">
+                    <li>Verbesserung: Die neue Saison 2026/27 ist nun als Standardauswahl im Admin-Bereich gesetzt.</li>
+                    <li>Feature: Das Dropdown-Menü der Saisons liest nun die URL aus und wählt automatisch die korrekte Altersklasse voraus.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">3. – 6. Juli 2026</div>
+                <h3 class="log-title">Viele neue Funktionen (Kontakt, Sponsoren, SEO)</h3>
+                <ul class="log-list">
+                    <li>Feature: Eine neue, dedizierte Kontaktseite mit funktionierendem Formular, Spamschutz (Honeypot) & strikter E-Mail-Validierung wurde hinzugefügt.</li>
+                    <li>Feature: Auffällige Banner zur Sponsoren-Suche auf der Startseite und Kontaktseite integriert.</li>
+                    <li>Feature: Neuer Promo-Bereich für überregionale Expansion hinzugefügt (inkl. neuem Premium-Button-Design).</li>
+                    <li>Umstrukturierung: SC West Köln aus dem Jahrgang 2016 entfernt und "Spielfrei"-Logik für ungerade Teamanzahlen implementiert.</li>
+                    <li>SEO: Umfassende Suchmaschinen-Optimierung (Meta-Tags, Sitemap, Robots) und Integration eines FAQ-Bereichs.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">10. – 15. Juni 2026</div>
+                <h3 class="log-title">Neue Teams</h3>
+                <ul class="log-list">
+                    <li>GSG Duisburg und SGS Essen als neue Teams offiziell hinzugefügt.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">2. – 8. Juni 2026</div>
+                <h3 class="log-title">Design & Layout Verbesserungen</h3>
+                <ul class="log-list">
+                    <li>Bugfix: Ein Fehler auf Smartphones, bei dem die Pfeile der Spieltage verschwanden, wurde behoben.</li>
+                    <li>Design: Der Light-Mode wurde erzwungen und die Farben im Admin-Bereich für bessere Lesbarkeit angepasst.</li>
+                    <li>Rechtliches: Impressum und Datenschutzseiten wurden hinzugefügt.</li>
+                    <li>Design: Umfassende Layout- und Tabellenanpassungen auf der Startseite.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">28. – 29. Mai 2026</div>
+                <h3 class="log-title">Startschuss & Redesign</h3>
+                <ul class="log-list">
+                    <li>Launch: Erster Upload der neuen Webseite!</li>
+                    <li>Feature: Komplettes Redesign und strukturelle Vorbereitungen für die kommende Saison.</li>
+                    <li>Feature: Der neue Jahrgang 2016 wurde offiziell mitsamt allen neuen Vereinswappen hinzugefügt.</li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Best of Cup</p>
+        <p style="margin-top: 10px;">
+            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
+            <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a> |
+            <a href="logbuch.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Logbuch</a>
+        </p>
+    </footer>
+</body>
+</html>
