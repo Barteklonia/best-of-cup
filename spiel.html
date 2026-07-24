@@ -476,7 +476,7 @@
             // Check if there is a match in schedule with a fixed date string
             let dateFixed = null;
             let matchdayName = "Unbekannt";
-            let matchLocation = "Kunstrasenplatz (Standard)";
+            let matchLocation = null;
 
             if (CUP_DATA.seasons[saison]) {
                 const configSeason = CUP_DATA.seasons[saison];
@@ -496,15 +496,19 @@
             
             const locationEl = document.getElementById('info-location');
             locationEl.innerHTML = '';
-            const mapLink = document.createElement('a');
-            mapLink.innerText = matchLocation;
-            mapLink.target = '_blank';
-            mapLink.rel = 'noopener noreferrer';
-            mapLink.style.color = 'inherit';
-            mapLink.style.textDecoration = 'underline';
-            mapLink.style.textUnderlineOffset = '3px';
-            mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(matchLocation);
-            locationEl.appendChild(mapLink);
+            if (matchLocation) {
+                const mapLink = document.createElement('a');
+                mapLink.innerText = matchLocation;
+                mapLink.target = '_blank';
+                mapLink.rel = 'noopener noreferrer';
+                mapLink.style.color = 'inherit';
+                mapLink.style.textDecoration = 'underline';
+                mapLink.style.textUnderlineOffset = '3px';
+                mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(matchLocation);
+                locationEl.appendChild(mapLink);
+            } else {
+                locationEl.innerText = 'Noch nicht bekannt';
+            }
 
             db.collection("spiele")
               .where("saison", "==", saison)
