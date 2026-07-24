@@ -45,8 +45,23 @@ async function scrapeAgeGroup(teams, keywords) {
         const html = await fetchMatchplan(team.id);
         const rows = html.split('<tr');
         
+        let currentDate = '';
+        let currentTime = '';
+        
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
+            
+            if (row.includes('row-headline visible-small')) {
+                const headlineMatch = row.match(/<td[^>]*>([^<]+)<\/td>/);
+                if (headlineMatch) {
+                    const text = headlineMatch[1]; 
+                    const dateMatch = text.match(/(\d{2}\.\d{2}\.\d{4})/);
+                    const timeMatch = text.match(/(\d{2}:\d{2})/);
+                    if (dateMatch) currentDate = dateMatch[1];
+                    if (timeMatch) currentTime = timeMatch[1];
+                }
+            }
+            
             if (row.includes('Absetzung') || row.includes('Abgesagt')) continue;
             
             let matchedKeywords = [];
@@ -56,14 +71,12 @@ async function scrapeAgeGroup(teams, keywords) {
                 }
             }
             
-            if (matchedKeywords.length >= 2) {
-                const dateMatch = row.match(/class="date-format">([^<]+)<\/span>/);
-                const timeMatch = row.match(/class="time-format">([^<]+)<\/span>/);
-                const linkMatch = row.match(/href="([^"]+)"\s*class="[^"]*btn-game-detail/);
+            if (matchedKeywords.length >= 2 && currentDate && currentTime) {
+                const linkMatch = row.match(/href="([^"]+\/spiel\/[^"]+)"/);
                 
-                if (dateMatch && timeMatch && linkMatch) {
-                    const date = dateMatch[1].trim();
-                    const time = timeMatch[1].trim();
+                if (linkMatch) {
+                    const date = currentDate;
+                    const time = currentTime;
                     let link = linkMatch[1];
                     if (link.startsWith('//')) link = 'https:' + link;
                     
