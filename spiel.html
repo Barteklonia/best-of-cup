@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Spieldetails | Best of Cup</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css?v=1.2">
+
+    <script src="js/config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        .match-hero {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 40px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .match-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+        }
+
+        .match-hero-header {
+            text-align: center;
+            margin-bottom: 30px;
+            z-index: 1;
+        }
+
+        .match-hero-competition {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .match-hero-date {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .match-hero-teams {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            z-index: 1;
+        }
+
+        .match-team-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .match-team-logo-wrapper {
+            width: 130px;
+            height: 130px;
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+
+        .match-team-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .match-team-name {
+            font-size: 1.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+        }
+
+        .match-score-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .match-score-main {
+            font-size: 4.5rem;
+            font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            background: #2a2a2a;
+            padding: 15px 30px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #444;
+        }
+
+        .match-score-main .colon {
+            color: #666;
+            font-size: 3.5rem;
+            line-height: 1;
+            transform: translateY(-1px);
+        }
+
+        .match-score-sub {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: #ddd;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .match-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .match-tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .match-tab-btn.active {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .match-tab-btn:hover:not(.active) {
+            background: rgba(0,0,0,0.05);
+            color: var(--text-main);
+        }
+
+        .match-content-section {
+            display: none;
+        }
+
+        .match-content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 166, 81, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .info-text h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .info-text p {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px dashed var(--border-color);
+        }
+        
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            color: var(--text-main);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .match-hero-teams {
+                gap: 10px;
+            }
+            .match-team-logo-wrapper {
+                width: 90px;
+                height: 90px;
+                padding: 10px;
+                border-width: 2px;
+            }
+            .match-team-name {
+                font-size: 1.1rem;
+            }
+            .match-score-main {
+                font-size: 2.8rem;
+                padding: 10px 15px;
+            }
+            .match-score-main .colon {
+                font-size: 2rem;
+            }
+            .match-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html"><img src="assets/logo.jpg" alt="Logo" class="nav-logo"></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Startseite</a></li>
+                <li><a href="saison.html" class="active">Saison</a></li>
+                <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <a href="saison.html" class="back-link" id="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+            Zurück zur Übersicht
+        </a>
+
+        <!-- Hero Section -->
+        <div class="match-hero">
+            <div class="match-hero-header">
+                <div class="match-hero-competition" id="competition-name">BEST OF CUP - SAISON</div>
+                <div class="match-hero-date" id="match-date">Lade Spieldaten...</div>
+            </div>
+            
+            <div class="match-hero-teams">
+                <div class="match-team-col">
+                    <div class="match-team-logo-wrapper">
+                        <img id="home-logo" src="" alt="Heim" class="match-team-logo">
+                    </div>
+                    <div class="match-team-name" id="home-name">-</div>
+                </div>
+                
+                <div class="match-score-col">
+                    <div class="match-score-main">
+                        <span id="home-score">&minus;</span>
+                        <span class="colon">:</span>
+                        <span id="away-score">&minus;</span>
+                    </div>
+                    <div class="match-score-sub" id="sub-score" style="display: none;">
+                        TG: &minus;:&minus;
+                    </div>
+                </div>
+
+                <div class="match-team-col">
+                    <div class="match-team-logo-wrapper">
+                        <img id="away-logo" src="" alt="Gast" class="match-team-logo">
+                    </div>
+                    <div class="match-team-name" id="away-name">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="match-tabs">
+            <button class="match-tab-btn active" onclick="switchTab('info', this)">Infos</button>
+            <button class="match-tab-btn" onclick="switchTab('bericht', this)">Spielbericht & News</button>
+        </div>
+
+        <!-- Tab Content: Info -->
+        <div id="tab-info" class="match-content-section active">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                    </div>
+                    <div class="info-text">
+                        <h4>Anstoß</h4>
+                        <p id="info-time">Wird geladen...</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                    </div>
+                    <div class="info-text">
+                        <h4>Stadion / Ort</h4>
+                        <p id="info-location">Kunstrasenplatz (Standard)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Bericht -->
+        <div id="tab-bericht" class="match-content-section">
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
+                </svg>
+                <h3>Spielbericht & News</h3>
+                <p>Es wurden leider noch keine Spielberichte angelegt. Unterstütze deinen Verein, deine Mannschaft und ihre Fans, indem du den ersten Spielbericht anlegst.</p>
+                <a href="kontakt.html" class="btn-primary" style="margin-top: 15px; display: inline-block;">Spielbericht einreichen</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Best of Cup</p>
+        <p style="margin-top: 10px;">
+            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
+            <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a>
+        </p>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
+            authDomain: "best-of-cup.firebaseapp.com",
+            projectId: "best-of-cup",
+            storageBucket: "best-of-cup.firebasestorage.app",
+            messagingSenderId: "188725945748",
+            appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
+            measurementId: "G-HGCM4M029D"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.match-content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.match-tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const saison = urlParams.get('saison');
+            const jahrgang = urlParams.get('jahrgang');
+            const heim = urlParams.get('heim');
+            const gast = urlParams.get('gast');
+
+            if (!saison || !jahrgang || !heim || !gast) {
+                alert("Fehlende Spieldaten.");
+                window.location.href = "saison.html";
+                return;
+            }
+
+            // Update Back Link
+            document.getElementById('back-link').href = `saison.html?saison=${saison}&jahrgang=${jahrgang}`;
+
+            const configSeason = CUP_DATA.seasons[saison];
+            if(!configSeason) return;
+            const configAgeGroup = configSeason.ageGroups[jahrgang];
+            if(!configAgeGroup) return;
+
+            document.getElementById('competition-name').innerText = `Best of Cup - ${configSeason.displayName} - ${configAgeGroup.displayName}`;
+            document.title = `${heim} vs ${gast} | Best of Cup`;
+
+            // Load Team Names and Logos
+            document.getElementById('home-name').innerText = heim;
+            document.getElementById('away-name').innerText = gast;
+
+            const homeTeamData = configAgeGroup.teams[heim];
+            const awayTeamData = configAgeGroup.teams[gast];
+
+            if(homeTeamData) document.getElementById('home-logo').src = homeTeamData.logo;
+            if(awayTeamData) document.getElementById('away-logo').src = awayTeamData.logo;
+
+            // Load Data from Firebase
+            loadMatchData(saison, jahrgang, heim, gast);
+        };
+
+        function loadMatchData(saison, jahrgang, heim, gast) {
+            // Check if there is a match in schedule with a fixed date string
+            let dateFixed = null;
+            let matchdayName = "Unbekannt";
+            let matchLocation = "Kunstrasenplatz (Standard)";
+
+            if (CUP_DATA.seasons[saison]) {
+                const configSeason = CUP_DATA.seasons[saison];
+                const schedule = configSeason.ageGroups[jahrgang].schedule;
+                schedule.forEach(day => {
+                    day.matches.forEach(match => {
+                        if (match[0] === heim && match[1] === gast) {
+                            matchdayName = day.name;
+                            if (match[2]) dateFixed = match[2];
+                            if (match[3]) matchLocation = match[3];
+                        }
+                    });
+                });
+            }
+
+            document.getElementById('match-date').innerText = matchdayName.toUpperCase();
+            
+            const locationEl = document.getElementById('info-location');
+            locationEl.innerHTML = '';
+            const mapLink = document.createElement('a');
+            mapLink.innerText = matchLocation;
+            mapLink.target = '_blank';
+            mapLink.rel = 'noopener noreferrer';
+            mapLink.style.color = 'inherit';
+            mapLink.style.textDecoration = 'underline';
+            mapLink.style.textUnderlineOffset = '3px';
+            mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(matchLocation);
+            locationEl.appendChild(mapLink);
+
+            db.collection("spiele")
+              .where("saison", "==", saison)
+              .where("jahrgang", "==", jahrgang)
+              .where("heim", "==", heim)
+              .where("gast", "==", gast)
+              .get()
+              .then((querySnapshot) => {
+                  let matchFound = false;
+
+                  querySnapshot.forEach((doc) => {
+                      matchFound = true;
+                      const game = doc.data();
+
+                      // Update Score
+                      document.getElementById('home-score').innerText = game.ergebnis81[0];
+                      document.getElementById('away-score').innerText = game.ergebnis81[1];
+                      
+                      const subScore = document.getElementById('sub-score');
+                      subScore.style.display = 'block';
+                      subScore.innerText = `Twin Games: ${game.ergebnis41[0]}:${game.ergebnis41[1]}`;
+
+                      // Update Date/Time
+                      const timeEl = document.getElementById('info-time');
+
+                      if (dateFixed) {
+                          timeEl.innerText = dateFixed;
+                      } else if (game.datum) {
+                          const dateObj = game.datum.toDate ? game.datum.toDate() : new Date(game.datum);
+                          const optionsDate = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                          const optionsTime = { hour: '2-digit', minute:'2-digit' };
+                          
+                          timeEl.innerText = `${dateObj.toLocaleDateString('de-DE', optionsDate)}, ${dateObj.toLocaleTimeString('de-DE', optionsTime)}`;
+                      } else {
+                          timeEl.innerText = '--.--.----, --:--';
+                      }
+                  });
+
+                  if (!matchFound) {
+                      // If no data in Firebase yet
+                      const timeEl = document.getElementById('info-time');
+                      if (dateFixed) {
+                          timeEl.innerText = dateFixed;
+                      } else {
+                          timeEl.innerText = 'Noch nicht terminiert';
+                      }
+                  }
+              })
+              .catch(error => {
+                  console.error("Fehler beim Laden der Spieldaten:", error);
+                  document.getElementById('match-date').innerText = 'FEHLER BEIM LADEN';
+              });
+        }
+    </script>
+</body>
+</html>

@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
     <title>Saison & Spielplan | Best of Cup</title>
-    <meta name="description" content="Aktuelle Tabellen, Ergebnisse und Spielpläne der Best of Cup Jugendliga. Alle Spiele und Leistungsvergleiche der Nachwuchsteams im Überblick.">
-    <meta name="keywords" content="Jugendliga, Teams auf Augenhöhe, Nachwuchsfußball, Fairplay Liga, Jugend Spielbetrieb, ausgeglichene Spielstärke, Best of Cup, Jugendfußball Leistungsvergleich, twin games, Tabelle, Ergebnisse">
-    
+    <meta name="description"
+        content="Aktuelle Tabellen, Ergebnisse und Spielpläne der Best of Cup Jugendliga. Alle Spiele und Leistungsvergleiche der Nachwuchsteams im Überblick.">
+    <meta name="keywords"
+        content="Jugendliga, Teams auf Augenhöhe, Nachwuchsfußball, Fairplay Liga, Jugend Spielbetrieb, ausgeglichene Spielstärke, Best of Cup, Jugendfußball Leistungsvergleich, twin games, Tabelle, Ergebnisse">
+
     <!-- Open Graph / Social Media -->
     <meta property="og:title" content="Saison & Spielplan | Best of Cup">
-    <meta property="og:description" content="Aktuelle Tabellen, Ergebnisse und Spielpläne der Best of Cup Jugendliga im Überblick.">
+    <meta property="og:description"
+        content="Aktuelle Tabellen, Ergebnisse und Spielpläne der Best of Cup Jugendliga im Überblick.">
     <meta property="og:image" content="https://bestofcup.de/assets/logo.jpg">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bestofcup.de/saison.html">
 
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="stylesheet" href="css/style.css?v=1.1">
-    
+
     <script src="js/config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
+
 <body>
 
     <header>
@@ -41,18 +46,24 @@
             <h1 id="page-title">Best of Cup</h1>
         </div>
 
-        <div class="filter-container card" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center;">
+        <div class="filter-container card"
+            style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center;">
             <div style="display: flex; flex-direction: column; flex: 1; min-width: 150px;">
-                <label for="season-select" style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Saison</label>
-                <select id="season-select" style="width: 100%; font-weight: bold; background-color: white;" onchange="onSeasonChange()"></select>
+                <label for="season-select"
+                    style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Saison</label>
+                <select id="season-select" style="width: 100%; font-weight: bold; background-color: white;"
+                    onchange="onSeasonChange()"></select>
             </div>
             <div style="display: flex; flex-direction: column; flex: 1; min-width: 150px;">
-                <label for="age-select" style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Jahrgang</label>
-                <select id="age-select" style="width: 100%; font-weight: bold; background-color: white;" onchange="onAgeGroupChange()"></select>
+                <label for="age-select"
+                    style="font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; color: #666;">Jahrgang</label>
+                <select id="age-select" style="width: 100%; font-weight: bold; background-color: white;"
+                    onchange="onAgeGroupChange()"></select>
             </div>
         </div>
 
-        <div class="filter-tabs variant-tabs" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+        <div class="filter-tabs variant-tabs"
+            style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
             <button class="filter-btn active" onclick="updateVariant('gesamt', this)">Gesamtwertung</button>
             <button class="filter-btn" id="btn-variant-81" onclick="updateVariant('81', this)">Feld (8+1)</button>
             <button class="filter-btn" onclick="updateVariant('41', this)">Twin Games</button>
@@ -92,17 +103,19 @@
             <button class="matchday-nav-btn" id="btn-next" onclick="changeMatchday(1)">&#10095;</button>
         </div>
 
-        <div id="schedule-list" class="match-list"></div>     
-     
+        <div id="schedule-list" class="match-list"></div>
+
     </main>
 
     <footer>
         <p>&copy; 2025 Best of Cup</p>
         <p style="margin-top: 10px;">
-            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> | 
+            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
             <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a>
         </p>
     </footer>
+
+    <!-- Match Details Modal removed as it is now a separate page -->
 
     <script>
         const firebaseConfig = {
@@ -127,7 +140,7 @@
         let currentFilter = 'gesamt';
         let currentVariant = 'gesamt';
 
-        window.onload = function() {
+        window.onload = function () {
             initSelectors();
         };
 
@@ -138,7 +151,7 @@
 
             const seasonSelect = document.getElementById('season-select');
             seasonSelect.innerHTML = "";
-            
+
             const seasons = Object.keys(CUP_DATA.seasons);
             seasons.forEach(key => {
                 let opt = document.createElement('option');
@@ -195,7 +208,7 @@
         function updateActiveConfig() {
             activeConfig = CUP_DATA.seasons[selectedSeason].ageGroups[selectedAgeGroup];
             schedule = activeConfig.schedule;
-            
+
             // Build teamLogos mapping
             teamLogos = {};
             for (let t in activeConfig.teams) {
@@ -240,7 +253,7 @@
                 allResults = {};
                 querySnapshot.forEach((doc) => {
                     const game = doc.data();
-                    
+
                     // Filter by selected season and age group (defaulting to 25/26 and 2014 for legacy games)
                     const s = game.saison || "2025_2026";
                     const j = game.jahrgang || "2014";
@@ -278,7 +291,7 @@
 
         function calculateTable(filter) {
             let stats = {};
-            for(let t in teamLogos) {
+            for (let t in teamLogos) {
                 stats[t] = {
                     name: t,
                     logo: teamLogos[t],
@@ -303,10 +316,10 @@
                 day.matches.forEach(match => {
                     const h = match[0];
                     const a = match[1];
-                    if(!a) return;
+                    if (!a) return;
 
                     const res = allResults[`${h}_${a}`];
-                    if(res) {
+                    if (res) {
                         const isHomeEligible = (filter !== 'auswaerts');
                         const isAwayEligible = (filter !== 'heim');
 
@@ -384,11 +397,11 @@
                                 stats[h].g += (goalsH_81 + goalsH_41);
                                 stats[h].a += (goalsA_81 + goalsA_41);
                                 stats[h].p += (pointsH_81 + pointsH_41);
-                                
+
                                 if (outcomeH_81 === 'S') stats[h].w += 1;
                                 else if (outcomeH_81 === 'U') stats[h].d += 1;
                                 else stats[h].l += 1;
-                                
+
                                 if (outcomeH_41 === 'S') stats[h].w += 1;
                                 else if (outcomeH_41 === 'U') stats[h].d += 1;
                                 else stats[h].l += 1;
@@ -401,11 +414,11 @@
                                 stats[a].g += (goalsA_81 + goalsA_41);
                                 stats[a].a += (goalsH_81 + goalsH_41);
                                 stats[a].p += (pointsA_81 + pointsA_41);
-                                
+
                                 if (outcomeA_81 === 'S') stats[a].w += 1;
                                 else if (outcomeA_81 === 'U') stats[a].d += 1;
                                 else stats[a].l += 1;
-                                
+
                                 if (outcomeA_41 === 'S') stats[a].w += 1;
                                 else if (outcomeA_41 === 'U') stats[a].d += 1;
                                 else stats[a].l += 1;
@@ -420,7 +433,7 @@
 
             let tableArray = Object.values(stats);
             tableArray.sort((a, b) => {
-                if (b.p !== a.p) return b.p - a.p; 
+                if (b.p !== a.p) return b.p - a.p;
                 const diffA = a.g - a.a;
                 const diffB = b.g - b.a;
                 if (diffB !== diffA) return diffB - diffA;
@@ -429,11 +442,11 @@
 
             const tbody = document.getElementById("tabelle-body");
             tbody.innerHTML = "";
-            
+
             tableArray.forEach((t, i) => {
                 let diff = t.g - t.a;
                 let diffSign = diff > 0 ? "+" : "";
-                
+
                 let formHtml = "";
                 // Sort the played games chronologically by their database date
                 t.formGames.sort((x, y) => x.date - y.date);
@@ -452,7 +465,7 @@
 
                 let row = `
                     <tr>
-                        <td class="td-rank">${i+1}</td>
+                        <td class="td-rank">${i + 1}</td>
                         <td class="td-team"><img src="${t.logo}">${t.name}</td>
                         <td class="td-matches">${t.m}</td>
                         <td class="hide-mobile">${t.w}</td>
@@ -470,7 +483,7 @@
         function changeMatchday(delta) {
             const select = document.getElementById('matchday-select');
             let newVal = parseInt(select.value) + delta;
-            if(newVal >= 0 && newVal < schedule.length) {
+            if (newVal >= 0 && newVal < schedule.length) {
                 select.value = newVal;
                 renderSchedule();
             }
@@ -496,7 +509,7 @@
                 const a = match[1];
                 const dateFixed = match[2];
 
-                if(!a) {
+                if (!a) {
                     list.innerHTML += `<div class="match-row" style="color:#666; justify-content:center;">${h} hat Spielfrei</div>`;
                     return;
                 }
@@ -504,21 +517,31 @@
                 const res = allResults[`${h}_${a}`];
                 let centerHtml = "";
 
-                if(dateFixed) centerHtml += `<div class="match-date-label">${dateFixed}</div>`;
-
-                if(res) {
+                if (res) {
                     const mainLabel = selectedAgeGroup === "2016" ? "6+1" : "8+1";
-                    centerHtml += `
+                    centerHtml = `
                         <div class="match-score-box">
                             <div class="score-line-main">${mainLabel}: ${res.gH_81}:${res.gA_81}</div>
                             <div class="score-line-sub">TG: ${res.gH_41}:${res.gA_41}</div>
                         </div>`;
+                } else if (dateFixed) {
+                    let parts = dateFixed.split(', ');
+                    if (parts.length === 2) {
+                        let datePart = parts[0].replace(/\.\d{4}$/, '.');
+                        centerHtml = `
+                            <div class="match-date-center">
+                                <div class="date-top">${datePart}</div>
+                                <div class="time-bottom">${parts[1]}</div>
+                            </div>`;
+                    } else {
+                        centerHtml = `<div class="match-date-center">${dateFixed}</div>`;
+                    }
                 } else {
-                    centerHtml += `<div class="match-vs">vs</div>`;
+                    centerHtml = `<div class="match-vs">vs</div>`;
                 }
 
                 let row = `
-                    <div class="match-row">
+                    <div class="match-row clickable" onclick="window.location.href='spiel.html?saison=' + selectedSeason + '&jahrgang=' + selectedAgeGroup + '&heim=' + encodeURIComponent('${h}') + '&gast=' + encodeURIComponent('${a}')">
                         <div class="match-team home">
                             ${h} <img src="${teamLogos[h]}">
                         </div>
@@ -532,6 +555,9 @@
                 list.innerHTML += row;
             });
         }
+
+
     </script>
 </body>
+
 </html>

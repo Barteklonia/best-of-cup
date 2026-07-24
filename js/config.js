@@ -4,13 +4,13 @@
 function generateSchedule(teamsObj) {
     const list = Object.keys(teamsObj);
     let numTeams = list.length;
-    
+
     // Add a dummy team for odd number of teams to simulate "Spielfrei"
     if (numTeams % 2 !== 0) {
         list.push(null);
         numTeams++;
     }
-    
+
     const schedule = [];
 
     for (let round = 0; round < (numTeams - 1) * 2; round++) {
@@ -136,7 +136,19 @@ const CUP_DATA = {
 };
 
 // Programmatically generate schedule for Jahrgang 2016 in Saison 26/27
-CUP_DATA.seasons["2026_2027"].ageGroups["2016"].schedule = generateSchedule(CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams);
+let schedule2016 = generateSchedule(CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams);
+
+// Manuelle Terminierungen eintragen
+schedule2016.forEach(day => {
+    day.matches.forEach(match => {
+        if (match[0] === "TSV Meerbusch" && match[1] === "SF Vorst") {
+            match[2] = "20.09.2026, 10:00";
+            match[3] = "Kunstrasenplatz, Sportplatz Lank, Nierster Str. 90, 40668 Meerbusch";
+        }
+    });
+});
+
+CUP_DATA.seasons["2026_2027"].ageGroups["2016"].schedule = schedule2016;
 
 // Global list of upcoming games across all seasons/age groups
 const UPCOMING_GAMES = [
@@ -144,21 +156,21 @@ const UPCOMING_GAMES = [
         saison: "2025_2026",
         jahrgang: "2014",
         date: "2026-05-31",
-        displayDate: "Sonntag, 31.05, 10:00 Uhr",
+        displayDate: "31.05.2026, 10:00",
         match: "SF Vorst vs SV Lohausen"
     },
     {
         saison: "2025_2026",
         jahrgang: "2014",
         date: "2026-06-14",
-        displayDate: "Sonntag, 14.06, 15:00 Uhr",
+        displayDate: "14.06.2026, 15:00",
         match: "1. FC MG vs SV Lohausen"
     },
     {
         saison: "2026_2027",
         jahrgang: "2014",
         date: "2026-09-06",
-        displayDate: "Sonntag, 06.09, 11:00 Uhr",
+        displayDate: "06.09.2026, 11:00",
         match: "SV Lohausen vs SF Vorst"
     }
 ];
