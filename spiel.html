@@ -492,7 +492,7 @@
 
             document.getElementById('match-date').innerText = matchdayName.toUpperCase();
 
-            const matchId = [heim, gast].sort().join('_');
+            const matchId = heim + '_' + gast;
             
             Promise.all([
                 db.collection("spiele").where("saison", "==", saison).where("jahrgang", "==", jahrgang).where("heim", "==", heim).where("gast", "==", gast).get(),

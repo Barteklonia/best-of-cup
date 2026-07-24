@@ -84,20 +84,25 @@ async function scrapeAgeGroup(teams, keywords) {
                         try {
                             const detailRes = await fetch(link);
                             const detailHtml = await detailRes.text();
-                            const locMatch = detailHtml.match(/class="location">\s*([^<]+)\s*</);
+                            const locMatch = detailHtml.match(/class="location"[^>]*>\s*([^<]+)\s*</);
                             const location = locMatch ? locMatch[1].trim() : "";
                             
-                            const team1 = matchedKeywords[0];
-                            const team2 = matchedKeywords[1];
-                            
-                            matchesFound.push({
-                                team1,
-                                team2,
-                                date,
-                                time,
-                                location,
-                                link
-                            });
+                            const nameMatches = [...row.matchAll(/class="club-name">\s*([^<]+)\s*</g)];
+                            if (nameMatches.length >= 2) {
+                                let htmlHeimName = nameMatches[0][1].trim();
+                                let htmlGastName = nameMatches[1][1].trim();
+                                let team1 = keywords.find(k => htmlHeimName.includes(k)) || matchedKeywords[0];
+                                let team2 = keywords.find(k => htmlGastName.includes(k)) || matchedKeywords[1];
+                                
+                                matchesFound.push({
+                                    team1,
+                                    team2,
+                                    date,
+                                    time,
+                                    location,
+                                    link
+                                });
+                            }
                         } catch(e) {
                             console.error("Fetch detail error", e);
                         }
@@ -147,13 +152,12 @@ exports.scrapeMatches = onSchedule({
     for (const match of matches2016) {
         const t1 = getFullTeamName(match.team1, 2016);
         const t2 = getFullTeamName(match.team2, 2016);
-        const teamsSorted = [t1, t2].sort();
-        const matchId = `${teamsSorted[0]}_${teamsSorted[1]}`;
+        const matchId = `${t1}_${t2}`;
         
         const ref = db.collection('match_dates').doc(matchId);
         batch.set(ref, {
-            team1: teamsSorted[0],
-            team2: teamsSorted[1],
+            team1: t1,
+            team2: t2,
             date: match.date,
             time: match.time,
             location: match.location,
@@ -165,13 +169,12 @@ exports.scrapeMatches = onSchedule({
     for (const match of matches2014) {
         const t1 = getFullTeamName(match.team1, 2014);
         const t2 = getFullTeamName(match.team2, 2014);
-        const teamsSorted = [t1, t2].sort();
-        const matchId = `${teamsSorted[0]}_${teamsSorted[1]}`;
+        const matchId = `${t1}_${t2}`;
         
         const ref = db.collection('match_dates').doc(matchId);
         batch.set(ref, {
-            team1: teamsSorted[0],
-            team2: teamsSorted[1],
+            team1: t1,
+            team2: t2,
             date: match.date,
             time: match.time,
             location: match.location,
