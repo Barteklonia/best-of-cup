@@ -167,3 +167,87 @@ const UPCOMING_GAMES = [
         match: "SV Lohausen vs SF Vorst"
     }
 ];
+
+// ==========================================
+// Google Analytics 4 & Cookie Consent Banner
+// ==========================================
+const GA_MEASUREMENT_ID = "G-HGCM4M029D";
+
+function loadGA4() {
+    if (window.ga4Loaded) return;
+    window.ga4Loaded = true;
+    
+    // Load gtag script
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+    document.head.appendChild(script);
+    
+    // Initialize dataLayer and gtag
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID, {
+        'anonymize_ip': true
+    });
+    console.log("GA4 Tracking (G-HGCM4M029D) aktiviert.");
+}
+
+function initCookieBanner() {
+    const consent = localStorage.getItem("boc_cookie_consent");
+    if (consent === "granted") {
+        loadGA4();
+        return;
+    } else if (consent === "denied") {
+        return;
+    }
+    
+    // Create modern, unobtrusive glassmorphism banner
+    const banner = document.createElement("div");
+    banner.id = "boc-cookie-banner";
+    banner.className = "boc-cookie-banner";
+    banner.innerHTML = `
+        <div class="boc-cookie-content">
+            <div class="boc-cookie-title">🍪 Privatsphäre & weltweites Tracking</div>
+            <p class="boc-cookie-text">
+                Wir nutzen Google Analytics (GA4), um zu verstehen, wie Teams und Fußballfans aus Deutschland und der ganzen Welt unsere faire Jugendliga entdecken und nutzen. Hilf uns, den Best of Cup weiterentwickeln zu können!
+            </p>
+            <div class="boc-cookie-actions">
+                <button id="boc-cookie-deny" class="boc-btn-deny">Nur Notwendige</button>
+                <button id="boc-cookie-accept" class="boc-btn-accept">Akzeptieren</button>
+            </div>
+            <div class="boc-cookie-links">
+                <a href="datenschutz.html">Datenschutz</a> | <a href="impressum.html">Impressum</a>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(banner);
+    
+    const acceptBtn = document.getElementById("boc-cookie-accept");
+    const denyBtn = document.getElementById("boc-cookie-deny");
+    
+    if (acceptBtn) {
+        acceptBtn.addEventListener("click", () => {
+            localStorage.setItem("boc_cookie_consent", "granted");
+            banner.classList.add("fade-out");
+            setTimeout(() => banner.remove(), 400);
+            loadGA4();
+        });
+    }
+    
+    if (denyBtn) {
+        denyBtn.addEventListener("click", () => {
+            localStorage.setItem("boc_cookie_consent", "denied");
+            banner.classList.add("fade-out");
+            setTimeout(() => banner.remove(), 400);
+        });
+    }
+}
+
+// Auto-init when DOM is ready
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCookieBanner);
+} else {
+    initCookieBanner();
+}
