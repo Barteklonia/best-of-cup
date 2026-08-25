@@ -65,11 +65,15 @@ async function scrapeAgeGroup(teams, keywords) {
             if (row.includes('info-text">Absetzung') || row.includes('info-text">Abgesagt')) continue;
             
             let matchedKeywords = [];
+            let keywordPositions = [];
             for (const keyword of keywords) {
-                if (row.includes(keyword)) {
-                    matchedKeywords.push(keyword);
+                const idx = row.indexOf(keyword);
+                if (idx !== -1) {
+                    keywordPositions.push({ keyword, idx });
                 }
             }
+            keywordPositions.sort((a, b) => a.idx - b.idx);
+            matchedKeywords = keywordPositions.map(kp => kp.keyword);
             
             if (matchedKeywords.length >= 2 && currentDate && currentTime) {
                 const linkMatch = row.match(/href="([^"]+\/spiel\/[^"]+)"/);

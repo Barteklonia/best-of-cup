@@ -1,7 +1,7 @@
 // Centralized Configuration for Best of Cup
 
 // Dynamic Round Robin Schedule Generator (Berger-System / Circle Method)
-function generateSchedule(teamsObj) {
+function generateSchedule(teamsObj, singleRoundRobin = false) {
     const list = Object.keys(teamsObj);
     let numTeams = list.length;
 
@@ -12,8 +12,9 @@ function generateSchedule(teamsObj) {
     }
 
     const schedule = [];
+    const totalRounds = singleRoundRobin ? (numTeams - 1) : (numTeams - 1) * 2;
 
-    for (let round = 0; round < (numTeams - 1) * 2; round++) {
+    for (let round = 0; round < totalRounds; round++) {
         const matches = [];
         const isHinrunde = round < numTeams - 1;
         const actualRound = isHinrunde ? round : round - (numTeams - 1);
