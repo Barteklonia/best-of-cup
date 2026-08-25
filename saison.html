@@ -37,6 +37,7 @@
                 <li><a href="index.html">Startseite</a></li>
                 <li><a href="saison.html" class="active">Saison</a></li>
                 <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="sponsoring.html">Sponsoring</a></li>
                 <li><a href="kontakt.html">Kontakt</a></li>
             </ul>
         </nav>
@@ -520,6 +521,16 @@
 
             if (dayIndex === 0) btnPrev.style.visibility = 'hidden'; else btnPrev.style.visibility = 'visible';
             if (dayIndex === schedule.length - 1) btnNext.style.visibility = 'hidden'; else btnNext.style.visibility = 'visible';
+
+            // Insert matchday sponsor placeholder
+            list.innerHTML += `
+                <a href="sponsoring.html" style="text-decoration:none; display:block;">
+                    <div class="matchday-sponsor">
+                        <span>Dieser ${dayIndex + 1}. Spieltag wird präsentiert von:</span>
+                        <div class="placeholder-logo">Platzhalter Logo / Unternehmen</div>
+                    </div>
+                </a>
+            `;
 
             day.matches.forEach(match => {
                 const h = match[0];

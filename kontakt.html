@@ -31,7 +31,8 @@
             color: var(--text-main);
         }
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border-color);
@@ -40,6 +41,8 @@
             color: var(--text-main);
             font-family: inherit;
             font-size: 1rem;
+            line-height: 1.5;
+            box-sizing: border-box;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .form-group input:focus,
@@ -119,6 +122,7 @@
                 <li><a href="index.html">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
                 <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="sponsoring.html">Sponsoring</a></li>
                 <li><a href="kontakt.html" class="active">Kontakt</a></li>
             </ul>
         </nav>
@@ -130,7 +134,7 @@
             <p style="margin-bottom: 15px;">Hast du Fragen zum Best of Cup oder möchtest ein Team anmelden? Schreib uns einfach eine Nachricht!</p>
             
             <p style="margin-bottom: 25px; padding: 15px; background: #f8fafc; border-left: 4px solid var(--accent); border-radius: 4px; box-shadow: var(--shadow-sm);">
-                <strong>Sponsoring:</strong> Du möchtest den Jugendfußball unterstützen und Sponsor des Best of Cups werden? Großartig! Nutze das Formular oder schreib uns eine E-Mail und wir besprechen sehr gerne die Möglichkeiten.
+                <strong>Sponsoring:</strong> Du möchtest den Jugendfußball unterstützen und Sponsor des Best of Cups werden? Großartig! <a href="sponsoring.html" style="color: var(--primary); font-weight: bold; text-decoration: underline;">Schau dir hier unsere Sponsoring-Optionen an</a> oder nutze das Formular für eine direkte Anfrage.
             </p>
             <div class="contact-info">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="contact-icon">
@@ -165,6 +169,20 @@
                 <div class="form-group">
                     <label for="email">Deine E-Mail-Adresse</label>
                     <input type="email" id="email" name="email" required pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Bitte gib eine gültige E-Mail-Adresse ein (z.B. beispiel@verein.de)" placeholder="beispiel@verein.de">
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Grund der Anfrage</label>
+                    <select id="subject" name="subject" required>
+                        <option value="Allgemeine Anfrage">Allgemeine Anfrage</option>
+                        <option value="Team anmelden">Team anmelden</option>
+                        <option value="spielball">Sponsoring: Spielball-Sponsor</option>
+                        <option value="spieltag">Sponsoring: Spieltag-Präsentator</option>
+                        <option value="ausruestung">Sponsoring: Ausrüstungs-Unterstützer</option>
+                        <option value="pokal">Sponsoring: Pokal-Pate</option>
+                        <option value="fairplay">Sponsoring: Fair-Play-Partner</option>
+                        <option value="kaffeekasse">Sponsoring: Team-Kaffeekasse</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -283,6 +301,23 @@
                 console.error('Kopieren fehlgeschlagen', err);
             });
         }
+
+        // Auto-select dropdown based on URL param
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const grund = urlParams.get('grund');
+            if (grund) {
+                const select = document.getElementById('subject');
+                if (select) {
+                    for (let i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value === grund) {
+                            select.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        });
     </script>
 </body>
 
