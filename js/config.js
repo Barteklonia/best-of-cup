@@ -139,6 +139,43 @@ const CUP_DATA = {
 // Programmatically generate schedule for Jahrgang 2016 in Saison 26/27
 let schedule2016 = generateSchedule(CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams);
 
+// Tausch von Hin- und Rückspielen für Paarungen, bei denen das Rückspiel zuerst terminiert / ausgetragen wurde
+function swapHinUndRueckspiel(schedule, t1, t2) {
+    const half = schedule.length / 2;
+    for (let r = 0; r < half; r++) {
+        const hinMatches = schedule[r].matches;
+        const rueckMatches = schedule[r + half].matches;
+        for (let i = 0; i < hinMatches.length; i++) {
+            const [h, a] = hinMatches[i];
+            if ((h === t1 && a === t2) || (h === t2 && a === t1)) {
+                for (let j = 0; j < rueckMatches.length; j++) {
+                    const [rh, ra] = rueckMatches[j];
+                    if ((rh === t1 && ra === t2) || (rh === t2 && ra === t1)) {
+                        hinMatches[i] = [rh, ra];
+                        rueckMatches[j] = [h, a];
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Teams, die das Heimrecht für Hin- und Rückrunde getauscht haben:
+const SWAPPED_PAIRS_2016 = [
+    ["DSC 99 Düsseldorf", "SC Velbert"],
+    ["TSV Meerbusch", "SF Vorst"],
+    ["DSC 99 Düsseldorf", "VfB Hilden"],
+    ["FC Dönberg", "DSC 99 Düsseldorf"],
+    ["ETB Essen", "TSV Meerbusch"],
+    ["VfB Hilden", "GSG Duisburg"],
+    ["VfB Hilden", "SC Velbert"],
+    ["SC Velbert", "FC Dönberg"],
+    ["ETB Essen", "SC Velbert"]
+];
+
+SWAPPED_PAIRS_2016.forEach(([t1, t2]) => swapHinUndRueckspiel(schedule2016, t1, t2));
+
 // Manuelle Terminierungen eintragen
 // Wird jetzt automatisch von Firebase Cloud Functions befüllt (Collection: match_dates)
 
