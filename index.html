@@ -69,7 +69,7 @@
                         Spieltags-Vorschau
                     </span>
                     <h2 id="preview-headline" style="margin: 0; border: none; padding: 0; font-family: 'Outfit', sans-serif; font-size: 1.6rem;">
-                        Kommende Spiele
+                        N&auml;chste Spiele
                     </h2>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -336,18 +336,14 @@
                     return;
                 }
 
-                // If games exist on the earliest upcoming date/weekend, highlight that date in the headline
-                const earliestDate = upcoming[0].dateTime;
-                const weekdayName = WEEKDAYS[earliestDate.getDay()];
-                const dayDateStr = `${String(earliestDate.getDate()).padStart(2, '0')}.${String(earliestDate.getMonth() + 1).padStart(2, '0')}.${earliestDate.getFullYear()}`;
-                
                 // Show the next matchday weekend or up to next 6 upcoming games
                 // Games within 7 days of the earliest match date
+                const earliestDate = upcoming[0].dateTime;
                 const maxRange = new Date(earliestDate);
                 maxRange.setDate(maxRange.getDate() + 7);
                 const displayGames = upcoming.filter(g => g.dateTime <= maxRange).slice(0, 6);
 
-                headline.innerHTML = `N&auml;chste Spiele &bull; <span style="color: var(--accent); font-weight: 800;">${weekdayName}, ${dayDateStr}</span>`;
+                headline.innerHTML = `N&auml;chste Spiele`;
 
                 let allUpcomingDisplayGames = displayGames;
                 let currentPreviewFilter = 'all';
