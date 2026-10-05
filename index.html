@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
-    <title>Best of Cup | Die faire Jugendliga für Fußballteams auf Augenhöhe (Deutschland & Weltweit)</title>
+    <title>Best of Cup | Die faire Jugendliga für Fußballteams auf Augenhöhe (Deutschland &amp; Weltweit)</title>
     <meta name="description"
         content="Best of Cup – Das innovative Ligasystem und Turnierformat für spannende Jugendfußball-Spiele auf Augenhöhe. Ausgeglichene Nachwuchsteams, Twin Games und maximale Spielpraxis in ganz Deutschland und weltweit.">
     <meta name="keywords"
@@ -13,7 +13,7 @@
     <meta name="google-site-verification" content="Y6n2BrMJvXwZVzJqDXgkn7EaSfxmCRAG">
 
     <!-- Open Graph / Social Media -->
-    <meta property="og:title" content="Best of Cup | Die faire Jugendliga auf Augenhöhe (Deutschlandweit & Weltweit)">
+    <meta property="og:title" content="Best of Cup | Die faire Jugendliga auf Augenhöhe (Deutschlandweit &amp; Weltweit)">
     <meta property="og:description"
         content="Best of Cup – Das Ligasystem für faire Spiele auf Augenhöhe. Ausgeglichene Nachwuchsteams und Fokus auf sportliche Entwicklung in Deutschland und der ganzen Welt.">
     <meta property="og:image" content="https://bestofcup.de/assets/logo.jpg">
@@ -23,6 +23,10 @@
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="stylesheet" href="css/style.css?v=1.1">
     <script src="js/config.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
@@ -48,6 +52,7 @@
             <ul>
                 <li><a href="index.html" class="active">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
+                <li><a href="historie.html">Historie</a></li>
                 <li><a href="regeln.html">Regeln</a></li>
                 <li><a href="sponsoring.html">Sponsoring</a></li>
                 <li><a href="kontakt.html">Kontakt</a></li>
@@ -56,55 +61,36 @@
     </header>
 
     <main>
-        <!-- Hero Announcement Section for the New Season -->
-        <div class="card hero-card"
-            style="background: var(--primary); color: var(--secondary); text-align: center; padding: 40px 20px; border-radius: var(--radius); margin-bottom: 30px;">
-            <h2
-                style="color: var(--secondary); border: none; font-size: 1.8rem; font-family: 'Outfit', sans-serif; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.05em;">
-                Der Best of Cup geht in die nächste Runde!</h2>
-            <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 25px;">Die neue Saison 26/27 startet mit zwei
-                Spielklassen:</p>
-            <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                <a href="saison.html?saison=2026_2027&jahrgang=2014"
-                    style="display: block; text-decoration: none; color: inherit; background: rgba(255, 255, 255, 0.12); padding: 15px 25px; border-radius: 8px; min-width: 220px; border: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; transition: transform 0.2s;"
-                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    <div
-                        style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; opacity: 0.8; letter-spacing: 0.05em;">
-                        8+1 / Twin Games</div>
-                    <div
-                        style="font-size: 1.4rem; font-weight: 900; margin-top: 5px; font-family: 'Outfit', sans-serif;">
-                        Jahrgang 2014</div>
-                </a>
-                <a href="saison.html?saison=2026_2027&jahrgang=2016"
-                    style="display: block; text-decoration: none; color: inherit; background: rgba(255, 255, 255, 0.12); padding: 15px 25px; border-radius: 8px; min-width: 220px; border: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; transition: transform 0.2s;"
-                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    <div
-                        style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; opacity: 0.8; letter-spacing: 0.05em;">
-                        6+1 / Twin Games</div>
-                    <div
-                        style="font-size: 1.4rem; font-weight: 900; margin-top: 5px; font-family: 'Outfit', sans-serif;">
-                        Jahrgang 2016</div>
-                </a>
+        <!-- Kommende Spiele / Wochenend-Vorschau -->
+        <section class="card preview-section" style="margin-bottom: 30px; border-top: 4px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 14px;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display: block; margin-bottom: 4px;">
+                        Spieltags-Vorschau
+                    </span>
+                    <h2 id="preview-headline" style="margin: 0; border: none; padding: 0; font-family: 'Outfit', sans-serif; font-size: 1.6rem;">
+                        Kommende Spiele
+                    </h2>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="saison.html?saison=2026_2027&jahrgang=2014" class="preview-season-btn">
+                        Jahrgang 2014 (8+1) &rarr;
+                    </a>
+                    <a href="saison.html?saison=2026_2027&jahrgang=2016" class="preview-season-btn">
+                        Jahrgang 2016 (6+1) &rarr;
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- Meister-Glückwunsch Saison 25/26 -->
-        <div class="card champion-card"
-            style="border: 2px solid var(--accent); position: relative; overflow: hidden; padding: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
-            <img src="assets/wappen-1fcmg.png" alt="1. FC Mönchengladbach"
-                style="width: 80px; height: 80px; object-fit: contain;">
-            <div style="flex: 1; min-width: 250px;">
-                <h2
-                    style="border: none; margin-bottom: 8px; font-family: 'Outfit', sans-serif; font-weight: 800; text-transform: uppercase; font-size: 1.3rem; padding-bottom: 0;">
-                    Herzlichen Glückwunsch!</h2>
-                <p style="font-size: 1.05rem; line-height: 1.5; color: var(--text-main);">Wir gratulieren dem <strong>1.
-                        FC Mönchengladbach</strong> herzlich zum Gesamtsieg im <strong>Jahrgang 2014</strong> in der
-                    abgelaufenen Saison 25/26!</p>
+            <div id="weekend-preview-container">
+                <div style="text-align: center; padding: 35px 15px; color: var(--text-muted); font-size: 0.95rem;">
+                    Lade anstehende Spiele...
+                </div>
             </div>
-        </div>
+        </section>
 
         <div class="card welcome-card">
-            <h2>Unsere "Europa League"</h2>
+            <h2>Unsere &quot;Europa League&quot;</h2>
             <p class="welcome-intro">Herzlich willkommen auf der offiziellen Seite des <strong>Best of Cup</strong> –
                 dem überregionalen Ligaformat für ambitionierte Jugendteams.</p>
 
@@ -173,7 +159,6 @@
             </div>
         </div>
 
-
         <!-- Participants Grids (dynamically loaded from config) -->
         <div class="card">
             <h2>Die Teilnehmer (Saison 26/27)</h2>
@@ -216,6 +201,7 @@
     <footer>
         <p>&copy; 2025 Best of Cup</p>
         <p style="margin-top: 10px;">
+            <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
             <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
             <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a> |
             <a href="logbuch.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Logbuch</a>
@@ -223,6 +209,182 @@
     </footer>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
+            authDomain: "best-of-cup.firebaseapp.com",
+            projectId: "best-of-cup",
+            storageBucket: "best-of-cup.firebasestorage.app",
+            messagingSenderId: "188725945748",
+            appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
+            measurementId: "G-HGCM4M029D"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Helper to get logos & age group
+        function getTeamMeta(teamName) {
+            const season = CUP_DATA.seasons["2026_2027"];
+            if (!season) return { logo: "assets/logo.jpg", ageGroup: "2014" };
+            
+            if (season.ageGroups["2014"] && season.ageGroups["2014"].teams[teamName]) {
+                return { logo: season.ageGroups["2014"].teams[teamName].logo, ageGroup: "2014" };
+            }
+            if (season.ageGroups["2016"] && season.ageGroups["2016"].teams[teamName]) {
+                return { logo: season.ageGroups["2016"].teams[teamName].logo, ageGroup: "2016" };
+            }
+            return { logo: "assets/logo.jpg", ageGroup: "2014" };
+        }
+
+        const WEEKDAYS = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
+
+        function parseMatchDateTime(dateStr, timeStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('.');
+            if (parts.length !== 3) return null;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            let hours = 12;
+            let minutes = 0;
+            if (timeStr && timeStr.includes(':')) {
+                const tParts = timeStr.split(':');
+                hours = parseInt(tParts[0], 10) || 12;
+                minutes = parseInt(tParts[1], 10) || 0;
+            }
+            return new Date(year, month, day, hours, minutes);
+        }
+
+        function loadWeekendPreview() {
+            const container = document.getElementById('weekend-preview-container');
+            const headline = document.getElementById('preview-headline');
+
+            Promise.all([
+                db.collection("match_dates").get(),
+                db.collection("spiele").get()
+            ]).then(([datesSnapshot, spieleSnapshot]) => {
+                // Collect games that already have results recorded
+                const playedGames = new Set();
+                spieleSnapshot.forEach(doc => {
+                    const g = doc.data();
+                    if ((g.saison === "2026_2027" || !g.saison) && (g.ergebnis81 || g.ergebnis41)) {
+                        playedGames.add(`${g.heim}_${g.gast}`);
+                    }
+                });
+
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                const upcoming = [];
+                datesSnapshot.forEach(doc => {
+                    const isCancelled = typeof CANCELLED_MATCH_DATES !== 'undefined' && CANCELLED_MATCH_DATES.includes(doc.id);
+                    if (isCancelled) return;
+                    if (playedGames.has(doc.id)) return; // already played
+
+                    const data = doc.data();
+                    const dt = parseMatchDateTime(data.date, data.time);
+                    if (!dt) return;
+
+                    // Only upcoming matches (today onwards)
+                    if (dt >= todayStart) {
+                        const homeMeta = getTeamMeta(data.team1);
+                        const awayMeta = getTeamMeta(data.team2);
+                        const ageGroup = data.ageGroup || homeMeta.ageGroup || awayMeta.ageGroup || "2014";
+
+                        upcoming.push({
+                            id: doc.id,
+                            team1: data.team1,
+                            team2: data.team2,
+                            dateStr: data.date,
+                            timeStr: data.time || "12:00",
+                            location: data.location || "",
+                            ageGroup: ageGroup,
+                            homeLogo: homeMeta.logo,
+                            awayLogo: awayMeta.logo,
+                            dateTime: dt
+                        });
+                    }
+                });
+
+                // Sort upcoming games chronologically
+                upcoming.sort((a, b) => a.dateTime - b.dateTime);
+
+                if (upcoming.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 30px 15px; background: rgba(0,0,0,0.02); border-radius: var(--radius); border: 1px dashed var(--border-color);">
+                            <p style="margin: 0 0 10px 0; font-weight: 700; color: var(--text-main);">Zurzeit sind keine weiteren Spiele für das kommende Wochenende terminiert.</p>
+                            <p style="margin: 0 0 15px 0; font-size: 0.9rem; color: var(--text-muted);">Alle Spieltermine und Ergebnisse findest du in den Saison-Übersichten.</p>
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <a href="saison.html?saison=2026_2027&jahrgang=2014" class="preview-season-btn">Spielplan Jahrgang 2014 &rarr;</a>
+                                <a href="saison.html?saison=2026_2027&jahrgang=2016" class="preview-season-btn">Spielplan Jahrgang 2016 &rarr;</a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // If games exist on the earliest upcoming date/weekend, highlight that date in the headline
+                const earliestDate = upcoming[0].dateTime;
+                const weekdayName = WEEKDAYS[earliestDate.getDay()];
+                const dayDateStr = `${String(earliestDate.getDate()).padStart(2, '0')}.${String(earliestDate.getMonth() + 1).padStart(2, '0')}.${earliestDate.getFullYear()}`;
+                
+                // Show the next matchday weekend or up to next 6 upcoming games
+                // Games within 7 days of the earliest match date
+                const maxRange = new Date(earliestDate);
+                maxRange.setDate(maxRange.getDate() + 7);
+                const displayGames = upcoming.filter(g => g.dateTime <= maxRange).slice(0, 6);
+
+                headline.innerHTML = `N&auml;chste Spiele &bull; <span style="color: var(--accent); font-weight: 800;">${weekdayName}, ${dayDateStr}</span>`;
+
+                let html = '<div class="preview-grid">';
+                displayGames.forEach(m => {
+                    const matchDay = WEEKDAYS[m.dateTime.getDay()];
+                    const matchDateShort = `${String(m.dateTime.getDate()).padStart(2, '0')}.${String(m.dateTime.getMonth() + 1).padStart(2, '0')}.`;
+                    const ageLabel = m.ageGroup === "2016" ? "Jg. 2016 (6+1)" : "Jg. 2014 (8+1)";
+                    const loc = m.location ? m.location : `Heimspiel ${m.team1}`;
+
+                    const url = `spiel.html?saison=2026_2027&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+
+                    html += `
+                        <a href="${url}" class="preview-match-card" title="Details zum Spiel anzeigen">
+                            <div class="preview-match-header">
+                                <div class="preview-date-badge">
+                                    <span>&#128197;</span>
+                                    <span>${matchDay} ${matchDateShort} &bull; ${m.timeStr} Uhr</span>
+                                </div>
+                                <span class="preview-age-pill">${ageLabel}</span>
+                            </div>
+                            <div class="preview-match-teams">
+                                <div class="preview-team-col home">
+                                    <img src="${m.homeLogo}" alt="${m.team1}" onerror="this.src='assets/logo.jpg'">
+                                    <span>${m.team1}</span>
+                                </div>
+                                <div class="preview-vs-badge">VS</div>
+                                <div class="preview-team-col away">
+                                    <span>${m.team2}</span>
+                                    <img src="${m.awayLogo}" alt="${m.team2}" onerror="this.src='assets/logo.jpg'">
+                                </div>
+                            </div>
+                            <div class="preview-location">
+                                <span style="opacity: 0.7;">&#128205;</span>
+                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${loc}</span>
+                                <span style="font-weight: 800; color: var(--primary);">&rarr;</span>
+                            </div>
+                        </a>
+                    `;
+                });
+                html += '</div>';
+
+                container.innerHTML = html;
+            }).catch(err => {
+                console.error("Error loading preview:", err);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 25px; color: var(--text-muted);">
+                        Spielevorschau konnte nicht geladen werden. Bitte versuche es später erneut.
+                    </div>
+                `;
+            });
+        }
+
         // Funktion zum Rendern der Teilnehmer
         function renderParticipants() {
             const newSeasonData = CUP_DATA.seasons["2026_2027"];
@@ -274,6 +436,7 @@
         }
 
         // Ausführen beim Laden der Seite
+        loadWeekendPreview();
         renderParticipants();
     </script>
 
