@@ -1552,6 +1552,8 @@ select.no-arrow {
     border-radius: 4px;
     background: #000;
     color: #fff;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .preview-match-teams {
