@@ -74,10 +74,10 @@
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="saison.html?saison=2026_2027&jahrgang=2014" class="preview-season-btn">
-                        Jahrgang 2014 (8+1) &rarr;
+                        Jahrgang 2014 &rarr;
                     </a>
                     <a href="saison.html?saison=2026_2027&jahrgang=2016" class="preview-season-btn">
-                        Jahrgang 2016 (6+1) &rarr;
+                        Jahrgang 2016 &rarr;
                     </a>
                 </div>
             </div>
@@ -339,7 +339,7 @@
                 displayGames.forEach(m => {
                     const matchDay = WEEKDAYS[m.dateTime.getDay()];
                     const matchDateShort = `${String(m.dateTime.getDate()).padStart(2, '0')}.${String(m.dateTime.getMonth() + 1).padStart(2, '0')}.`;
-                    const ageLabel = m.ageGroup === "2016" ? "Jg. 2016 (6+1)" : "Jg. 2014 (8+1)";
+                    const ageLabel = m.ageGroup === "2016" ? "Jahrgang 2016" : "Jahrgang 2014";
                     const loc = m.location ? m.location : `Heimspiel ${m.team1}`;
 
                     const url = `spiel.html?saison=2026_2027&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
