@@ -1722,3 +1722,37 @@ select.no-arrow {
     align-items: center;
     gap: 6px;
 }
+
+.preview-filter-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preview-filter-btn:hover {
+    color: var(--primary);
+    border-color: #000;
+}
+
+.preview-filter-btn.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.preview-age-pill.pill-2016 {
+    background: #000;
+    color: #fff;
+}
+
+.preview-age-pill.pill-2014 {
+    background: #1e3a8a;
+    color: #fff;
+}

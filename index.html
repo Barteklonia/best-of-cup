@@ -222,15 +222,18 @@
         const db = firebase.firestore();
 
         // Helper to get logos & age group
-        function getTeamMeta(teamName) {
+        function getTeamMeta(teamName, preferredAgeGroup) {
             const season = CUP_DATA.seasons["2026_2027"];
             if (!season) return { logo: "assets/logo.jpg", ageGroup: "2014" };
             
-            if (season.ageGroups["2014"] && season.ageGroups["2014"].teams[teamName]) {
-                return { logo: season.ageGroups["2014"].teams[teamName].logo, ageGroup: "2014" };
+            if (preferredAgeGroup && season.ageGroups[preferredAgeGroup] && season.ageGroups[preferredAgeGroup].teams[teamName]) {
+                return { logo: season.ageGroups[preferredAgeGroup].teams[teamName].logo, ageGroup: preferredAgeGroup };
             }
             if (season.ageGroups["2016"] && season.ageGroups["2016"].teams[teamName]) {
                 return { logo: season.ageGroups["2016"].teams[teamName].logo, ageGroup: "2016" };
+            }
+            if (season.ageGroups["2014"] && season.ageGroups["2014"].teams[teamName]) {
+                return { logo: season.ageGroups["2014"].teams[teamName].logo, ageGroup: "2014" };
             }
             return { logo: "assets/logo.jpg", ageGroup: "2014" };
         }
@@ -286,9 +289,20 @@
 
                     // Only upcoming matches (today onwards)
                     if (dt >= todayStart) {
-                        const homeMeta = getTeamMeta(data.team1);
-                        const awayMeta = getTeamMeta(data.team2);
-                        const ageGroup = data.ageGroup || homeMeta.ageGroup || awayMeta.ageGroup || "2014";
+                        const rawAge = data.ageGroup ? String(data.ageGroup).trim() : "";
+                        let resolvedAge = rawAge;
+                        const teams2016 = (CUP_DATA.seasons["2026_2027"] && CUP_DATA.seasons["2026_2027"].ageGroups["2016"]) ? CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams : {};
+
+                        if (resolvedAge !== "2014" && resolvedAge !== "2016") {
+                            if (teams2016[data.team1] || teams2016[data.team2]) {
+                                resolvedAge = "2016";
+                            } else {
+                                resolvedAge = "2014";
+                            }
+                        }
+
+                        const homeMeta = getTeamMeta(data.team1, resolvedAge);
+                        const awayMeta = getTeamMeta(data.team2, resolvedAge);
 
                         upcoming.push({
                             id: doc.id,
@@ -297,7 +311,7 @@
                             dateStr: data.date,
                             timeStr: data.time || "12:00",
                             location: data.location || "",
-                            ageGroup: ageGroup,
+                            ageGroup: resolvedAge,
                             homeLogo: homeMeta.logo,
                             awayLogo: awayMeta.logo,
                             dateTime: dt
@@ -335,46 +349,86 @@
 
                 headline.innerHTML = `N&auml;chste Spiele &bull; <span style="color: var(--accent); font-weight: 800;">${weekdayName}, ${dayDateStr}</span>`;
 
-                let html = '<div class="preview-grid">';
-                displayGames.forEach(m => {
-                    const matchDay = WEEKDAYS[m.dateTime.getDay()];
-                    const matchDateShort = `${String(m.dateTime.getDate()).padStart(2, '0')}.${String(m.dateTime.getMonth() + 1).padStart(2, '0')}.`;
-                    const ageLabel = m.ageGroup === "2016" ? "Jahrgang 2016" : "Jahrgang 2014";
-                    const loc = m.location ? m.location : `Heimspiel ${m.team1}`;
+                let allUpcomingDisplayGames = displayGames;
+                let currentPreviewFilter = 'all';
 
-                    const url = `spiel.html?saison=2026_2027&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+                window.filterPreview = function(filter, btn) {
+                    currentPreviewFilter = filter;
+                    document.querySelectorAll('.preview-filter-btn').forEach(b => b.classList.remove('active'));
+                    if (btn) btn.classList.add('active');
+                    renderPreviewCards();
+                };
 
-                    html += `
-                        <a href="${url}" class="preview-match-card" title="Details zum Spiel anzeigen">
-                            <div class="preview-match-header">
-                                <div class="preview-date-badge">
-                                    <span>&#128197;</span>
-                                    <span>${matchDay} ${matchDateShort} &bull; ${m.timeStr} Uhr</span>
-                                </div>
-                                <span class="preview-age-pill">${ageLabel}</span>
-                            </div>
-                            <div class="preview-match-teams">
-                                <div class="preview-team-col home">
-                                    <img src="${m.homeLogo}" alt="${m.team1}" onerror="this.src='assets/logo.jpg'">
-                                    <span>${m.team1}</span>
-                                </div>
-                                <div class="preview-vs-badge">VS</div>
-                                <div class="preview-team-col away">
-                                    <span>${m.team2}</span>
-                                    <img src="${m.awayLogo}" alt="${m.team2}" onerror="this.src='assets/logo.jpg'">
-                                </div>
-                            </div>
-                            <div class="preview-location">
-                                <span style="opacity: 0.7;">&#128205;</span>
-                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${loc}</span>
-                                <span style="font-weight: 800; color: var(--primary);">&rarr;</span>
-                            </div>
-                        </a>
-                    `;
-                });
-                html += '</div>';
+                function renderPreviewCards() {
+                    const gridContainer = document.getElementById('preview-cards-grid');
+                    if (!gridContainer) return;
 
-                container.innerHTML = html;
+                    const filtered = currentPreviewFilter === 'all'
+                        ? allUpcomingDisplayGames
+                        : allUpcomingDisplayGames.filter(m => m.ageGroup === currentPreviewFilter);
+
+                    if (filtered.length === 0) {
+                        gridContainer.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 25px; color: var(--text-muted); background: rgba(0,0,0,0.02); border-radius: var(--radius); border: 1px dashed var(--border-color);">
+                                Für diesen Jahrgang sind am kommenden Spieltag keine weiteren Partien terminiert.
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    let html = '';
+                    filtered.forEach(m => {
+                        const matchDay = WEEKDAYS[m.dateTime.getDay()];
+                        const matchDateShort = `${String(m.dateTime.getDate()).padStart(2, '0')}.${String(m.dateTime.getMonth() + 1).padStart(2, '0')}.`;
+                        const ageLabel = m.ageGroup;
+                        const loc = m.location ? m.location : `Heimspiel ${m.team1}`;
+
+                        const url = `spiel.html?saison=2026_2027&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+
+                        html += `
+                            <a href="${url}" class="preview-match-card" title="Details zum Spiel anzeigen">
+                                <div class="preview-match-header">
+                                    <div class="preview-date-badge">
+                                        <span>&#128197;</span>
+                                        <span>${matchDay} ${matchDateShort} &bull; ${m.timeStr} Uhr</span>
+                                    </div>
+                                    <span class="preview-age-pill pill-${m.ageGroup}">${ageLabel}</span>
+                                </div>
+                                <div class="preview-match-teams">
+                                    <div class="preview-team-col home">
+                                        <img src="${m.homeLogo}" alt="${m.team1}" onerror="this.src='assets/logo.jpg'">
+                                        <span>${m.team1}</span>
+                                    </div>
+                                    <div class="preview-vs-badge">VS</div>
+                                    <div class="preview-team-col away">
+                                        <span>${m.team2}</span>
+                                        <img src="${m.awayLogo}" alt="${m.team2}" onerror="this.src='assets/logo.jpg'">
+                                    </div>
+                                </div>
+                                <div class="preview-location">
+                                    <span style="opacity: 0.7;">&#128205;</span>
+                                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${loc}</span>
+                                    <span style="font-weight: 800; color: var(--primary);">&rarr;</span>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    gridContainer.innerHTML = html;
+                }
+
+                const count2014 = allUpcomingDisplayGames.filter(g => g.ageGroup === '2014').length;
+                const count2016 = allUpcomingDisplayGames.filter(g => g.ageGroup === '2016').length;
+
+                container.innerHTML = `
+                    <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
+                        <button class="preview-filter-btn active" onclick="filterPreview('all', this)">Alle (${allUpcomingDisplayGames.length})</button>
+                        <button class="preview-filter-btn" onclick="filterPreview('2014', this)">Jahrgang 2014 (${count2014})</button>
+                        <button class="preview-filter-btn" onclick="filterPreview('2016', this)">Jahrgang 2016 (${count2016})</button>
+                    </div>
+                    <div id="preview-cards-grid" class="preview-grid"></div>
+                `;
+
+                renderPreviewCards();
             }).catch(err => {
                 console.error("Error loading preview:", err);
                 container.innerHTML = `
