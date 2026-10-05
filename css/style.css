@@ -1792,3 +1792,61 @@ select.no-arrow {
     background: #1e3a8a;
     color: #fff;
 }
+
+/* Sponsoring Promo Card in Preview Grid */
+.preview-sponsor-card {
+    background: var(--bg-body);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.preview-sponsor-card:hover {
+    border-color: #000;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.preview-sponsor-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 8px 0 12px 0;
+}
+
+.preview-sponsor-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: var(--primary);
+    transition: transform 0.2s ease;
+}
+
+.preview-sponsor-card:hover .preview-sponsor-icon-wrap {
+    transform: scale(1.08);
+}
+
+.preview-sponsor-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--primary);
+    margin-bottom: 4px;
+    line-height: 1.25;
+}
+
+.preview-sponsor-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    max-width: 250px;
+}
