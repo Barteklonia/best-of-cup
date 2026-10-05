@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 
 <head>
@@ -581,8 +581,8 @@
                     const mainLabel = selectedAgeGroup === "2016" ? "6+1" : "8+1";
                     centerHtml = `
                         <div class="match-score-box">
-                            <div class="score-line-main">${mainLabel}: ${res.gH_81}:${res.gA_81}</div>
-                            <div class="score-line-sub">TG: ${res.gH_41}:${res.gA_41}</div>
+                            <div class="score-line-main"><span class="score-mode">${mainLabel}:</span> <span class="score-val">${res.gH_81}:${res.gA_81}</span></div>
+                            <div class="score-line-sub"><span class="score-mode">TG:</span> <span class="score-val">${res.gH_41}:${res.gA_41}</span></div>
                         </div>`;
                 } else if (dateFixed) {
                     let parts = dateFixed.split(', ');
