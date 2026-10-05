@@ -147,6 +147,12 @@ function getFullTeamName(keyword, ageGroup) {
     return keyword;
 }
 
+const IGNORED_OR_CANCELLED_MATCH_IDS = [
+    "ETB Essen_GSG Duisburg",
+    "TSV Meerbusch_DSC 99 Düsseldorf",
+    "DSC 99 Düsseldorf_TSV Meerbusch"
+];
+
 exports.scrapeMatches = onSchedule({
     schedule: "0 3 * * *", // Every day at 3 AM
     timeZone: "Europe/Berlin",
@@ -159,11 +165,17 @@ exports.scrapeMatches = onSchedule({
     const { matchesFound: matches2014, matchesCancelled: cancelled2014 } = await scrapeAgeGroup(TEAMS_2014, teamKeywords2014);
     
     const batch = db.batch();
+
+    // Explicitly delete known cancelled games or private test matches from match_dates
+    for (const id of IGNORED_OR_CANCELLED_MATCH_IDS) {
+        batch.delete(db.collection('match_dates').doc(id));
+    }
     
     for (const match of matches2016) {
         const t1 = getFullTeamName(match.team1, 2016);
         const t2 = getFullTeamName(match.team2, 2016);
         const matchId = `${t1}_${t2}`;
+        if (IGNORED_OR_CANCELLED_MATCH_IDS.includes(matchId)) continue;
         
         const ref = db.collection('match_dates').doc(matchId);
         batch.set(ref, {
@@ -189,6 +201,7 @@ exports.scrapeMatches = onSchedule({
         const t1 = getFullTeamName(match.team1, 2014);
         const t2 = getFullTeamName(match.team2, 2014);
         const matchId = `${t1}_${t2}`;
+        if (IGNORED_OR_CANCELLED_MATCH_IDS.includes(matchId)) continue;
         
         const ref = db.collection('match_dates').doc(matchId);
         batch.set(ref, {

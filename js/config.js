@@ -177,9 +177,11 @@ const SWAPPED_PAIRS_2016 = [
 
 SWAPPED_PAIRS_2016.forEach(([t1, t2]) => swapHinUndRueckspiel(schedule2016, t1, t2));
 
-// Abgesetzte Spiele / Stornierungen (werden hier sofort gefiltert, falls Firestore noch alte Daten enthält)
+// Abgesetzte Spiele / Stornierungen / Testspiele (werden hier sofort gefiltert, falls Firestore noch alte Daten enthält)
 const CANCELLED_MATCH_DATES = [
-    "ETB Essen_GSG Duisburg"
+    "ETB Essen_GSG Duisburg",
+    "TSV Meerbusch_DSC 99 Düsseldorf",
+    "DSC 99 Düsseldorf_TSV Meerbusch"
 ];
 
 // Manuelle Terminierungen eintragen
