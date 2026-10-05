@@ -40,6 +40,7 @@ async function fetchMatchplan(teamId) {
 
 async function scrapeAgeGroup(teams, keywords) {
     const matchesFound = [];
+    const matchesCancelled = [];
     
     for (const team of teams) {
         const html = await fetchMatchplan(team.id);
@@ -62,7 +63,7 @@ async function scrapeAgeGroup(teams, keywords) {
                 }
             }
             
-            if (row.includes('info-text">Absetzung') || row.includes('info-text">Abgesagt')) continue;
+            const isCancelled = row.includes('info-text">Absetzung') || row.includes('info-text">Abgesagt') || row.includes('Absetzung') || row.includes('Abgesagt');
             
             let matchedKeywords = [];
             let keywordPositions = [];
@@ -75,47 +76,53 @@ async function scrapeAgeGroup(teams, keywords) {
             keywordPositions.sort((a, b) => a.idx - b.idx);
             matchedKeywords = keywordPositions.map(kp => kp.keyword);
             
-            if (matchedKeywords.length >= 2 && currentDate && currentTime) {
-                const linkMatch = row.match(/href="([^"]+\/spiel\/[^"]+)"/);
-                
-                if (linkMatch) {
-                    const date = currentDate;
-                    const time = currentTime;
-                    let link = linkMatch[1];
-                    if (link.startsWith('//')) link = 'https:' + link;
+            if (matchedKeywords.length >= 2) {
+                const nameMatches = [...row.matchAll(/class="club-name">\s*([^<]+)\s*</g)];
+                if (nameMatches.length >= 2) {
+                    let htmlHeimName = nameMatches[0][1].trim();
+                    let htmlGastName = nameMatches[1][1].trim();
+                    let team1 = keywords.find(k => htmlHeimName.includes(k)) || matchedKeywords[0];
+                    let team2 = keywords.find(k => htmlGastName.includes(k)) || matchedKeywords[1];
                     
-                    if (!matchesFound.some(m => m.link === link)) {
-                        try {
-                            const detailRes = await fetch(link);
-                            const detailHtml = await detailRes.text();
-                            const locMatch = detailHtml.match(/class="location"[^>]*>\s*([^<]+)\s*</);
-                            const location = locMatch ? locMatch[1].trim() : "";
+                    if (isCancelled) {
+                        matchesCancelled.push({ team1, team2 });
+                        continue;
+                    }
+                    
+                    if (currentDate && currentTime) {
+                        const linkMatch = row.match(/href="([^"]+\/spiel\/[^"]+)"/);
+                        if (linkMatch) {
+                            const date = currentDate;
+                            const time = currentTime;
+                            let link = linkMatch[1];
+                            if (link.startsWith('//')) link = 'https:' + link;
                             
-                            const nameMatches = [...row.matchAll(/class="club-name">\s*([^<]+)\s*</g)];
-                            if (nameMatches.length >= 2) {
-                                let htmlHeimName = nameMatches[0][1].trim();
-                                let htmlGastName = nameMatches[1][1].trim();
-                                let team1 = keywords.find(k => htmlHeimName.includes(k)) || matchedKeywords[0];
-                                let team2 = keywords.find(k => htmlGastName.includes(k)) || matchedKeywords[1];
-                                
-                                matchesFound.push({
-                                    team1,
-                                    team2,
-                                    date,
-                                    time,
-                                    location,
-                                    link
-                                });
+                            if (!matchesFound.some(m => m.link === link)) {
+                                try {
+                                    const detailRes = await fetch(link);
+                                    const detailHtml = await detailRes.text();
+                                    const locMatch = detailHtml.match(/class="location"[^>]*>\s*([^<]+)\s*</);
+                                    const location = locMatch ? locMatch[1].trim() : "";
+                                    
+                                    matchesFound.push({
+                                        team1,
+                                        team2,
+                                        date,
+                                        time,
+                                        location,
+                                        link
+                                    });
+                                } catch(e) {
+                                    console.error("Fetch detail error", e);
+                                }
                             }
-                        } catch(e) {
-                            console.error("Fetch detail error", e);
                         }
                     }
                 }
             }
         }
     }
-    return matchesFound;
+    return { matchesFound, matchesCancelled };
 }
 
 function getFullTeamName(keyword, ageGroup) {
@@ -148,8 +155,8 @@ exports.scrapeMatches = onSchedule({
 }, async (event) => {
     console.log("Starting daily fussball.de scrape...");
     
-    const matches2016 = await scrapeAgeGroup(TEAMS_2016, teamKeywords2016);
-    const matches2014 = await scrapeAgeGroup(TEAMS_2014, teamKeywords2014);
+    const { matchesFound: matches2016, matchesCancelled: cancelled2016 } = await scrapeAgeGroup(TEAMS_2016, teamKeywords2016);
+    const { matchesFound: matches2014, matchesCancelled: cancelled2014 } = await scrapeAgeGroup(TEAMS_2014, teamKeywords2014);
     
     const batch = db.batch();
     
@@ -170,6 +177,14 @@ exports.scrapeMatches = onSchedule({
         }, { merge: true });
     }
     
+    for (const match of cancelled2016) {
+        const t1 = getFullTeamName(match.team1, 2016);
+        const t2 = getFullTeamName(match.team2, 2016);
+        const matchId = `${t1}_${t2}`;
+        const ref = db.collection('match_dates').doc(matchId);
+        batch.delete(ref);
+    }
+    
     for (const match of matches2014) {
         const t1 = getFullTeamName(match.team1, 2014);
         const t2 = getFullTeamName(match.team2, 2014);
@@ -187,6 +202,14 @@ exports.scrapeMatches = onSchedule({
         }, { merge: true });
     }
     
+    for (const match of cancelled2014) {
+        const t1 = getFullTeamName(match.team1, 2014);
+        const t2 = getFullTeamName(match.team2, 2014);
+        const matchId = `${t1}_${t2}`;
+        const ref = db.collection('match_dates').doc(matchId);
+        batch.delete(ref);
+    }
+    
     await batch.commit();
-    console.log(`Scraping finished. Updated ${matches2016.length + matches2014.length} matches.`);
+    console.log(`Scraping finished. Updated ${matches2016.length + matches2014.length} matches, deleted ${cancelled2016.length + cancelled2014.length} cancelled matches.`);
 });

@@ -171,10 +171,16 @@ const SWAPPED_PAIRS_2016 = [
     ["VfB Hilden", "GSG Duisburg"],
     ["VfB Hilden", "SC Velbert"],
     ["SC Velbert", "FC Dönberg"],
-    ["ETB Essen", "SC Velbert"]
+    ["ETB Essen", "SC Velbert"],
+    ["ETB Essen", "GSG Duisburg"]
 ];
 
 SWAPPED_PAIRS_2016.forEach(([t1, t2]) => swapHinUndRueckspiel(schedule2016, t1, t2));
+
+// Abgesetzte Spiele / Stornierungen (werden hier sofort gefiltert, falls Firestore noch alte Daten enthält)
+const CANCELLED_MATCH_DATES = [
+    "ETB Essen_GSG Duisburg"
+];
 
 // Manuelle Terminierungen eintragen
 // Wird jetzt automatisch von Firebase Cloud Functions befüllt (Collection: match_dates)

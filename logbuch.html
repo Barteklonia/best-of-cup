@@ -111,6 +111,16 @@
 
             <div class="log-entry">
                 <div class="log-date">5. Oktober 2026</div>
+                <h3 class="log-title">Automatische Bereinigung abgesetzter Spiele & Spielplan-Feinschliff</h3>
+                <ul class="log-list">
+                    <li>Firebase Scraper: Der Cloud-Functions-Scraper erkennt nun offizielle Spielabsetzungen („Absetzung“ / „Abgesagt“) auf fussball.de und löscht diese Termine automatisch aus der Datenbank, anstatt alte Termine fälschlicherweise beizubehalten.</li>
+                    <li>6. Spieltag (Jahrgang 2016): Die abgesetzte Vormittagspartie zwischen ETB Essen und GSG Duisburg (09:30 Uhr) wurde bereinigt und durch die tatsächliche Ansetzung in Duisburg (13:00 Uhr) mit getauschtem Heimrecht ersetzt.</li>
+                    <li>Frontend-Absicherung: Spielplan (saison.html) und Spiel-Detailansicht (spiel.html) filtern abgesetzte Spieltermine nun sofort heraus.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">5. Oktober 2026</div>
                 <h3 class="log-title">Spielplan-Anpassung Jahrgang 2016 (Heimrecht & Spielreihenfolge)</h3>
                 <ul class="log-list">
                     <li>Spielplan: Synchronisation und Tausch von Hin- und Rückspielen für Paarungen, bei denen Teams organisatorisch zuerst das Rückspiel angesetzt oder ausgetragen haben (u.&nbsp;a. SC Velbert vs. DSC 99 Düsseldorf, SF Vorst vs. TSV Meerbusch, VfB Hilden vs. DSC 99 Düsseldorf).</li>

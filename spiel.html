@@ -524,7 +524,8 @@
             ]).then(([spieleSnapshot, dateDoc]) => {
                 let matchFound = false;
                 
-                if (dateDoc.exists && dateDoc.data().ageGroup.toString() === jahrgang) {
+                const isCancelled = typeof CANCELLED_MATCH_DATES !== 'undefined' && CANCELLED_MATCH_DATES.includes(matchId);
+                if (dateDoc.exists && dateDoc.data().ageGroup.toString() === jahrgang && !isCancelled) {
                     const dData = dateDoc.data();
                     dateFixed = dData.date + ", " + dData.time;
                     matchLocation = dData.location;

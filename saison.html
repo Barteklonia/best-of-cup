@@ -281,7 +281,8 @@
                 allMatchDates = {};
                 datesSnapshot.forEach((doc) => {
                     const dateData = doc.data();
-                    if (dateData.ageGroup && dateData.ageGroup.toString() === selectedAgeGroup) {
+                    const isCancelled = typeof CANCELLED_MATCH_DATES !== 'undefined' && CANCELLED_MATCH_DATES.includes(doc.id);
+                    if (dateData.ageGroup && dateData.ageGroup.toString() === selectedAgeGroup && !isCancelled) {
                         allMatchDates[doc.id] = dateData;
                     }
                 });
