@@ -439,14 +439,11 @@
                     gridContainer.innerHTML = html;
                 }
 
-                const count2014 = allUpcomingDisplayGames.filter(g => g.ageGroup === '2014').length;
-                const count2016 = allUpcomingDisplayGames.filter(g => g.ageGroup === '2016').length;
-
                 container.innerHTML = `
                     <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
-                        <button class="preview-filter-btn active" onclick="filterPreview('all', this)">Alle (${allUpcomingDisplayGames.length})</button>
-                        <button class="preview-filter-btn" onclick="filterPreview('2014', this)">Jahrgang 2014 (${count2014})</button>
-                        <button class="preview-filter-btn" onclick="filterPreview('2016', this)">Jahrgang 2016 (${count2016})</button>
+                        <button class="preview-filter-btn active" onclick="filterPreview('all', this)">Alle</button>
+                        <button class="preview-filter-btn" onclick="filterPreview('2014', this)">Jahrgang 2014</button>
+                        <button class="preview-filter-btn" onclick="filterPreview('2016', this)">Jahrgang 2016</button>
                     </div>
                     <div id="preview-cards-grid" class="preview-grid"></div>
                 `;
