@@ -362,14 +362,13 @@
                 </div>
                 
                 <div class="match-score-col">
-                    <div style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.7); margin-bottom: 6px;">Großfeld</div>
                     <div class="match-score-main">
                         <span id="home-score">&minus;</span>
                         <span class="colon">:</span>
                         <span id="away-score">&minus;</span>
                     </div>
                     <div class="match-score-sub" id="sub-score" style="display: none;">
-                        TWIN GAMES: &minus;:&minus;
+                        TG: &minus;:&minus;
                     </div>
                 </div>
 
@@ -560,7 +559,7 @@
                       
                       const subScore = document.getElementById('sub-score');
                       subScore.style.display = 'block';
-                      subScore.innerText = `TWIN GAMES: ${game.ergebnis41[0]}:${game.ergebnis41[1]}`;
+                      subScore.innerText = `TG: ${game.ergebnis41[0]}:${game.ergebnis41[1]}`;
 
                       // Update Date/Time
                       const timeEl = document.getElementById('info-time');

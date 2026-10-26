@@ -343,9 +343,6 @@
                 }
 
                 // Beziehe dich immer auf die nächsten 2 Wochen bis einschließlich Sonntag
-                const todayStart = new Date();
-                todayStart.setHours(0, 0, 0, 0);
-
                 // Tage bis zum Sonntag dieser Woche (Sonntag = 0 -> 7 Tage, sonst 7 - getDay())
                 const currentDay = todayStart.getDay();
                 const daysToThisSunday = (currentDay === 0) ? 7 : (7 - currentDay);
