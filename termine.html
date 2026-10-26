@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Alle geplanten Spiele &amp; Termine | Best of Cup</title>
+    <meta name="description"
+        content="Alle bisher terminierten und ausgetragenen Spiele der Best of Cup Saison 2026/2027 in chronologischer Reihenfolge für Jahrgang 2014 und Jahrgang 2016.">
+    <meta name="keywords"
+        content="Spielplan, Spieltermine, Best of Cup, Jugendfußball, Jahrgang 2014, Jahrgang 2016, Termine, Ergebnisse, faire Jugendliga">
+    <meta name="google-site-verification" content="Y6n2BrMJvXwZVzJqDXgkn7EaSfxmCRAG">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Alle geplanten Spiele | Best of Cup">
+    <meta property="og:description"
+        content="Vollständige chronologische Terminübersicht aller Best of Cup Spiele der Saison 2026/2027.">
+    <meta property="og:image" content="https://bestofcup.de/assets/logo.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bestofcup.de/termine.html">
+
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css?v=1.4">
+    <script src="js/config.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      "name": "Best of Cup Spieltermine",
+      "description": "Chronologische Übersicht aller geplanten Spiele der fairen Best of Cup Jugendliga.",
+      "sport": "Football (Soccer)"
+    }
+    </script>
+    <style>
+        .termine-header-card {
+            margin-bottom: 25px;
+            border-top: 4px solid var(--primary);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #000;
+        }
+
+        .termine-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-right: 4px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            min-width: 200px;
+            flex: 1;
+            max-width: 280px;
+        }
+
+        .termine-search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .termine-search-input:focus {
+            border-color: #000;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        /* ==========================================
+           Kicker.de-Style Fixture Timeline & Rows
+           ========================================== */
+        .kicker-timeline {
+            position: relative;
+            padding-left: 36px;
+            margin-top: 15px;
+        }
+
+        /* Continuous vertical timeline line */
+        .kicker-timeline::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 12px;
+            bottom: 24px;
+            width: 2px;
+            background: #0f172a; /* Brand dark neutral line */
+        }
+
+        .kicker-month-section {
+            position: relative;
+            margin-bottom: 35px;
+        }
+
+        .kicker-month-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .kicker-timeline-node {
+            position: absolute;
+            left: -36px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-body, #f4f4f4);
+            z-index: 2;
+        }
+
+        .kicker-hexagon-svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        .kicker-month-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #0f172a; /* Brand dark neutral title */
+        }
+
+        .kicker-matches-table {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .kicker-match-row {
+            display: grid;
+            grid-template-columns: 145px 65px 1fr 115px 1fr 130px;
+            align-items: center;
+            padding: 13px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.15s ease;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .kicker-match-row:last-child {
+            border-bottom: none;
+        }
+
+        .kicker-match-row:hover {
+            background-color: #f8fafc;
+        }
+
+        .kicker-match-row.is-today {
+            background-color: #f0f7ff;
+            border-left: 4px solid #2563eb;
+        }
+
+        .kicker-match-row.is-today:hover {
+            background-color: #e0effe;
+        }
+
+        /* Column 1: Date & Time */
+        .kicker-col-date {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .kicker-date-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .kicker-time-text {
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Column 2: Badge */
+        .kicker-col-badge {
+            display: flex;
+            align-items: center;
+        }
+
+        .kicker-age-pill {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .kicker-age-pill.pill-2016 {
+            background: #0f172a;
+            color: #ffffff;
+        }
+
+        .kicker-age-pill.pill-2014 {
+            background: #1e40af;
+            color: #ffffff;
+        }
+
+        /* Column 3: Home Team */
+        .kicker-team-home {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            text-align: right;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #0f172a;
+            padding-right: 6px;
+            overflow: hidden;
+        }
+
+        .kicker-team-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .kicker-team-logo {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* Column 4: Score Box / Center */
+        .kicker-col-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .kicker-score-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 56px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+            box-sizing: border-box;
+        }
+
+        .kicker-score-box.played {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .kicker-score-box.upcoming {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .kicker-tg-score {
+            font-size: 0.68rem;
+            color: #64748b;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Column 5: Away Team */
+        .kicker-team-away {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #0f172a;
+            padding-left: 6px;
+            overflow: hidden;
+        }
+
+        /* Column 6: Action Link */
+        .kicker-col-action {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-left: 8px;
+        }
+
+        .kicker-action-link {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            transition: color 0.15s ease, transform 0.15s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kicker-match-row:hover .kicker-action-link {
+            color: #000000;
+            font-weight: 800;
+            transform: translateX(3px);
+        }
+
+        .show-mobile-kicker {
+            display: none;
+        }
+
+        /* ==========================================
+           Responsive Layout for Tablets & Mobile
+           ========================================== */
+        @media (max-width: 860px) {
+            .hide-mobile-kicker {
+                display: none !important;
+            }
+
+            .show-mobile-kicker {
+                display: block !important;
+            }
+
+            .kicker-timeline {
+                padding-left: 24px;
+            }
+
+            .kicker-timeline::before {
+                left: 8px;
+            }
+
+            .kicker-timeline-node {
+                left: -24px;
+                width: 18px;
+                height: 18px;
+            }
+
+            .kicker-hexagon-svg {
+                width: 17px;
+                height: 17px;
+            }
+
+            .kicker-match-row {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 14px 16px;
+                align-items: stretch;
+            }
+
+            .kicker-mobile-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .kicker-mobile-teams {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .kicker-mobile-bottom {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                border-top: 1px dashed #f1f5f9;
+                padding-top: 8px;
+                margin-top: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Startseite</a></li>
+                <li><a href="termine.html" class="active">Termine</a></li>
+                <li><a href="saison.html">Saison</a></li>
+                <li><a href="historie.html">Historie</a></li>
+                <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="sponsoring.html">Sponsoring</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Header Card (without counter) -->
+        <section class="card termine-header-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display: block; margin-bottom: 4px;">
+                        Spielplan &middot; <span id="season-display-label">Saison 2026/2027</span>
+                    </span>
+                    <h1 style="margin: 0; border: none; padding: 0; font-family: 'Outfit', sans-serif; font-size: 1.8rem;">
+                        Alle geplanten Spiele
+                    </h1>
+                    <p style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
+                        Chronologische &Uuml;bersicht aller bisher angesetzten und ausgetragenen Spiele der Best of Cup Saison.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <a href="saison.html?saison=2026_2027&jahrgang=2014" class="preview-season-btn">
+                        Tabelle &amp; Spielplan 2014 &rarr;
+                    </a>
+                    <a href="saison.html?saison=2026_2027&jahrgang=2016" class="preview-season-btn">
+                        Tabelle &amp; Spielplan 2016 &rarr;
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter Bar -->
+        <div class="termine-filter-bar">
+            <!-- Saison Filter -->
+            <div class="filter-group">
+                <span class="filter-label">Saison:</span>
+                <button class="preview-filter-btn active" id="btn-season-2026" onclick="setSeasonFilter('2026_2027', this)">Saison 26/27</button>
+                <button class="preview-filter-btn" id="btn-season-2025" onclick="setSeasonFilter('2025_2026', this)">Saison 25/26</button>
+            </div>
+
+            <!-- Jahrgang Filter -->
+            <div class="filter-group" id="age-filter-group">
+                <span class="filter-label">Jahrgang:</span>
+                <button class="preview-filter-btn active" id="btn-age-all" onclick="setAgeFilter('all', this)">Alle</button>
+                <button class="preview-filter-btn" id="btn-age-2014" onclick="setAgeFilter('2014', this)">Jahrgang 2014</button>
+                <button class="preview-filter-btn" id="btn-age-2016" onclick="setAgeFilter('2016', this)">Jahrgang 2016</button>
+            </div>
+
+            <!-- Team Search -->
+            <div class="search-input-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input type="text" id="team-search" class="termine-search-input" placeholder="Nach Verein suchen..." oninput="onSearchChange(this.value)">
+            </div>
+        </div>
+
+        <!-- Matches Output in Kicker.de Timeline Style -->
+        <div id="matches-container">
+            <div style="text-align: center; padding: 40px 15px; color: var(--text-muted); font-size: 1rem;">
+                Lade Spieltermine...
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Best of Cup</p>
+        <p style="margin-top: 10px;">
+            <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px; font-weight: 700;">Termine</a> |
+            <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
+            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
+            <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a> |
+            <a href="logbuch.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Logbuch</a>
+        </p>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
+            authDomain: "best-of-cup.firebaseapp.com",
+            projectId: "best-of-cup",
+            storageBucket: "best-of-cup.firebasestorage.app",
+            messagingSenderId: "188725945748",
+            appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
+            measurementId: "G-HGCM4M029D"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const WEEKDAYS_SHORT = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
+        const MONTHS_UPPER = ["JANUAR", "FEBRUAR", "MÄRZ", "APRIL", "MAI", "JUNI", "JULI", "AUGUST", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DEZEMBER"];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let selectedSeason = urlParams.get('saison') || "2026_2027";
+        let currentAgeFilter = urlParams.get('jahrgang') || 'all';
+        let currentSearchQuery = '';
+        let allMatches = [];
+
+        function setSeasonFilter(saisonKey, btn) {
+            selectedSeason = saisonKey;
+            btn.parentElement.querySelectorAll('.preview-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const labelSeason = selectedSeason === "2025_2026" ? "Saison 2025/2026" : "Saison 2026/2027";
+            document.getElementById('season-display-label').innerText = labelSeason;
+
+            const btnAge2016 = document.getElementById('btn-age-2016');
+            if (selectedSeason === "2025_2026") {
+                if (btnAge2016) btnAge2016.style.display = 'none';
+                if (currentAgeFilter === '2016') {
+                    currentAgeFilter = 'all';
+                    document.querySelectorAll('#age-filter-group .preview-filter-btn').forEach(b => {
+                        b.classList.toggle('active', b.id === 'btn-age-all');
+                    });
+                }
+            } else {
+                if (btnAge2016) btnAge2016.style.display = '';
+            }
+
+            loadAllTermine();
+        }
+
+        function getTeamMeta(teamName, preferredAgeGroup) {
+            const season = CUP_DATA.seasons[selectedSeason] || CUP_DATA.seasons["2026_2027"];
+            if (!season) return { logo: "assets/logo.jpg", ageGroup: "2014" };
+            
+            if (preferredAgeGroup && season.ageGroups[preferredAgeGroup] && season.ageGroups[preferredAgeGroup].teams[teamName]) {
+                return { logo: season.ageGroups[preferredAgeGroup].teams[teamName].logo, ageGroup: preferredAgeGroup };
+            }
+            if (season.ageGroups["2016"] && season.ageGroups["2016"].teams[teamName]) {
+                return { logo: season.ageGroups["2016"].teams[teamName].logo, ageGroup: "2016" };
+            }
+            if (season.ageGroups["2014"] && season.ageGroups["2014"].teams[teamName]) {
+                return { logo: season.ageGroups["2014"].teams[teamName].logo, ageGroup: "2014" };
+            }
+            return { logo: "assets/logo.jpg", ageGroup: "2014" };
+        }
+
+        function setAgeFilter(filter, btn) {
+            currentAgeFilter = filter;
+            btn.parentElement.querySelectorAll('.preview-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMatches();
+        }
+
+        function onSearchChange(val) {
+            currentSearchQuery = (val || '').trim().toLowerCase();
+            renderMatches();
+        }
+
+        function loadAllTermine() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 15px; color: var(--text-muted); font-size: 1rem;">
+                    Lade Spieltermine...
+                </div>
+            `;
+
+            Promise.all([
+                db.collection("match_dates").get(),
+                db.collection("spiele").get()
+            ]).then(([datesSnapshot, spieleSnapshot]) => {
+                const resultsMap = new Map();
+                spieleSnapshot.forEach(doc => {
+                    const g = doc.data();
+                    // Legacy games without explicit saison attribute belong to 2025_2026 and Jahrgang 2014
+                    const s = g.saison || "2025_2026";
+                    const j = g.jahrgang || "2014";
+
+                    if (s === selectedSeason) {
+                        const key = `${g.heim}_${g.gast}`;
+                        resultsMap.set(key, {
+                            ergebnis81: g.ergebnis81,
+                            ergebnis41: g.ergebnis41,
+                            datum: g.datum ? (g.datum.toDate ? g.datum.toDate() : new Date(g.datum)) : null,
+                            jahrgang: j,
+                            saison: s
+                        });
+                    }
+                });
+
+                const matchesMap = new Map();
+
+                // Only process match_dates for current active season 2026_2027
+                if (selectedSeason === "2026_2027") {
+                    datesSnapshot.forEach(doc => {
+                        const isCancelled = typeof CANCELLED_MATCH_DATES !== 'undefined' && CANCELLED_MATCH_DATES.includes(doc.id);
+                        if (isCancelled) return;
+
+                        const data = doc.data();
+                        const dt = parseMatchDateTime(data.date, data.time);
+                        if (!dt) return;
+
+                        // Resolve Age Group
+                        let age = data.ageGroup ? String(data.ageGroup).trim() : "";
+                        const teams2016 = (CUP_DATA.seasons["2026_2027"] && CUP_DATA.seasons["2026_2027"].ageGroups["2016"]) 
+                            ? CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams : {};
+                        const teams2014 = (CUP_DATA.seasons["2026_2027"] && CUP_DATA.seasons["2026_2027"].ageGroups["2014"]) 
+                            ? CUP_DATA.seasons["2026_2027"].ageGroups["2014"].teams : {};
+
+                        if (age !== "2014" && age !== "2016") {
+                            if (teams2016[data.team1] && !teams2014[data.team1]) {
+                                age = "2016";
+                            } else if (teams2014[data.team1] && !teams2016[data.team1]) {
+                                age = "2014";
+                            } else if (teams2016[data.team2] && !teams2014[data.team2]) {
+                                age = "2016";
+                            } else if (teams2014[data.team2] && !teams2016[data.team2]) {
+                                age = "2014";
+                            } else {
+                                age = "2014";
+                            }
+                        }
+
+                        const matchKey = `${data.team1}_${data.team2}`;
+                        const playedResult = resultsMap.get(matchKey);
+
+                        matchesMap.set(matchKey, {
+                            id: doc.id,
+                            team1: data.team1,
+                            team2: data.team2,
+                            dateStr: data.date,
+                            timeStr: data.time || "12:00",
+                            location: data.location || "",
+                            ageGroup: age,
+                            dateTime: dt,
+                            isPlayed: !!(playedResult && (playedResult.ergebnis81 || playedResult.ergebnis41)),
+                            result: playedResult || null
+                        });
+                    });
+                }
+
+                // Also include played games from spiele that were not in match_dates (for the selected season)
+                resultsMap.forEach((result, key) => {
+                    if (!matchesMap.has(key)) {
+                        const parts = key.split('_');
+                        if (parts.length === 2 && result.datum) {
+                            const [h, a] = parts;
+                            const age = result.jahrgang || "2014";
+
+                            const d = result.datum;
+                            const dateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+                            const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+                            matchesMap.set(key, {
+                                id: key,
+                                team1: h,
+                                team2: a,
+                                dateStr: dateStr,
+                                timeStr: timeStr,
+                                location: `Heimspiel ${h}`,
+                                ageGroup: age,
+                                dateTime: d,
+                                isPlayed: true,
+                                result: result
+                            });
+                        }
+                    }
+                });
+
+                allMatches = Array.from(matchesMap.values());
+                allMatches.sort((a, b) => a.dateTime - b.dateTime);
+
+                renderMatches();
+            }).catch(err => {
+                console.error("Fehler beim Laden der Spieltermine:", err);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted); background: #ffffff; border-radius: 12px; border: 1px dashed var(--border-color);">
+                        Spieltermine konnten nicht geladen werden. Bitte versuche es später noch einmal.
+                    </div>
+                `;
+            });
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matches-container');
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+
+            let filtered = allMatches.filter(m => {
+                // Age filter
+                if (currentAgeFilter !== 'all' && m.ageGroup !== currentAgeFilter) {
+                    return false;
+                }
+
+                // Search query
+                if (currentSearchQuery) {
+                    const matchText = `${m.team1} ${m.team2} ${m.dateStr}`.toLowerCase();
+                    if (!matchText.includes(currentSearchQuery)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 45px 20px; background: #ffffff; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 20px;">
+                        <p style="margin: 0 0 10px 0; font-weight: 700; color: var(--text-main); font-size: 1.05rem;">
+                            Keine Spiele gefunden
+                        </p>
+                        <p style="margin: 0 0 15px 0; font-size: 0.9rem; color: var(--text-muted);">
+                            Für die ausgewählten Filterkriterien liegen zurzeit keine Spieltermine vor.
+                        </p>
+                        <button class="preview-filter-btn active" onclick="resetFilters()">Filter zurücksetzen</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group filtered matches by Month (Key: YYYY-MM)
+            const monthGroups = new Map();
+            filtered.forEach(m => {
+                const year = m.dateTime.getFullYear();
+                const month = m.dateTime.getMonth();
+                const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+                if (!monthGroups.has(key)) {
+                    monthGroups.set(key, {
+                        year: year,
+                        month: month,
+                        monthName: MONTHS_UPPER[month],
+                        matches: []
+                    });
+                }
+                monthGroups.get(key).matches.push(m);
+            });
+
+            let html = '<div class="kicker-timeline">';
+
+            monthGroups.forEach((group) => {
+                html += `
+                    <section class="kicker-month-section">
+                        <div class="kicker-month-header">
+                            <div class="kicker-timeline-node">
+                                <svg viewBox="0 0 24 24" class="kicker-hexagon-svg">
+                                    <polygon points="12,2 21,7.5 21,16.5 12,21 3,16.5 3,7.5" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+                                </svg>
+                            </div>
+                            <span class="kicker-month-title">${group.monthName} ${group.year}</span>
+                        </div>
+
+                        <div class="kicker-matches-table">
+                `;
+
+                group.matches.forEach(m => {
+                    const homeMeta = getTeamMeta(m.team1, m.ageGroup);
+                    const awayMeta = getTeamMeta(m.team2, m.ageGroup);
+                    const url = `spiel.html?saison=2026_2027&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+
+                    const d = m.dateTime;
+                    const weekday = WEEKDAYS_SHORT[d.getDay()];
+                    const dateFormatted = `${weekday}, ${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+                    const timeFormatted = `${m.timeStr} Uhr`;
+
+                    const isToday = (d.getFullYear() === todayStart.getFullYear() && 
+                                     d.getMonth() === todayStart.getMonth() && 
+                                     d.getDate() === todayStart.getDate());
+
+                    let scoreHtml = '';
+                    let actionText = 'Spieldetails';
+
+                    if (m.isPlayed && m.result) {
+                        actionText = 'Spielbericht';
+                        const r81 = m.result.ergebnis81 ? `${m.result.ergebnis81[0]}:${m.result.ergebnis81[1]}` : '-:-';
+                        const r41 = m.result.ergebnis41 ? `${m.result.ergebnis41[0]}:${m.result.ergebnis41[1]}` : null;
+
+                        scoreHtml = `
+                            <div class="kicker-score-box played" title="Großfeld">${r81}</div>
+                            ${r41 ? `<span class="kicker-tg-score" title="TWIN GAMES">TWIN GAMES: ${r41}</span>` : ''}
+                        `;
+                    } else {
+                        scoreHtml = `
+                            <div class="kicker-score-box upcoming">- : -</div>
+                        `;
+                    }
+
+                    // Desktop row + mobile responsive structure
+                    html += `
+                        <a href="${url}" class="kicker-match-row ${isToday ? 'is-today' : ''}" title="Spieldetails &amp; Spielbericht aufrufen">
+                            <!-- Desktop Column 1: Date & Time -->
+                            <div class="kicker-col-date hide-mobile-kicker">
+                                <span class="kicker-date-text">${dateFormatted}</span>
+                                <span class="kicker-time-text">${timeFormatted}</span>
+                            </div>
+
+                            <!-- Desktop Column 2: Age Group Pill -->
+                            <div class="kicker-col-badge hide-mobile-kicker">
+                                <span class="kicker-age-pill pill-${m.ageGroup}">${m.ageGroup}</span>
+                            </div>
+
+                            <!-- Desktop Column 3: Home Team -->
+                            <div class="kicker-team-home hide-mobile-kicker">
+                                <span class="kicker-team-name">${m.team1}</span>
+                                <img src="${homeMeta.logo}" alt="${m.team1}" class="kicker-team-logo" onerror="this.src='assets/logo.jpg'">
+                            </div>
+
+                            <!-- Desktop Column 4: Score Box -->
+                            <div class="kicker-col-score hide-mobile-kicker">
+                                ${scoreHtml}
+                            </div>
+
+                            <!-- Desktop Column 5: Away Team -->
+                            <div class="kicker-team-away hide-mobile-kicker">
+                                <img src="${awayMeta.logo}" alt="${m.team2}" class="kicker-team-logo" onerror="this.src='assets/logo.jpg'">
+                                <span class="kicker-team-name">${m.team2}</span>
+                            </div>
+
+                            <!-- Desktop Column 6: Action -->
+                            <div class="kicker-col-action hide-mobile-kicker">
+                                <span class="kicker-action-link">${actionText} &rarr;</span>
+                            </div>
+
+                            <!-- Mobile Layout (Only visible on screens <= 860px) -->
+                            <div class="show-mobile-kicker">
+                                <div class="kicker-mobile-top">
+                                    <div>
+                                        <span class="kicker-date-text">${dateFormatted}</span>
+                                        <span class="kicker-time-text">&bull; ${timeFormatted}</span>
+                                    </div>
+                                    <span class="kicker-age-pill pill-${m.ageGroup}">${m.ageGroup}</span>
+                                </div>
+                                <div class="kicker-mobile-teams" style="margin: 8px 0;">
+                                    <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end; text-align: right; overflow: hidden;">
+                                        <span class="kicker-team-name" style="font-weight: 700; font-size: 0.9rem;">${m.team1}</span>
+                                        <img src="${homeMeta.logo}" alt="${m.team1}" class="kicker-team-logo" onerror="this.src='assets/logo.jpg'">
+                                    </div>
+                                    <div class="kicker-col-score">
+                                        ${scoreHtml}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-start; text-align: left; overflow: hidden;">
+                                        <img src="${awayMeta.logo}" alt="${m.team2}" class="kicker-team-logo" onerror="this.src='assets/logo.jpg'">
+                                        <span class="kicker-team-name" style="font-weight: 700; font-size: 0.9rem;">${m.team2}</span>
+                                    </div>
+                                </div>
+                                <div class="kicker-mobile-bottom">
+                                    <span class="kicker-action-link" style="font-size: 0.82rem;">${actionText} &rarr;</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </section>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function resetFilters() {
+            currentAgeFilter = 'all';
+            currentSearchQuery = '';
+            document.getElementById('team-search').value = '';
+            document.querySelectorAll('.termine-filter-bar .preview-filter-btn').forEach(b => {
+                if (b.innerText === 'Alle') {
+                    b.classList.add('active');
+                } else {
+                    b.classList.remove('active');
+                }
+            });
+            renderMatches();
+        }
+
+        window.onload = function() {
+            if (selectedSeason === "2025_2026") {
+                const btn25 = document.getElementById('btn-season-2025');
+                const btn26 = document.getElementById('btn-season-2026');
+                if (btn25 && btn26) {
+                    btn26.classList.remove('active');
+                    btn25.classList.add('active');
+                }
+                const btnAge2016 = document.getElementById('btn-age-2016');
+                if (btnAge2016) btnAge2016.style.display = 'none';
+                const lbl = document.getElementById('season-display-label');
+                if (lbl) lbl.innerText = "Saison 2025/2026";
+            }
+            if (currentAgeFilter && currentAgeFilter !== 'all') {
+                document.querySelectorAll('#age-filter-group .preview-filter-btn').forEach(b => {
+                    b.classList.toggle('active', b.id === `btn-age-${currentAgeFilter}`);
+                });
+            }
+            loadAllTermine();
+        };
+    </script>
+</body>
+
+</html>

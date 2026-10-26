@@ -176,6 +176,45 @@ const SWAPPED_PAIRS_2016 = [
 ];
 
 SWAPPED_PAIRS_2016.forEach(([t1, t2]) => swapHinUndRueckspiel(schedule2016, t1, t2));
+CUP_DATA.seasons["2026_2027"].ageGroups["2016"].schedule = schedule2016;
+
+// Teams (Jahrgang 2014), die das Heimrecht für Hin- und Rückrunde getauscht haben:
+let schedule2014 = CUP_DATA.seasons["2026_2027"].ageGroups["2014"].schedule;
+const SWAPPED_PAIRS_2014 = [
+    ["SV Wersten 04", "SG Unterrath"],
+    ["DSC Düsseldorf", "SV Straelen"],
+    ["SV Wersten 04", "SF Vorst"],
+    ["SF Vorst", "SV Straelen"]
+];
+
+SWAPPED_PAIRS_2014.forEach(([t1, t2]) => swapHinUndRueckspiel(schedule2014, t1, t2));
+
+// Helper: Parse date and time into JavaScript Date
+function parseMatchDateTime(dateStr, timeStr) {
+    if (!dateStr) return null;
+    let day, month, year;
+    if (dateStr.includes('.')) {
+        const parts = dateStr.split('.');
+        day = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10) - 1;
+        year = parseInt(parts[2], 10);
+    } else if (dateStr.includes('-')) {
+        const parts = dateStr.split('-');
+        year = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10) - 1;
+        day = parseInt(parts[2], 10);
+    } else {
+        return null;
+    }
+    let hours = 12;
+    let minutes = 0;
+    if (timeStr && timeStr.includes(':')) {
+        const tParts = timeStr.split(':');
+        hours = parseInt(tParts[0], 10) || 12;
+        minutes = parseInt(tParts[1], 10) || 0;
+    }
+    return new Date(year, month, day, hours, minutes);
+}
 
 // Abgesetzte Spiele / Stornierungen / Testspiele (werden hier sofort gefiltert, falls Firestore noch alte Daten enthält)
 const CANCELLED_MATCH_DATES = [
@@ -186,8 +225,6 @@ const CANCELLED_MATCH_DATES = [
 
 // Manuelle Terminierungen eintragen
 // Wird jetzt automatisch von Firebase Cloud Functions befüllt (Collection: match_dates)
-
-CUP_DATA.seasons["2026_2027"].ageGroups["2016"].schedule = schedule2016;
 
 // Global list of upcoming games across all seasons/age groups
 const UPCOMING_GAMES = [

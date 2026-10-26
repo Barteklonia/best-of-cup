@@ -21,7 +21,7 @@
     <meta property="og:url" content="https://bestofcup.de/">
 
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <link rel="stylesheet" href="css/style.css?v=1.3">
     <script src="js/config.js"></script>
 
     <!-- Firebase SDK -->
@@ -52,6 +52,7 @@
             <ul>
                 <li><a href="index.html" class="active">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
+                <li><a href="termine.html">Termine</a></li>
                 <li><a href="historie.html">Historie</a></li>
                 <li><a href="regeln.html">Regeln</a></li>
                 <li><a href="sponsoring.html">Sponsoring</a></li>
@@ -72,7 +73,10 @@
                         N&auml;chste Spiele
                     </h2>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <a href="termine.html" class="preview-season-btn" style="background: var(--primary); color: #fff; border-color: var(--primary);" title="Alle bisher terminierten Spiele chronologisch anzeigen">
+                        Alle geplanten Spiele &rarr;
+                    </a>
                     <a href="saison.html?saison=2026_2027&jahrgang=2014" class="preview-season-btn">
                         Jahrgang 2014 &rarr;
                     </a>
@@ -143,7 +147,7 @@
                     <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px;">
                         Der <strong>Best of Cup</strong> ist ein grenzenloses Konzept! Wir richten uns an Teams aus ganz
                         Deutschland und dem angrenzenden Ausland. Hast du Lust, dieses faire Ligaformat – mit Fokus auf
-                        maximale Spielzeit für alle Kinder durch Twin-Games – auch aktiv in <strong>deiner
+                        maximale Spielzeit für alle Kinder durch Twin Games – auch aktiv in <strong>deiner
                             Region</strong> mit aufzubauen?
                     </p>
                     <a href="kontakt.html" class="btn-primary">Melde dich bei uns!</a>
@@ -201,6 +205,7 @@
     <footer>
         <p>&copy; 2025 Best of Cup</p>
         <p style="margin-top: 10px;">
+            <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Termine</a> |
             <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
             <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
             <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a> |
@@ -269,7 +274,8 @@
                 const playedGames = new Set();
                 spieleSnapshot.forEach(doc => {
                     const g = doc.data();
-                    if ((g.saison === "2026_2027" || !g.saison) && (g.ergebnis81 || g.ergebnis41)) {
+                    const s = g.saison || "2025_2026";
+                    if (s === "2026_2027" && (g.ergebnis81 || g.ergebnis41)) {
                         playedGames.add(`${g.heim}_${g.gast}`);
                     }
                 });
@@ -336,12 +342,28 @@
                     return;
                 }
 
-                // Show the next matchday weekend or up to next 6 upcoming games
-                // Games within 7 days of the earliest match date
-                const earliestDate = upcoming[0].dateTime;
-                const maxRange = new Date(earliestDate);
-                maxRange.setDate(maxRange.getDate() + 7);
-                const displayGames = upcoming.filter(g => g.dateTime <= maxRange).slice(0, 6);
+                // Beziehe dich immer auf die nächsten 2 Wochen bis einschließlich Sonntag
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                // Tage bis zum Sonntag dieser Woche (Sonntag = 0 -> 7 Tage, sonst 7 - getDay())
+                const currentDay = todayStart.getDay();
+                const daysToThisSunday = (currentDay === 0) ? 7 : (7 - currentDay);
+                // Sonntag der nächsten Woche (+ 7 Tage)
+                const daysToNextSunday = daysToThisSunday + 7;
+
+                const maxRange = new Date(todayStart);
+                maxRange.setDate(maxRange.getDate() + daysToNextSunday);
+                maxRange.setHours(23, 59, 59, 999);
+
+                // Alle Spiele innerhalb dieses 2-Wochen-Fensters bis einschl. Sonntag
+                let displayGames = upcoming.filter(g => g.dateTime <= maxRange);
+                // Fallback: Falls in den nächsten 2 Wochen keine Spiele liegen, die nächsten anstehenden Partien zeigen
+                if (displayGames.length === 0) {
+                    const fallbackMax = new Date(upcoming[0].dateTime);
+                    fallbackMax.setDate(fallbackMax.getDate() + 7);
+                    displayGames = upcoming.filter(g => g.dateTime <= fallbackMax);
+                }
 
                 headline.innerHTML = `N&auml;chste Spiele`;
 

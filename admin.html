@@ -131,14 +131,14 @@
 
             <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
 
-            <h4 id="label-part1">Teil 1: Das 8+1 (Endergebnis Tore)</h4>
+            <h4 id="label-part1">Teil 1: Großfeld (Endergebnis Tore)</h4>
             <div class="score-input-group">
                 <input type="number" id="scoreHome81" placeholder="0">
                 <span>:</span>
                 <input type="number" id="scoreAway81" placeholder="0">
             </div>
 
-            <h4 id="label-part2">Teil 2: Das 4+1 (Anzahl Siege)</h4>
+            <h4 id="label-part2">Teil 2: TWIN GAMES (Anzahl Siege)</h4>
             <div class="score-input-group">
                 <input type="number" id="scoreHome41" placeholder="0">
                 <span>:</span>
@@ -252,9 +252,8 @@
             const labelPart1 = document.getElementById('label-part1');
             const labelPart2 = document.getElementById('label-part2');
             if (labelPart1 && labelPart2) {
-                const mainLabel = selectedAgeGroup === "2016" ? "Das 6+1" : "Das 8+1";
-                labelPart1.innerText = `Teil 1: ${mainLabel} (Endergebnis Tore)`;
-                labelPart2.innerText = `Teil 2: Twin Games (Anzahl Siege)`;
+                labelPart1.innerText = `Teil 1: Großfeld (Endergebnis Tore)`;
+                labelPart2.innerText = `Teil 2: TWIN GAMES (Anzahl Siege)`;
             }
 
             loadGames(); // Refresh the list of games
@@ -335,13 +334,12 @@
                             h41: game.ergebnis41[0], a41: game.ergebnis41[1]
                         }).replace(/"/g, '&quot;');
 
-                        const mainLabel = j === "2016" ? "6+1" : "8+1";
                         const html = `
                             <div class="game-item">
                                 <div class="game-info">
                                     <strong>${game.heim} vs ${game.gast}</strong><br>
-                                    ${mainLabel}: ${game.ergebnis81[0]}:${game.ergebnis81[1]} | 
-                                    Twin Games: ${game.ergebnis41[0]}:${game.ergebnis41[1]}
+                                    Großfeld: ${game.ergebnis81[0]}:${game.ergebnis81[1]} | 
+                                    TWIN GAMES: ${game.ergebnis41[0]}:${game.ergebnis41[1]}
                                 </div>
                                 <div class="game-actions">
                                     <button class="btn-edit" onclick="editGame(${dataString})">✏️</button>

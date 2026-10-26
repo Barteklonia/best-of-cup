@@ -98,6 +98,7 @@
             <ul>
                 <li><a href="index.html">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
+                <li><a href="termine.html">Termine</a></li>
                 <li><a href="historie.html">Historie</a></li>
                 <li><a href="regeln.html">Regeln</a></li>
                 <li><a href="sponsoring.html">Sponsoring</a></li>
@@ -109,6 +110,22 @@
     <main>
         <div class="container">
             <h1 style="text-align: center; margin-bottom: 40px;">Logbuch (Changelog)</h1>
+
+            <div class="log-entry">
+                <div class="log-date">26. Oktober 2026</div>
+                <h3 class="log-title">Chronologie-Synchronisation Jahrgang 2014 &amp; Neue Termin&uuml;bersicht</h3>
+                <ul class="log-list">
+                    <li><strong>Format-Update Jahrgang 2016 (8+1 auf Gro&szlig;feld):</strong> Das Regelwerk (<code>regeln.html</code>) wurde entsprechend aktualisiert: Auch der Jahrgang 2016 tr&auml;gt den Hauptteil des Spieltags nun offiziell im <strong>8+1</strong> auf dem Kompakt-/Gro&szlig;feld aus (zuvor 6+1).</li>
+                    <li><strong>Einheitliche Spielmodus-Bezeichnungen (&bdquo;Gro&szlig;feld&ldquo; &amp; &bdquo;TWIN GAMES&ldquo;):</strong> S&auml;mtliche fr&uuml;heren Bezeichnungen wie &bdquo;Feld (8+1)&ldquo;, &bdquo;Feld (6+1)&ldquo;, &bdquo;8+1&ldquo; und &bdquo;6+1&ldquo; wurden ligaweit &uuml;ber alle Seiten hinweg (Saison-Filter, Spielplan-Ergebnisse, Spieldetails, Admin-Panel und Regelwerk) durch die einheitliche Bezeichnung <strong>&bdquo;Gro&szlig;feld&ldquo;</strong> ersetzt. Das parallele Kleinfeldformat wird nun &uuml;berall konsistent als <strong>&bdquo;TWIN GAMES&ldquo;</strong> gef&uuml;hrt.</li>
+                    <li><strong>Hin- &amp; R&uuml;ckrunden-Chronologie (Jahrgang 2014 &amp; zukunftssicher):</strong> Wie zuvor für den Jahrgang 2016 wurden im Spielplan 2014 Partien, deren R&uuml;ckspiel zuerst angesetzt bzw. ausgetragen wurde (u.&nbsp;a. Unterrath vs. Wersten 04, Straelen vs. DSC D&uuml;sseldorf, Vorst vs. Wersten 04, Straelen vs. Vorst), in die Hinrunde getauscht. Zudem sorgt in <code>saison.html</code> eine dynamische Synchronisierungsfunktion (<code>autoSyncHinRueckrunde</code>) daf&uuml;r, dass auch alle zuk&uuml;nftig fr&uuml;her ausgetragenen R&uuml;ckrundenspiele beider Jahrg&auml;nge automatisch in der Hinrunde gef&uuml;hrt werden.</li>
+                    <li><strong>Erweiterung der Spieltagsvorschau (&bdquo;N&auml;chste Spiele&ldquo;):</strong> Die Vorschau auf der Startseite (<code>index.html</code>) ber&uuml;cksichtigt nun zuverl&auml;ssig immer die n&auml;chsten 2 vollen Wochen bis einschlie&szlig;lich Sonntag (23:59:59 Uhr). Dadurch erscheinen alle anstehenden Partien der n&auml;chsten beiden Wochenenden (z.&nbsp;B. am 07.11. und 08.11.) l&uuml;ckenlos.</li>
+                    <li><strong>Neue &Uuml;bersichtsseite &bdquo;Alle geplanten Spiele&ldquo; (<code>termine.html</code>):</strong> Einrichtung einer zentralen Terminseite im modernen <em>kicker.de</em>-Timeline-Format &ndash; mit durchgehender, zeitlicher Chronologie aller Saisonbegegnungen, Monatsabschnitten und Filterung nach Jahrgang und Vereinssuche.</li>
+                    <li><strong>Farb- &amp; Design-Harmonisierung (Kein Rot):</strong> Die Timeline-Linie, Hexagon-Knoten und Monats-Header wurden vollst&auml;ndig an das Marken-Farbschema von Best of Cup angepasst (edles Dunkelgrau/Schwarz statt Rot).</li>
+                    <li><strong>Reduzierte, saubere Darstellung:</strong> Statusfilter (Anstehend/Gespielt) sowie redundante Ortszeilen (&bdquo;Heimspiel ...&ldquo;) unter dem Spielbericht-Link wurden entfernt. Gespielte Partien zeigen direkt &bdquo;Spielbericht &rarr;&ldquo;, k&uuml;nftige &bdquo;Spieldetails &rarr;&ldquo;.</li>
+                    <li><strong>Saisonale Trennung &amp; korrekte Jahrgangszuordnung:</strong> Partien der vergangenen Saison 2025/2026 wurden strikt isoliert und korrekt dem Jahrgang 2014 zugeordnet, sodass sie nicht mehr f&auml;lschlicherweise mit &bdquo;2016&ldquo;-Badge im Spielplan der Saison 2026/2027 erscheinen. Zudem erm&ouml;glicht ein neuer Saison-Umschalter auf <code>termine.html</code> die Auswahl zwischen Saison 26/27 und 25/26.</li>
+                    <li><strong>Spieltags-Verlinkung auf der Saison-Seite:</strong> Auf <code>saison.html</code> wurde direkt beim Spieltags-Umschalter eine prominente Schaltfl&auml;che sowie ein Link unter dem Spielplan platziert, um nahtlos zur chronologischen Gesamtermin-&Uuml;bersicht zu gelangen.</li>
+                </ul>
+            </div>
 
             <div class="log-entry">
                 <div class="log-date">6. Oktober 2026</div>
