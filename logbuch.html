@@ -114,8 +114,10 @@
 
             <div class="log-entry">
                 <div class="log-date">27. Oktober 2026</div>
-                <h3 class="log-title">SEO-Optimierung: Canonical-Tags &amp; Gl&auml;ttung der Startseiten-URLs</h3>
+                <h3 class="log-title">SEO-Optimierung &amp; Fehlerbehebung Termin-Chronologie</h3>
                 <ul class="log-list">
+                    <li><strong>Termin-Korrektur SG Unterrath vs. DSC D&uuml;sseldorf (<code>termine.html</code>):</strong> Ein von <em>fussball.de</em> automatisch ausgelesenes, externes Kreisliga-Spiel am 12.12.2026 hatte die bereits am 04.10.2026 regul&auml;r ausgetragene Best-of-Cup-Partie (4:2) f&auml;lschlicherweise in den Dezember verschoben. Das Spiel wird nun wieder korrekt und chronologisch unter Oktober 2026 gef&uuml;hrt. Zudem verhindert eine Schutzlogik in <code>termine.html</code>, <code>config.js</code> und der Scraper-Cloud-Function, dass bereits gespielte Partien jemals auf zuk&uuml;nftige Fremdspiel-Termine gesetzt werden.</li>
+                    <li><strong>Filterung vereinsinterner Paarungen:</strong> Fehlerhafte Ansetzungen wie identische Heim- und Gastteams (z.&nbsp;B. aus vereinsinternen Begegnungen) werden im Terminplan automatisch ausgefiltert.</li>
                     <li><strong>Google Search Console Duplikat-Behebung:</strong> Auf allen Seiten der Plattform wurden offizielle Canonical-Tags (<code>&lt;link rel="canonical"&gt;</code>) im Header hinterlegt. Insbesondere die Startseite deklariert nun unmissverst&auml;ndlich <code>https://bestofcup.de/</code> als kanonisches Original gegen&uuml;ber Google.</li>
                     <li><strong>Interne Verlinkung bereinigt:</strong> Alle Header- und Navigationslinks zur Startseite wurden von <code>index.html</code> auf die saubere Stammdomain (<code>/</code>) umgestellt, um Duplicate-Content-Warnungen dauerhaft zu verhindern.</li>
                 </ul>

@@ -150,7 +150,9 @@ function getFullTeamName(keyword, ageGroup) {
 const IGNORED_OR_CANCELLED_MATCH_IDS = [
     "ETB Essen_GSG Duisburg",
     "TSV Meerbusch_DSC 99 Düsseldorf",
-    "DSC 99 Düsseldorf_TSV Meerbusch"
+    "DSC 99 Düsseldorf_TSV Meerbusch",
+    "SG Unterrath_DSC Düsseldorf",
+    "SGS Essen_SGS Essen"
 ];
 
 exports.scrapeMatches = onSchedule({

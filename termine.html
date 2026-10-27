@@ -644,6 +644,8 @@
                         if (isCancelled) return;
 
                         const data = doc.data();
+                        if (!data.team1 || !data.team2 || data.team1 === data.team2) return;
+
                         const dt = parseMatchDateTime(data.date, data.time);
                         if (!dt) return;
 
@@ -670,17 +672,30 @@
 
                         const matchKey = `${data.team1}_${data.team2}`;
                         const playedResult = resultsMap.get(matchKey);
+                        const isPlayed = !!(playedResult && (playedResult.ergebnis81 || playedResult.ergebnis41));
+
+                        let matchDt = dt;
+                        let matchDateStr = data.date;
+                        let matchTimeStr = data.time || "12:00";
+
+                        // Falls für das Spiel bereits ein Ergebnis vorliegt, das Datum aus match_dates aber in der Zukunft liegt:
+                        // Das Spiel wurde bereits in der Vergangenheit ausgetragen – verwende das tatsächliche Spieldatum!
+                        if (isPlayed && dt > new Date() && playedResult && playedResult.datum) {
+                            matchDt = playedResult.datum;
+                            matchDateStr = `${String(matchDt.getDate()).padStart(2, '0')}.${String(matchDt.getMonth() + 1).padStart(2, '0')}.${matchDt.getFullYear()}`;
+                            matchTimeStr = `${String(matchDt.getHours()).padStart(2, '0')}:${String(matchDt.getMinutes()).padStart(2, '0')}`;
+                        }
 
                         matchesMap.set(matchKey, {
                             id: doc.id,
                             team1: data.team1,
                             team2: data.team2,
-                            dateStr: data.date,
-                            timeStr: data.time || "12:00",
+                            dateStr: matchDateStr,
+                            timeStr: matchTimeStr,
                             location: data.location || "",
                             ageGroup: age,
-                            dateTime: dt,
-                            isPlayed: !!(playedResult && (playedResult.ergebnis81 || playedResult.ergebnis41)),
+                            dateTime: matchDt,
+                            isPlayed: isPlayed,
                             result: playedResult || null
                         });
                     });
@@ -694,9 +709,16 @@
                             const [h, a] = parts;
                             const age = result.jahrgang || "2014";
 
-                            const d = result.datum;
-                            const dateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
-                            const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                            const d = new Date(result.datum);
+                            let dateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+                            let timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                            let loc = `Heimspiel ${h}`;
+
+                            if (key === "SG Unterrath_DSC Düsseldorf") {
+                                timeStr = "13:30";
+                                d.setHours(13, 30, 0, 0);
+                                loc = "Kunstrasenplatz, HR-Schrott-Arena (oberer Platz), Franz-Rennefeld-Weg 13, 40472 Düsseldorf";
+                            }
 
                             matchesMap.set(key, {
                                 id: key,
@@ -704,7 +726,7 @@
                                 team2: a,
                                 dateStr: dateStr,
                                 timeStr: timeStr,
-                                location: `Heimspiel ${h}`,
+                                location: loc,
                                 ageGroup: age,
                                 dateTime: d,
                                 isPlayed: true,

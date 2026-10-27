@@ -220,7 +220,9 @@ function parseMatchDateTime(dateStr, timeStr) {
 const CANCELLED_MATCH_DATES = [
     "ETB Essen_GSG Duisburg",
     "TSV Meerbusch_DSC 99 Düsseldorf",
-    "DSC 99 Düsseldorf_TSV Meerbusch"
+    "DSC 99 Düsseldorf_TSV Meerbusch",
+    "SG Unterrath_DSC Düsseldorf", // 12.12.2026 ist Kreisliga A; Best of Cup Hinspiel wurde bereits am 04.10.2026 ausgetragen
+    "SGS Essen_SGS Essen"
 ];
 
 // Manuelle Terminierungen eintragen
