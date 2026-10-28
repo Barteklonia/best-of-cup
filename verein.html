@@ -1235,7 +1235,7 @@
         <!-- Age Group Filter Bar (Visible when club has multiple age groups in the active season) -->
         <div id="club-age-filter-bar" class="club-age-filter-bar" style="display: none;">
             <span class="club-age-filter-label">Jahrgang filtern:</span>
-            <button class="club-age-filter-btn active" onclick="setAgeFilter('all', this)">Alle Teams</button>
+            <button id="btn-age-all" class="club-age-filter-btn" onclick="setAgeFilter('all', this)">Alle Teams</button>
             <button id="btn-age-2014" class="club-age-filter-btn" onclick="setAgeFilter('2014', this)" style="display: none;">Jahrgang 2014</button>
             <button id="btn-age-2016" class="club-age-filter-btn" onclick="setAgeFilter('2016', this)" style="display: none;">Jahrgang 2016</button>
         </div>
@@ -1469,6 +1469,8 @@
             const ageParam = urlParams.get('jahrgang');
             if (ageParam === "2014" || ageParam === "2016") {
                 currentAgeFilter = ageParam;
+            } else {
+                currentAgeFilter = "all";
             }
 
             loadClub(teamParam);
@@ -1524,27 +1526,37 @@
             if (btn) btn.classList.add('active');
         }
 
-        function setAgeFilter(filter, btn) {
-            currentAgeFilter = filter;
-            document.querySelectorAll('.club-age-filter-btn').forEach(b => b.classList.remove('active'));
-            if (btn) {
-                btn.classList.add('active');
-            } else {
-                // Find matching button
-                document.querySelectorAll('.club-age-filter-btn').forEach(b => {
-                    if ((filter === 'all' && b.innerText.includes('Alle')) ||
-                        (filter === '2014' && b.id === 'btn-age-2014') ||
-                        (filter === '2016' && b.id === 'btn-age-2016')) {
-                        b.classList.add('active');
-                    }
-                });
-            }
+        function updateAgeFilterButtons() {
+            document.querySelectorAll('.club-age-filter-btn').forEach(b => {
+                b.classList.remove('active');
+                if (currentAgeFilter === 'all' && (b.id === 'btn-age-all' || b.innerText.toLowerCase().includes('alle'))) {
+                    b.classList.add('active');
+                } else if (currentAgeFilter === '2014' && b.id === 'btn-age-2014') {
+                    b.classList.add('active');
+                } else if (currentAgeFilter === '2016' && b.id === 'btn-age-2016') {
+                    b.classList.add('active');
+                }
+            });
 
             // Highlight corresponding competition card in Info tab
             document.querySelectorAll('.comp-card').forEach(card => {
                 const cardAge = card.getAttribute('data-age');
                 card.classList.toggle('active-comp', currentAgeFilter === cardAge);
             });
+        }
+
+        function setAgeFilter(filter, btn) {
+            currentAgeFilter = filter;
+            updateAgeFilterButtons();
+
+            // Sync URL parameter without reload
+            const url = new URL(window.location.href);
+            if (currentAgeFilter === 'all') {
+                url.searchParams.delete('jahrgang');
+            } else {
+                url.searchParams.set('jahrgang', currentAgeFilter);
+            }
+            window.history.replaceState({}, '', url);
 
             // Re-render views with new filter
             applyAgeFilterAndRender();
@@ -1674,6 +1686,8 @@
                 currentAgeFilter = in2014 ? "2014" : (in2016 ? "2016" : "all");
             }
 
+            updateAgeFilterButtons();
+
             if (in2014) {
                 compList.innerHTML += `
                     <div class="comp-card ${currentAgeFilter === '2014' ? 'active-comp' : ''}" data-age="2014" onclick="setAgeFilter('2014', null)">
@@ -1729,14 +1743,18 @@
                     const j = g.jahrgang || "2014";
 
                     if (s === currentSeason) {
-                        const key = `${g.heim}_${g.gast}`;
-                        resultsMap.set(key, {
+                        const key = `${j}_${g.heim}_${g.gast}`;
+                        const resObj = {
                             ergebnis81: g.ergebnis81,
                             ergebnis41: g.ergebnis41,
                             datum: g.datum ? (g.datum.toDate ? g.datum.toDate() : new Date(g.datum)) : null,
                             jahrgang: j,
                             saison: s
-                        });
+                        };
+                        resultsMap.set(key, resObj);
+                        if (!resultsMap.has(`${g.heim}_${g.gast}`)) {
+                            resultsMap.set(`${g.heim}_${g.gast}`, resObj);
+                        }
                     }
                 });
 
@@ -1774,8 +1792,8 @@
                             }
                         }
 
-                        const matchKey = `${data.team1}_${data.team2}`;
-                        const playedResult = resultsMap.get(matchKey);
+                        const matchKey = `${age}_${data.team1}_${data.team2}`;
+                        const playedResult = resultsMap.get(matchKey) || resultsMap.get(`${data.team1}_${data.team2}`);
                         const isPlayed = !!(playedResult && (
                             (Array.isArray(playedResult.ergebnis81) && playedResult.ergebnis81.length >= 2) ||
                             (Array.isArray(playedResult.ergebnis41) && playedResult.ergebnis41.length >= 2) ||
@@ -1810,27 +1828,36 @@
 
                 // Also include played games from spiele without match_dates
                 resultsMap.forEach((result, key) => {
-                    if (!matchesMap.has(key)) {
-                        const parts = key.split('_');
-                        if (parts.length === 2) {
-                            const [h, a] = parts;
-                            const d = result.datum ? (result.datum.toDate ? result.datum.toDate() : new Date(result.datum)) : new Date(0);
-                            const dateStr = d.getTime() > 0 ? `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}` : "Gespielt";
-                            const timeStr = d.getTime() > 0 ? `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : "";
+                    const parts = key.split('_');
+                    let age = result.jahrgang || "2014";
+                    let h = "";
+                    let a = "";
+                    if (parts.length === 3) {
+                        age = parts[0];
+                        h = parts[1];
+                        a = parts[2];
+                    } else if (parts.length === 2) {
+                        h = parts[0];
+                        a = parts[1];
+                    }
+                    const fullKey = `${age}_${h}_${a}`;
+                    if (h && a && !matchesMap.has(fullKey)) {
+                        const d = result.datum ? (result.datum.toDate ? result.datum.toDate() : new Date(result.datum)) : new Date(0);
+                        const dateStr = d.getTime() > 0 ? `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}` : "Gespielt";
+                        const timeStr = d.getTime() > 0 ? `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : "";
 
-                            matchesMap.set(key, {
-                                id: key,
-                                team1: h,
-                                team2: a,
-                                dateStr: dateStr,
-                                timeStr: timeStr,
-                                location: `Heimspiel ${h}`,
-                                ageGroup: result.jahrgang || "2014",
-                                dateTime: d,
-                                isPlayed: true,
-                                result: result
-                            });
-                        }
+                        matchesMap.set(fullKey, {
+                            id: key,
+                            team1: h,
+                            team2: a,
+                            dateStr: dateStr,
+                            timeStr: timeStr,
+                            location: `Heimspiel ${h}`,
+                            ageGroup: age,
+                            dateTime: d,
+                            isPlayed: true,
+                            result: result
+                        });
                     }
                 });
 
@@ -2154,8 +2181,8 @@
                 const isAwayClub = isSameClub(m.team2, club.displayName);
 
                 const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
-                const homeUrl = `verein.html?team=${encodeURIComponent(m.team1)}&saison=${currentSeason}&jahrgang=${m.ageGroup}`;
-                const awayUrl = `verein.html?team=${encodeURIComponent(m.team2)}&saison=${currentSeason}&jahrgang=${m.ageGroup}`;
+                const homeUrl = `verein.html?team=${encodeURIComponent(m.team1)}&saison=${currentSeason}`;
+                const awayUrl = `verein.html?team=${encodeURIComponent(m.team2)}&saison=${currentSeason}`;
 
                 const outcome = getMatchOutcome(m);
                 let scoreDisplay = '';

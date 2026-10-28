@@ -113,6 +113,17 @@
             <h1 style="text-align: center; margin-bottom: 40px;">Logbuch (Changelog)</h1>
 
             <div class="log-entry">
+                <div class="log-date">29. Oktober 2026</div>
+                <h3 class="log-title">Fehlerbehebung Jahrgangs-Filterung &amp; Termin-Vollst&auml;ndigkeit (<code>verein.html</code>)</h3>
+                <ul class="log-list">
+                    <li><strong>Schaltfl&auml;chen-Desynchronisierung behoben (<code>verein.html</code>):</strong> Bei Vereinen mit mehreren Altersklassen (z.&nbsp;B. SF Vorst mit Jahrgang 2014 &amp; 2016) war in der Leiste <em>&bdquo;Jahrgang filtern&ldquo;</em> optisch die Schaltfl&auml;che <em>&bdquo;Alle Teams&ldquo;</em> aktiv geschaltet, angezeigt wurden jedoch zun&auml;chst nur die Partien des Jahrgangs 2014. Die visuelle Kennzeichnung der Filter-Buttons wurde vollst&auml;ndig mit dem Anzeigestatus synchronisiert (<code>updateAgeFilterButtons</code>).</li>
+                    <li><strong>Vollst&auml;ndige Spielanzeige im Standardmodus &bdquo;Alle Teams&ldquo;:</strong> Bei der Auswahl von <em>&bdquo;Alle Teams&ldquo;</em> werden nun zuverl&auml;ssig s&auml;mtliche Begegnungen beider Jahrg&auml;nge (z.&nbsp;B. alle 12 Partien von SF Vorst aus 2014 und 2016) chronologisch in der Termin-Timeline, in der Formkurve, bei den n&auml;chsten Spielen und im Statistik-Diagramm ausgewertet und angezeigt.</li>
+                    <li><strong>Schl&uuml;sselkollisionen &uuml;ber Altersklassen hinweg verhindert:</strong> In <code>loadClubData</code> wird bei der Zuordnung von Spielergebnissen und Terminen der Jahrgang nun als fester Bestandteil des Identifikators gef&uuml;hrt (<code>${age}_${team1}_${team2}</code>), sodass sich Partien bei Vereinen mit paralleler Teilnahme in mehreren Jahrg&auml;ngen niemals gegenseitig &uuml;berschreiben k&ouml;nnen.</li>
+                    <li><strong>Startseiten-Verlinkung &amp; URL-Synchronisation:</strong> Die Teilnehmerkarten auf der Startseite (<code>index.html</code>) leiten nun neutral auf das ganzheitliche Vereinsprofil weiter. Beim Bet&auml;tigen der Filter-Schaltfl&auml;chen wird der ausgew&auml;hlte Jahrgang dynamisch und ohne Seitenneuladen in der Adresszeile aktualisiert.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
                 <div class="log-date">28. Oktober 2026</div>
                 <h3 class="log-title">Neue Vereins-Unterseiten im UEFA- &amp; kicker-Stil (<code>verein.html</code>)</h3>
                 <ul class="log-list">
