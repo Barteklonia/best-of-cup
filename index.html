@@ -46,12 +46,12 @@
 <body>
 
     <header>
-        <a href="/">
+        <a href="index.html">
             <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
         </a>
         <nav>
             <ul>
-                <li><a href="/" class="active">Startseite</a></li>
+                <li><a href="index.html" class="active">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
                 <li><a href="termine.html">Termine</a></li>
                 <li><a href="historie.html">Historie</a></li>
@@ -206,6 +206,7 @@
     <footer>
         <p>&copy; 2025 Best of Cup</p>
         <p style="margin-top: 10px;">
+            <a href="verein.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Vereinsinfos</a> |
             <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Termine</a> |
             <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
             <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
@@ -492,18 +493,23 @@
                 const team = teams2014[teamName];
                 const isPlaceholder = teamName.includes("Gesucht") || teamName.includes("Offen");
                 const displayName = isPlaceholder ? "Noch offen" : teamName;
-                const cardClass = isPlaceholder ? "participant-card placeholder" : "participant-card";
 
-                const logoHtml = isPlaceholder
-                    ? `<a href="kontakt.html" title="Hier bewerben!"><img src="${team.logo}" alt="${displayName}" class="participant-logo" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`
-                    : `<img src="${team.logo}" alt="${displayName}" class="participant-logo">`;
-
-                p2014.innerHTML += `
-                    <div class="${cardClass}">
-                        ${logoHtml}
-                        <div class="participant-name">${displayName}</div>
-                    </div>
-                `;
+                if (isPlaceholder) {
+                    p2014.innerHTML += `
+                        <a href="kontakt.html" class="participant-card placeholder" title="Hier bewerben!">
+                            <img src="${team.logo}" alt="${displayName}" class="participant-logo">
+                            <div class="participant-name">${displayName}</div>
+                        </a>
+                    `;
+                } else {
+                    const vereinUrl = `verein.html?team=${encodeURIComponent(teamName)}&saison=2026_2027&jahrgang=2014`;
+                    p2014.innerHTML += `
+                        <a href="${vereinUrl}" class="participant-card" title="${displayName} – Vereinsinfo &amp; Statistiken">
+                            <img src="${team.logo}" alt="${displayName}" class="participant-logo">
+                            <div class="participant-name">${displayName}</div>
+                        </a>
+                    `;
+                }
             }
 
             // Render Year 2016
@@ -514,18 +520,23 @@
                 const team = teams2016[teamName];
                 const isPlaceholder = teamName.includes("Gesucht") || teamName.includes("Offen");
                 const displayName = isPlaceholder ? "Noch offen" : teamName;
-                const cardClass = isPlaceholder ? "participant-card placeholder" : "participant-card";
 
-                const logoHtml = isPlaceholder
-                    ? `<a href="kontakt.html" title="Hier bewerben!"><img src="${team.logo}" alt="${displayName}" class="participant-logo" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`
-                    : `<img src="${team.logo}" alt="${displayName}" class="participant-logo">`;
-
-                p2016.innerHTML += `
-                    <div class="${cardClass}">
-                        ${logoHtml}
-                        <div class="participant-name">${displayName}</div>
-                    </div>
-                `;
+                if (isPlaceholder) {
+                    p2016.innerHTML += `
+                        <a href="kontakt.html" class="participant-card placeholder" title="Hier bewerben!">
+                            <img src="${team.logo}" alt="${displayName}" class="participant-logo">
+                            <div class="participant-name">${displayName}</div>
+                        </a>
+                    `;
+                } else {
+                    const vereinUrl = `verein.html?team=${encodeURIComponent(teamName)}&saison=2026_2027&jahrgang=2016`;
+                    p2016.innerHTML += `
+                        <a href="${vereinUrl}" class="participant-card" title="${displayName} – Vereinsinfo &amp; Statistiken">
+                            <img src="${team.logo}" alt="${displayName}" class="participant-logo">
+                            <div class="participant-name">${displayName}</div>
+                        </a>
+                    `;
+                }
             }
         }
 

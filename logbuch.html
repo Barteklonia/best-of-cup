@@ -92,12 +92,12 @@
 </head>
 <body>
     <header>
-        <a href="/">
+        <a href="index.html">
             <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
         </a>
         <nav>
             <ul>
-                <li><a href="/">Startseite</a></li>
+                <li><a href="index.html">Startseite</a></li>
                 <li><a href="saison.html">Saison</a></li>
                 <li><a href="termine.html">Termine</a></li>
                 <li><a href="historie.html">Historie</a></li>
@@ -111,6 +111,27 @@
     <main>
         <div class="container">
             <h1 style="text-align: center; margin-bottom: 40px;">Logbuch (Changelog)</h1>
+
+            <div class="log-entry">
+                <div class="log-date">28. Oktober 2026</div>
+                <h3 class="log-title">Neue Vereins-Unterseiten im UEFA- &amp; kicker-Stil (<code>verein.html</code>)</h3>
+                <ul class="log-list">
+                    <li><strong>Launch der Vereins-Detailseiten (<code>verein.html</code>):</strong> Jeder teilnehmende Verein erh&auml;lt eine eigene, moderne Profilseite im dynamischen Champions-League- und kicker-Design mit Wappen-Hero-Banner, interaktiver Saison-Umschaltung und dreiteiliger Gliederung (Info, Termine, Statistik).</li>
+                    <li><strong>Vereinsauswahl-Toolbar entfernt &amp; Saisonumschaltung neu integriert:</strong> Die wei&szlig;e Schnellwechsler-Leiste mit dem Dropdown-Men&uuml; <em>&bdquo;Verein w&auml;hlen&ldquo;</em> oberhalb des Headers wurde entfernt, sodass das markante dunkle Vereins-Hero-Banner direkt oben auf der Seite platziert ist. Die Saison-Umschaltung (<em>Saison 26/27</em> / <em>Saison 25/26</em>) wurde elegant und responsiv direkt auf der rechten Seite der Reiter-Leiste (<em>Info / Termine / Statistik</em>) platziert.</li>
+                    <li><strong>Formkurven-Doppelung aufgel&ouml;st &amp; Hero-Spotlight integriert:</strong> Die redundanten f&uuml;nf S/U/N-Punkte oben rechts im Hero-Banner wurden entfernt. Stattdessen ziert die obere rechte Ecke des Banners nun ein dynamisches <em>&bdquo;N&auml;chstes Spiel&ldquo;</em>-Spotlight mit Wappen des kommenden Gegners, Ansto&szlig;zeit und Direktverlinkung (oder bei Saisonende die kompakte <em>Saison-Bilanz</em> mit Punkten und Torverh&auml;ltnis). Die Kachelkette im Info-Tab wurde in <em>&bdquo;Letzte Spiele&ldquo;</em> umbenannt.</li>
+                    <li><strong>Reiter &bdquo;INFO&ldquo;:</strong> Pr&auml;sentation der Formkurve mit den letzten Partien (S/U/N-Kette), anstehenden Spielansetzungen, aktiven Jahrg&auml;ngen sowie einer vollst&auml;ndigen Vereinsdaten-Tabelle (offizieller Name, Gr&uuml;ndung, Vereinsfarben mit Farbkreisen, Sportanlage, Anschrift mit Maps-Verlinkung, Telefon, E-Mail und offizielle Vereinswebsite).</li>
+                    <li><strong>Reiter &bdquo;TERMINE&ldquo; &amp; Team-Verlinkung:</strong> Monatsweise chronologische Timeline aller Begegnungen des jeweiligen Vereins mit Live-Ergebnissen, Spielst&auml;nden und Direktverlinkung zu den Spielberichten (<code>spiel.html</code>). Zudem sind nun alle Vereinsnamen und Wappen in der Timeline direkt als Klick-Links mit den jeweiligen Vereinsprofilen verkn&uuml;pft, und auch die mittige Ergebnisbox leitet direkt zum Spielbericht weiter.</li>
+                    <li><strong>Reiter &bdquo;STATISTIK&ldquo; (Donut-Diagramm korrigiert):</strong> Der kreisf&ouml;rmige Spiele-Ring im Statistik-Tab stellt nun analog zur Legende alle drei Spielausg&auml;nge (Siege = Gr&uuml;n, Unentschieden = Grau/Slate, Niederlagen = Rot) anteilig als dreiteiliges SVG-Donut-Diagramm dar. Zudem wurde die Grammatik in der Legende (z.&nbsp;B. <em>&bdquo;1 Sieg&ldquo;</em> statt <em>&bdquo;1 Siege&ldquo;</em>) pr&auml;zisiert.</li>
+                    <li><strong>Zentrale Vereinsdatenbank (<code>js/vereine_data.js</code>):</strong> Vollst&auml;ndige Stammdaten aller 15 Vereine der Liga (SF Vorst, SG Unterrath, DSC 99 D&uuml;sseldorf, SV Straelen, SV Wersten 04, SGS Essen, FC D&ouml;nberg, SF Baumberg, ETB Schwarz-Wei&szlig; Essen, SC Velbert, TSV Meerbusch, VfB Hilden, GSG Duisburg, SV Lohausen und 1. FC MG) recherchiert und hinterlegt.</li>
+                    <li><strong>Plattformweite Verkn&uuml;pfung:</strong> In der Ligatabelle (<code>saison.html</code>) und in den Spielberichten (<code>spiel.html</code>) sind Teamnamen und Wappen nun direkt mit den neuen Vereinsprofilen verlinkt.</li>
+                    <li><strong>Feinschliff &amp; Jahrgangs-Filterung:</strong> Automatische Ausblendung von Vorsaison-Schaltfl&auml;chen bei Vereinen ohne fr&uuml;here Teilnahme (z.&nbsp;B. SV Wersten 04), Bereinigung aller Emojis/Icons f&uuml;r ein klares Schriftbild, interaktive Jahrgangs-Umschaltung f&uuml;r Vereine mit mehreren Teams (z.&nbsp;B. SF Vorst mit 2014 &amp; 2016) sowie direkte Verlinkung des Fu&szlig;ballkreises (FVN) und des &bdquo;BEST OF CUP&ldquo;-Badges.</li>
+                    <li><strong>Lokale Datei-Navigation optimiert:</strong> In der Hauptnavigation und im Logo-Link aller Unterseiten wurde die Verlinkung zur Startseite auf <code>index.html</code> harmonisiert, damit bei lokalem &Ouml;ffnen der HTML-Dateien im Browser (ohne Webserver) nicht das Stammverzeichnis <code>C:\</code> aufgerufen wird.</li>
+                    <li><strong>Startseiten-Teilnehmerkarten verlinkt (<code>index.html</code>):</strong> Alle Vereinskarten der Teilnehmer-Raster (Jahrgang 2014 &amp; 2016) auf der Startseite verlinken nun direkt auf die jeweilige Vereins-Unterseite (<code>verein.html</code>) mit Jahrgangs-Vorauswahl und sanfter Hover-Animation.</li>
+                    <li><strong>Bugfix Formkurven-Ergebnis-Parsing:</strong> Behebung eines Datenformat-Fehlers bei der Auswertung von Spielergebnissen in der Formkurve (Unterst&uuml;tzung von Firestore-Zahlenarrays wie <code>[4, 2]</code>), sodass die farbigen S/U/N-Indikatoren in der oberen UEFA-Formbox und der Spielkette zuverl&auml;ssig angezeigt werden.</li>
+                    <li><strong>Twin-Games-Ergebnisse (TG) integriert:</strong> In der Termin-Timeline und der Formkurve auf <code>verein.html</code> werden nun analog zu <code>saison.html</code> und <code>termine.html</code> die Twin-Games-Parallelergebnisse (<code>TG: X:Y</code>) vollst&auml;ndig und dezent unterhalb des Gro&szlig;feld-Ergebnisses dargestellt.</li>
+                    <li><strong>Layout-Stabilisierung Spaltenbreite:</strong> Fixierung der Spaltenverh&auml;ltnisse im Info-Tab von <code>verein.html</code> (mittels <code>minmax(0, ...)</code> und <code>min-width: 0</code>), sodass mehr Spiele in der linken Formkurven-Kette die rechte Spalte (Wettbewerbe &amp; Vereinsdaten) in fr&uuml;heren Saisons nicht mehr zusammendr&uuml;cken.</li>
+                </ul>
+            </div>
 
             <div class="log-entry">
                 <div class="log-date">28. Oktober 2026</div>

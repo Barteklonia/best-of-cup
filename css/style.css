@@ -902,11 +902,17 @@ select.no-arrow {
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
     min-height: 140px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 .participant-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
     border-color: var(--accent);
+}
+.participant-card:hover .participant-logo {
+    transform: scale(1.06);
 }
 .participant-logo {
     width: 55px;
@@ -914,6 +920,7 @@ select.no-arrow {
     object-fit: contain;
     margin-bottom: 10px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+    transition: transform 0.2s ease;
 }
 .participant-name {
     font-weight: 700;
@@ -926,7 +933,7 @@ select.no-arrow {
     border-style: dashed;
     border-color: #cbd5e1;
     box-shadow: none;
-    cursor: default;
+    cursor: pointer;
 }
 .participant-card.placeholder:hover {
     transform: none;

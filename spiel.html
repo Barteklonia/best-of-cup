@@ -326,10 +326,10 @@
 <body>
 
     <header>
-        <a href="/"><img src="assets/logo.jpg" alt="Logo" class="nav-logo"></a>
+        <a href="index.html"><img src="assets/logo.jpg" alt="Logo" class="nav-logo"></a>
         <nav>
             <ul>
-                <li><a href="/">Startseite</a></li>
+                <li><a href="index.html">Startseite</a></li>
                 <li><a href="saison.html" class="active">Saison</a></li>
                 <li><a href="termine.html">Termine</a></li>
                 <li><a href="historie.html">Historie</a></li>
@@ -356,12 +356,12 @@
             </div>
             
             <div class="match-hero-teams">
-                <div class="match-team-col">
+                <a id="home-club-link" href="#" class="match-team-col" style="text-decoration: none; color: inherit;">
                     <div class="match-team-logo-wrapper">
                         <img id="home-logo" src="" alt="Heim" class="match-team-logo">
                     </div>
                     <div class="match-team-name" id="home-name">-</div>
-                </div>
+                </a>
                 
                 <div class="match-score-col">
                     <div class="match-score-main">
@@ -374,12 +374,12 @@
                     </div>
                 </div>
 
-                <div class="match-team-col">
+                <a id="away-club-link" href="#" class="match-team-col" style="text-decoration: none; color: inherit;">
                     <div class="match-team-logo-wrapper">
                         <img id="away-logo" src="" alt="Gast" class="match-team-logo">
                     </div>
                     <div class="match-team-name" id="away-name">-</div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -496,6 +496,11 @@
 
             if(homeTeamData) document.getElementById('home-logo').src = homeTeamData.logo;
             if(awayTeamData) document.getElementById('away-logo').src = awayTeamData.logo;
+
+            const homeLink = document.getElementById('home-club-link');
+            if (homeLink) homeLink.href = `verein.html?team=${encodeURIComponent(heim)}&saison=${saison}`;
+            const awayLink = document.getElementById('away-club-link');
+            if (awayLink) awayLink.href = `verein.html?team=${encodeURIComponent(gast)}&saison=${saison}`;
 
             // Load Data from Firebase
             loadMatchData(saison, jahrgang, heim, gast);

@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Vereinsinfo &amp; Statistiken | Best of Cup</title>
+    <link rel="canonical" href="https://bestofcup.de/verein.html">
+    <meta name="description" content="Vereinsinfo, Formkurve, Termine und detaillierte Statistiken der Vereine des Best of Cup.">
+    <meta name="keywords" content="Best of Cup, Vereinsinfo, Jugendfußball, Formkurve, Termine, Statistiken, Fußballturnier">
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css?v=1.3">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Project Config & Club Master Data -->
+    <script src="js/config.js"></script>
+    <script src="js/vereine_data.js"></script>
+
+    <style>
+        /* --- VEREIN PAGE HERO (UEFA CHAMPIONS LEAGUE STYLE) --- */
+        .club-hero {
+            background: linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%);
+            border-radius: var(--radius);
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            padding: 36px 30px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .club-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .club-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .club-hero-identity {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .club-hero-crest-wrapper {
+            width: 105px;
+            height: 105px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .club-hero-crest-wrapper:hover {
+            transform: scale(1.04);
+        }
+
+        .club-hero-crest {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .club-hero-title-box h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            line-height: 1.15;
+            margin: 0 0 6px 0;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .club-hero-full-name {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .club-hero-meta-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .club-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.12);
+            color: #f1f5f9;
+            backdrop-filter: blur(8px);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        a.club-badge:hover {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .club-badge-accent {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+        }
+
+        a.club-badge-accent:hover {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hero Spotlight Card (UEFA Top Right: Nächstes Spiel / Saisonbilanz) */
+        .club-hero-spotlight {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 12px 18px;
+            border-radius: 14px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 240px;
+            max-width: 330px;
+            transition: all 0.2s ease;
+        }
+
+        .club-hero-spotlight:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .hero-spotlight-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .hero-spotlight-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            font-size: 0.68rem;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-spotlight-body {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 2px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .hero-spotlight-crest {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 4px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        .hero-spotlight-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .hero-spotlight-opp {
+            font-size: 0.94rem;
+            font-weight: 800;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hero-spotlight-meta {
+            font-size: 0.76rem;
+            color: #94a3b8;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hero-spotlight-meta strong {
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .form-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            cursor: default;
+        }
+
+        .form-dot.win { background: #10b981; }
+        .form-dot.draw { background: #64748b; }
+        .form-dot.loss { background: #ef4444; }
+
+        /* Tabs & Season Toggle Bar */
+        .club-tabs-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .club-season-pills {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .club-season-btn {
+            padding: 6px 14px;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .club-season-btn:hover {
+            border-color: #000000;
+            color: #000000;
+            background: #f8fafc;
+        }
+
+        .club-season-btn.active {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        /* Age Group Filter Pills */
+        .club-age-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .club-age-filter-label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        .club-age-filter-btn {
+            padding: 6px 16px;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .club-age-filter-btn:hover {
+            border-color: #000000;
+            color: #000000;
+        }
+
+        .club-age-filter-btn.active {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        /* --- TABS SYSTEM --- */
+        .club-tabs-nav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: -2px;
+        }
+
+        .club-tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 22px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.98rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .club-tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .club-tab-btn.active {
+            color: #000000;
+        }
+
+        .club-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #000000;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInTab 0.25s ease-out;
+        }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- INFO TAB STYLES --- */
+        .info-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 58%) minmax(0, 42%);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .info-grid > div {
+            min-width: 0;
+        }
+
+        @media (max-width: 900px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-card {
+            background: #ffffff;
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        .info-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        /* Recent Form Chain (Kicker Style) */
+        .form-chain-summary {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .form-summary-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .form-summary-pill.win { background: #10b981; }
+        .form-summary-pill.draw { background: #64748b; }
+        .form-summary-pill.loss { background: #ef4444; }
+
+        .form-matches-strip {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding: 8px 4px 14px;
+            scrollbar-width: thin;
+        }
+
+        .form-match-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 10px;
+            min-width: 90px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-match-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .form-match-tag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .form-match-opp-logo {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            margin-bottom: 6px;
+        }
+
+        .form-match-opp-name {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 75px;
+        }
+
+        .form-match-score {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin-top: 4px;
+            color: #0f172a;
+        }
+
+        /* Next Matches List */
+        .next-matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .next-match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            gap: 12px;
+        }
+
+        .next-match-row:hover {
+            border-color: #000000;
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .next-match-date-col {
+            min-width: 90px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .next-match-teams-col {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .next-match-crest {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .next-match-time-badge {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        /* Vereinsdaten Table (Kicker Image 3) */
+        .club-data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .club-data-table tr {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .club-data-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .club-data-table td {
+            padding: 11px 4px;
+            font-size: 0.88rem;
+            vertical-align: top;
+        }
+
+        .club-data-label {
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 35%;
+        }
+
+        .club-data-val {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .club-data-val a {
+            color: #0f172a;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .club-data-val a:hover {
+            color: #2563eb;
+        }
+
+        .color-swatch-group {
+            display: inline-flex;
+            gap: 6px;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+
+        .color-swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+
+        /* Competitions List */
+        .comp-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .comp-card:hover {
+            border-color: #94a3b8;
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .comp-card.active-comp {
+            border-color: #000000;
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .comp-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .comp-badge-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #000000;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .comp-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .comp-info h4 {
+            margin: 0 0 3px 0;
+            font-size: 0.94rem;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .comp-info p {
+            margin: 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .comp-action-btn {
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            border: 1px solid #cbd5e1;
+        }
+
+        .comp-action-btn:hover {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        /* --- TERMINE TAB (TIMELINE) --- */
+        .club-timeline-section {
+            position: relative;
+            padding-left: 28px;
+        }
+
+        .club-timeline-section::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background: #cbd5e1;
+        }
+
+        .timeline-month-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 16px -28px;
+        }
+
+        .timeline-month-header:first-child {
+            margin-top: 0;
+        }
+
+        .timeline-hex-node {
+            width: 22px;
+            height: 22px;
+            background: #0f172a;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 2px #0f172a;
+            border-radius: 50%;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .timeline-month-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .timeline-match-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            transition: all 0.2s ease;
+        }
+
+        .timeline-match-card:hover {
+            border-color: #000000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .timeline-match-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            min-width: 140px;
+        }
+
+        .timeline-match-teams {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 260px;
+            justify-content: center;
+        }
+
+        .timeline-team-side {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 42%;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .timeline-team-side:hover {
+            opacity: 0.75;
+        }
+
+        .timeline-team-side:hover .timeline-team-name {
+            text-decoration: underline;
+            color: #000000;
+        }
+
+        .timeline-team-side.home {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .timeline-team-side.away {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .timeline-team-crest {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .timeline-team-side:hover .timeline-team-crest {
+            transform: scale(1.1);
+        }
+
+        .timeline-team-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            transition: color 0.2s ease;
+        }
+
+        .timeline-team-name.highlight {
+            font-weight: 900;
+            color: #000000;
+        }
+
+        .timeline-score-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            min-width: 72px;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .timeline-score-wrap:hover {
+            transform: scale(1.05);
+        }
+
+        .timeline-score-wrap:hover .timeline-score-box {
+            border-color: #000000;
+            background: #0f172a;
+            color: #ffffff;
+        }
+
+        .timeline-score-box {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            white-space: nowrap;
+            letter-spacing: 0.04em;
+            text-align: center;
+            min-width: 58px;
+        }
+
+        .timeline-score-box.scheduled {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            font-size: 0.88rem;
+            min-width: auto;
+        }
+
+        .timeline-tg-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #64748b;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .form-match-tg {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #64748b;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+
+        .timeline-action-btn {
+            padding: 6px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .timeline-action-btn:hover {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        /* --- STATISTIK TAB (UEFA KEY STATS STYLE) --- */
+        .stats-hero-card {
+            background: #ffffff;
+            border-radius: var(--radius);
+            padding: 28px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 36px;
+            align-items: center;
+        }
+
+        @media (max-width: 800px) {
+            .stats-overview-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .stats-circle-container {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            justify-content: center;
+            border-right: 1px solid #e2e8f0;
+            padding-right: 24px;
+        }
+
+        @media (max-width: 800px) {
+            .stats-circle-container {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding-right: 0;
+                padding-bottom: 20px;
+            }
+        }
+
+        .stats-ring-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .stats-ring-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .stats-ring-circle-bg {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 8;
+        }
+
+        .stats-ring-segment {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: butt;
+            transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stats-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .stats-ring-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .stats-ring-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .stats-ring-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stats-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .stats-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .stats-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+        }
+
+        .stat-metric-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-metric-card:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-metric-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .stat-metric-label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-main);
+        }
+
+        .stat-metric-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .home-away-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .home-away-grid {
+                grid-template-columns: 1fr;
+            }
+            .club-tabs-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .club-season-pills {
+                width: 100%;
+                justify-content: flex-start;
+                margin-bottom: 10px;
+            }
+        }
+
+        .ha-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .ha-card h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin: 0 0 14px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #0f172a;
+        }
+
+        .ha-stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.88rem;
+        }
+
+        .ha-stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .ha-stats-row span:first-child {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .ha-stats-row span:last-child {
+            font-weight: 800;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Startseite</a></li>
+                <li><a href="saison.html">Saison</a></li>
+                <li><a href="termine.html">Termine</a></li>
+                <li><a href="historie.html">Historie</a></li>
+                <li><a href="regeln.html">Regeln</a></li>
+                <li><a href="sponsoring.html">Sponsoring</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main style="max-width: 1070px; margin: 0 auto; padding: 24px 20px;">
+
+        <!-- HERO BANNER (UEFA Style) -->
+        <div class="club-hero">
+            <div class="club-hero-top">
+                <div class="club-hero-identity">
+                    <div class="club-hero-crest-wrapper">
+                        <img id="hero-crest" src="assets/logo.jpg" alt="Vereinswappen" class="club-hero-crest">
+                    </div>
+                    <div class="club-hero-title-box">
+                        <h1 id="hero-name">Sportfreunde Vorst</h1>
+                        <div id="hero-full-name" class="club-hero-full-name">Sportfreunde 1945 Vorst e.V.</div>
+                        <div class="club-hero-meta-badges">
+                            <a id="hero-assoc-badge" class="club-badge" target="_blank" rel="noopener noreferrer" title="Offizielle Verbandsseite öffnen">FVN • Kreis Grevenbroich-Neuss</a>
+                            <a id="hero-cup-badge" class="club-badge club-badge-accent" href="saison.html" title="Zur Best of Cup Saisonübersicht">BEST OF CUP</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Spotlight Box (Top Right: Nächstes Spiel / Bilanz) -->
+                <div id="hero-spotlight-card" class="club-hero-spotlight">
+                    <!-- Loaded dynamically via renderHeroSpotlight() -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS & SAISON-LEISTE -->
+        <div class="club-tabs-wrapper">
+            <div class="club-tabs-nav">
+                <button class="club-tab-btn active" onclick="switchTab('info', this)">Info</button>
+                <button class="club-tab-btn" onclick="switchTab('termine', this)">Termine</button>
+                <button class="club-tab-btn" onclick="switchTab('statistik', this)">Statistik</button>
+            </div>
+            <div id="season-toggle-group" class="club-season-pills" role="group" aria-label="Saison wählen">
+                <button id="btn-season-2627" class="club-season-btn active" onclick="switchSeason('2026_2027')" title="Saison 2026/2027 anzeigen">Saison 26/27</button>
+                <button id="btn-season-2526" class="club-season-btn" onclick="switchSeason('2025_2026')" title="Saison 2025/2026 anzeigen">Saison 25/26</button>
+            </div>
+        </div>
+
+        <!-- Age Group Filter Bar (Visible when club has multiple age groups in the active season) -->
+        <div id="club-age-filter-bar" class="club-age-filter-bar" style="display: none;">
+            <span class="club-age-filter-label">Jahrgang filtern:</span>
+            <button class="club-age-filter-btn active" onclick="setAgeFilter('all', this)">Alle Teams</button>
+            <button id="btn-age-2014" class="club-age-filter-btn" onclick="setAgeFilter('2014', this)" style="display: none;">Jahrgang 2014</button>
+            <button id="btn-age-2016" class="club-age-filter-btn" onclick="setAgeFilter('2016', this)" style="display: none;">Jahrgang 2016</button>
+        </div>
+
+        <!-- TAB 1: INFO -->
+        <div id="tab-info" class="tab-content active">
+            <div class="info-grid">
+                <!-- Left Column: Form & Upcoming Matches -->
+                <div>
+                    <!-- Letzte Spiele (Kicker Style) -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <h3 class="info-card-title">Letzte Spiele</h3>
+                            <button onclick="switchTab('termine', document.querySelectorAll('.club-tab-btn')[1])" style="background: none; border: none; font-size: 0.82rem; font-weight: 700; color: #2563eb; cursor: pointer;">Alle Termine &rarr;</button>
+                        </div>
+                        <div id="form-summary-pills" class="form-chain-summary">
+                            <!-- Injected: S 4, U 1, N 1 -->
+                        </div>
+                        <div id="form-matches-strip" class="form-matches-strip">
+                            <!-- Injected horizontal match badges -->
+                            <div style="color: var(--text-muted); font-size: 0.88rem;">Lade bisherige Spiele...</div>
+                        </div>
+                    </div>
+
+                    <!-- Nächste Spiele (Upcoming Fixtures) -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <h3 class="info-card-title">Die nächsten Spiele</h3>
+                        </div>
+                        <div id="next-matches-list" class="next-matches-list">
+                            <div style="color: var(--text-muted); font-size: 0.88rem;">Lade Spielplan...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Vereinsdaten & Wettbewerbe -->
+                <div>
+                    <!-- Wettbewerbe & Teams -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <h3 class="info-card-title">Wettbewerbe &amp; Teams</h3>
+                        </div>
+                        <div id="club-competitions-list">
+                            <!-- Populated with Best of Cup 2014 / 2016 participation cards -->
+                        </div>
+                    </div>
+
+                    <!-- Vereinsdaten (Kicker Style Image 3) -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <h3 class="info-card-title">Vereinsdaten</h3>
+                        </div>
+                        <table class="club-data-table">
+                            <tbody>
+                                <tr>
+                                    <td class="club-data-label">Vereinsname</td>
+                                    <td id="data-full-name" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">Gründungsdatum</td>
+                                    <td id="data-founded" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">Vereinsfarben</td>
+                                    <td id="data-colors" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">Sportanlage</td>
+                                    <td id="data-ground" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">Anschrift</td>
+                                    <td id="data-address" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">Telefon</td>
+                                    <td id="data-phone" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">Webseite</td>
+                                    <td id="data-website" class="club-data-val">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="club-data-label">E-Mail</td>
+                                    <td id="data-email" class="club-data-val">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: TERMINE -->
+        <div id="tab-termine" class="tab-content">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h3 class="info-card-title">Saison-Terminplan &amp; Ergebnisse</h3>
+                    <span id="termine-count-badge" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); background: #f1f5f9; padding: 4px 10px; border-radius: 9999px;">0 Spiele</span>
+                </div>
+                <div id="club-timeline-container" class="club-timeline-section">
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">Lade Termine...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: STATISTIK -->
+        <div id="tab-statistik" class="tab-content">
+            <!-- UEFA Key Stats Hero Card -->
+            <div class="stats-hero-card">
+                <div class="stats-overview-grid">
+                    <!-- Circular Donut Chart -->
+                    <div class="stats-circle-container">
+                        <div class="stats-ring-wrapper">
+                            <svg class="stats-ring-svg" viewBox="0 0 100 100">
+                                <circle class="stats-ring-circle-bg" cx="50" cy="50" r="40" />
+                                <circle id="stats-ring-win" class="stats-ring-segment" stroke="#10b981" cx="50" cy="50" r="40" stroke-dasharray="0 251.327" stroke-dashoffset="0" />
+                                <circle id="stats-ring-draw" class="stats-ring-segment" stroke="#64748b" cx="50" cy="50" r="40" stroke-dasharray="0 251.327" stroke-dashoffset="0" />
+                                <circle id="stats-ring-loss" class="stats-ring-segment" stroke="#ef4444" cx="50" cy="50" r="40" stroke-dasharray="0 251.327" stroke-dashoffset="0" />
+                            </svg>
+                            <div class="stats-ring-text">
+                                <div id="stats-total-played" class="stats-ring-number">0</div>
+                                <div class="stats-ring-label">Spiele</div>
+                            </div>
+                        </div>
+                        <div class="stats-ring-legend">
+                            <div class="stats-legend-item">
+                                <span class="stats-legend-dot" style="background: #10b981;"></span>
+                                <span id="stats-won-text">0 Siege</span>
+                            </div>
+                            <div class="stats-legend-item">
+                                <span class="stats-legend-dot" style="background: #64748b;"></span>
+                                <span id="stats-drawn-text">0 Unentschieden</span>
+                            </div>
+                            <div class="stats-legend-item">
+                                <span class="stats-legend-dot" style="background: #ef4444;"></span>
+                                <span id="stats-lost-text">0 Niederlagen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics Grid -->
+                    <div class="stats-metrics-grid">
+                        <div class="stat-metric-card">
+                            <div id="stat-goals-for" class="stat-metric-value">0</div>
+                            <div class="stat-metric-label">Tore erzielt</div>
+                            <div id="stat-goals-avg" class="stat-metric-sub">0.0 &Oslash; pro Spiel</div>
+                        </div>
+                        <div class="stat-metric-card">
+                            <div id="stat-goals-against" class="stat-metric-value">0</div>
+                            <div class="stat-metric-label">Gegentore</div>
+                            <div id="stat-goals-against-avg" class="stat-metric-sub">0.0 &Oslash; pro Spiel</div>
+                        </div>
+                        <div class="stat-metric-card">
+                            <div id="stat-goal-diff" class="stat-metric-value">+0</div>
+                            <div class="stat-metric-label">Tordifferenz</div>
+                            <div id="stat-points-sub" class="stat-metric-sub">0 Punkte insgesamt</div>
+                        </div>
+                        <div class="stat-metric-card">
+                            <div id="stat-win-rate" class="stat-metric-value">0%</div>
+                            <div class="stat-metric-label">Siegquote</div>
+                            <div id="stat-clean-sheets" class="stat-metric-sub">0 Spiele zu Null</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home vs Away Breakdown -->
+                <div class="home-away-grid">
+                    <div class="ha-card">
+                        <h4>Heimbilanz</h4>
+                        <div class="ha-stats-row"><span>Heimspiele:</span><span id="ha-home-played">0</span></div>
+                        <div class="ha-stats-row"><span>Siege / Remis / Niederlagen:</span><span id="ha-home-record">0 / 0 / 0</span></div>
+                        <div class="ha-stats-row"><span>Torverhältnis:</span><span id="ha-home-goals">0:0</span></div>
+                        <div class="ha-stats-row"><span>Punkte zu Hause:</span><span id="ha-home-points">0</span></div>
+                    </div>
+                    <div class="ha-card">
+                        <h4>Auswärtsbilanz</h4>
+                        <div class="ha-stats-row"><span>Auswärtsspiele:</span><span id="ha-away-played">0</span></div>
+                        <div class="ha-stats-row"><span>Siege / Remis / Niederlagen:</span><span id="ha-away-record">0 / 0 / 0</span></div>
+                        <div class="ha-stats-row"><span>Torverhältnis:</span><span id="ha-away-goals">0:0</span></div>
+                        <div class="ha-stats-row"><span>Punkte in der Ferne:</span><span id="ha-away-points">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Best of Cup</p>
+        <p style="margin-top: 10px;">
+            <a href="verein.html" style="color: inherit; text-decoration: none; margin: 0 10px; font-weight: 700;">Vereinsinfos</a> |
+            <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Termine</a> |
+            <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
+            <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
+            <a href="datenschutz.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Datenschutz</a> |
+            <a href="logbuch.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Logbuch</a>
+        </p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW55bZ_AbRRja3na--YmYP4MBCQQVCtBg",
+            authDomain: "best-of-cup.firebaseapp.com",
+            projectId: "best-of-cup",
+            storageBucket: "best-of-cup.firebasestorage.app",
+            messagingSenderId: "188725945748",
+            appId: "1:188725945748:web:3a5fe06b1548bfc40c9b81",
+            measurementId: "G-HGCM4M029D"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const WEEKDAYS_SHORT = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
+        const MONTHS_NAMES = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+        let currentSeason = "2026_2027";
+        let currentClub = null;
+        let clubMatches = [];
+        let currentAgeFilter = "all";
+
+        function initPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const teamParam = urlParams.get('team') || urlParams.get('v') || urlParams.get('name') || "SF Vorst";
+            const seasonParam = urlParams.get('saison');
+            if (seasonParam === "2025_2026" || seasonParam === "2026_2027") {
+                currentSeason = seasonParam;
+            }
+
+            const ageParam = urlParams.get('jahrgang');
+            if (ageParam === "2014" || ageParam === "2016") {
+                currentAgeFilter = ageParam;
+            }
+
+            loadClub(teamParam);
+        }
+
+        // Dynamically adjust season toggle buttons based on club participation
+        function updateSeasonButtons(club) {
+            const clubSeasons = club.seasons || ["2026_2027"];
+            const has2627 = clubSeasons.includes("2026_2027");
+            const has2526 = clubSeasons.includes("2025_2026");
+
+            const btn2627 = document.getElementById('btn-season-2627');
+            const btn2526 = document.getElementById('btn-season-2526');
+
+            if (btn2627) btn2627.style.display = has2627 ? '' : 'none';
+            if (btn2526) btn2526.style.display = has2526 ? '' : 'none';
+
+            // Auto-switch if currently selected season is not available for this club
+            if (currentSeason === "2025_2026" && !has2526) {
+                currentSeason = "2026_2027";
+            } else if (currentSeason === "2026_2027" && !has2627) {
+                currentSeason = "2025_2026";
+            }
+
+            if (btn2627) btn2627.classList.toggle('active', currentSeason === '2026_2027');
+            if (btn2526) btn2526.classList.toggle('active', currentSeason === '2025_2026');
+        }
+
+        function switchSeason(saisonKey) {
+            currentSeason = saisonKey;
+            const btn2627 = document.getElementById('btn-season-2627');
+            const btn2526 = document.getElementById('btn-season-2526');
+            if (btn2627) btn2627.classList.toggle('active', currentSeason === '2026_2027');
+            if (btn2526) btn2526.classList.toggle('active', currentSeason === '2025_2026');
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('saison', currentSeason);
+            window.history.replaceState({}, '', url);
+
+            currentAgeFilter = "all";
+            if (currentClub) {
+                renderCompetitions(currentClub);
+                loadClubData(currentClub);
+            }
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.club-tab-btn').forEach(el => el.classList.remove('active'));
+
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        function setAgeFilter(filter, btn) {
+            currentAgeFilter = filter;
+            document.querySelectorAll('.club-age-filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) {
+                btn.classList.add('active');
+            } else {
+                // Find matching button
+                document.querySelectorAll('.club-age-filter-btn').forEach(b => {
+                    if ((filter === 'all' && b.innerText.includes('Alle')) ||
+                        (filter === '2014' && b.id === 'btn-age-2014') ||
+                        (filter === '2016' && b.id === 'btn-age-2016')) {
+                        b.classList.add('active');
+                    }
+                });
+            }
+
+            // Highlight corresponding competition card in Info tab
+            document.querySelectorAll('.comp-card').forEach(card => {
+                const cardAge = card.getAttribute('data-age');
+                card.classList.toggle('active-comp', currentAgeFilter === cardAge);
+            });
+
+            // Re-render views with new filter
+            applyAgeFilterAndRender();
+        }
+
+        function loadClub(teamQuery) {
+            currentClub = getClubByQuery(teamQuery);
+            if (!currentClub) currentClub = CLUBS_DATA[0];
+
+            // Sync Season buttons
+            updateSeasonButtons(currentClub);
+
+            // Render Master Data into DOM
+            renderClubMasterData(currentClub);
+
+            // Fetch live match data from Firestore
+            loadClubData(currentClub);
+        }
+
+        function renderClubMasterData(club) {
+            document.title = `${club.displayName} | Best of Cup Vereinsinfo`;
+            document.getElementById('hero-name').innerText = club.displayName;
+            document.getElementById('hero-full-name').innerText = club.fullName;
+            document.getElementById('hero-crest').src = club.logo;
+            document.getElementById('hero-crest').alt = club.displayName;
+
+            // Association badge with clickable link
+            const assocBadge = document.getElementById('hero-assoc-badge');
+            assocBadge.innerText = club.association || 'FVN • Niederrhein';
+            if (club.associationUrl) {
+                assocBadge.href = club.associationUrl;
+                assocBadge.style.display = 'inline-flex';
+            } else {
+                assocBadge.removeAttribute('href');
+            }
+
+            // Cup badge with link to saison.html
+            const cupBadge = document.getElementById('hero-cup-badge');
+            cupBadge.innerText = "BEST OF CUP";
+            cupBadge.href = `saison.html?saison=${currentSeason}`;
+
+            // Vereinsdaten Table
+            document.getElementById('data-full-name').innerText = club.fullName;
+            document.getElementById('data-founded').innerText = club.founded || '-';
+
+            // Colors with visual swatches
+            const colorsCell = document.getElementById('data-colors');
+            colorsCell.innerHTML = club.colors;
+            if (club.colorCodes && club.colorCodes.length) {
+                const swatchWrap = document.createElement('span');
+                swatchWrap.className = 'color-swatch-group';
+                club.colorCodes.forEach(hex => {
+                    const s = document.createElement('span');
+                    s.className = 'color-swatch';
+                    s.style.backgroundColor = hex;
+                    swatchWrap.appendChild(s);
+                });
+                colorsCell.appendChild(swatchWrap);
+            }
+
+            document.getElementById('data-ground').innerText = club.ground || '-';
+
+            // Address with Maps Link (clean text without icon)
+            const addrCell = document.getElementById('data-address');
+            if (club.address) {
+                addrCell.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(club.address)}" target="_blank" rel="noopener noreferrer">${club.address}</a>`;
+            } else {
+                addrCell.innerText = '-';
+            }
+
+            // Phone
+            const phoneCell = document.getElementById('data-phone');
+            if (club.phone) {
+                phoneCell.innerHTML = `<a href="tel:${club.phone.replace(/[^0-9+]/g, '')}">${club.phone}</a>`;
+            } else {
+                phoneCell.innerText = '-';
+            }
+
+            // Website (clean text without icon)
+            const webCell = document.getElementById('data-website');
+            if (club.website) {
+                webCell.innerHTML = `<a href="${club.website}" target="_blank" rel="noopener noreferrer">${club.website.replace('https://', '').replace('http://', '')}</a>`;
+            } else {
+                webCell.innerText = '-';
+            }
+
+            // Email
+            const emailCell = document.getElementById('data-email');
+            if (club.email) {
+                emailCell.innerHTML = `<a href="mailto:${club.email}">${club.email}</a>`;
+            } else {
+                emailCell.innerText = '-';
+            }
+
+            // Competitions
+            renderCompetitions(club);
+        }
+
+        function renderCompetitions(club) {
+            const compList = document.getElementById('club-competitions-list');
+            compList.innerHTML = '';
+
+            const seasonObj = CUP_DATA.seasons[currentSeason];
+            if (!seasonObj) return;
+
+            let in2014 = false;
+            let in2016 = false;
+
+            if (seasonObj.ageGroups["2014"] && seasonObj.ageGroups["2014"].teams) {
+                in2014 = !!Object.keys(seasonObj.ageGroups["2014"].teams).some(t => isSameClub(t, club.displayName));
+            }
+            if (seasonObj.ageGroups["2016"] && seasonObj.ageGroups["2016"].teams) {
+                in2016 = !!Object.keys(seasonObj.ageGroups["2016"].teams).some(t => isSameClub(t, club.displayName));
+            }
+
+            // Setup Age Filter Bar
+            const filterBar = document.getElementById('club-age-filter-bar');
+            const btn2014 = document.getElementById('btn-age-2014');
+            const btn2016 = document.getElementById('btn-age-2016');
+
+            if (in2014 && in2016) {
+                filterBar.style.display = 'flex';
+                btn2014.style.display = 'inline-block';
+                btn2016.style.display = 'inline-block';
+            } else {
+                filterBar.style.display = 'none';
+                currentAgeFilter = in2014 ? "2014" : (in2016 ? "2016" : "all");
+            }
+
+            if (in2014) {
+                compList.innerHTML += `
+                    <div class="comp-card ${currentAgeFilter === '2014' ? 'active-comp' : ''}" data-age="2014" onclick="setAgeFilter('2014', null)">
+                        <div class="comp-left">
+                            <div class="comp-badge-icon">14</div>
+                            <div class="comp-info">
+                                <h4>Best of Cup – Jahrgang 2014</h4>
+                                <p>Modus: Großfeld (8+1) • ${currentSeason === '2025_2026' ? 'Saison 25/26' : 'Saison 26/27'}</p>
+                            </div>
+                        </div>
+                        <a href="saison.html?saison=${currentSeason}&jahrgang=2014" class="comp-action-btn" onclick="event.stopPropagation()">Zur Tabelle &rarr;</a>
+                    </div>
+                `;
+            }
+            if (in2016) {
+                compList.innerHTML += `
+                    <div class="comp-card ${currentAgeFilter === '2016' ? 'active-comp' : ''}" data-age="2016" onclick="setAgeFilter('2016', null)">
+                        <div class="comp-left">
+                            <div class="comp-badge-icon">16</div>
+                            <div class="comp-info">
+                                <h4>Best of Cup – Jahrgang 2016</h4>
+                                <p>Modus: Großfeld (8+1) &amp; TWIN GAMES</p>
+                            </div>
+                        </div>
+                        <a href="saison.html?saison=${currentSeason}&jahrgang=2016" class="comp-action-btn" onclick="event.stopPropagation()">Zur Tabelle &rarr;</a>
+                    </div>
+                `;
+            }
+
+            if (!in2014 && !in2016) {
+                compList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Keine aktiven Wettbewerbe in der gewählten Saison.</div>`;
+            }
+        }
+
+        function isSameClub(nameA, nameB) {
+            if (!nameA || !nameB) return false;
+            if (nameA === nameB) return true;
+            const ca = getClubByQuery(nameA);
+            const cb = getClubByQuery(nameB);
+            return ca && cb && ca.id === cb.id;
+        }
+
+        function loadClubData(club) {
+            // Load from Firestore: match_dates & spiele
+            Promise.all([
+                db.collection("match_dates").get(),
+                db.collection("spiele").get()
+            ]).then(([datesSnapshot, spieleSnapshot]) => {
+                const resultsMap = new Map();
+                spieleSnapshot.forEach(doc => {
+                    const g = doc.data();
+                    const s = g.saison || "2025_2026";
+                    const j = g.jahrgang || "2014";
+
+                    if (s === currentSeason) {
+                        const key = `${g.heim}_${g.gast}`;
+                        resultsMap.set(key, {
+                            ergebnis81: g.ergebnis81,
+                            ergebnis41: g.ergebnis41,
+                            datum: g.datum ? (g.datum.toDate ? g.datum.toDate() : new Date(g.datum)) : null,
+                            jahrgang: j,
+                            saison: s
+                        });
+                    }
+                });
+
+                const matchesMap = new Map();
+
+                if (currentSeason === "2026_2027") {
+                    datesSnapshot.forEach(doc => {
+                        const isCancelled = typeof CANCELLED_MATCH_DATES !== 'undefined' && CANCELLED_MATCH_DATES.includes(doc.id);
+                        if (isCancelled) return;
+
+                        const data = doc.data();
+                        if (!data.team1 || !data.team2 || data.team1 === data.team2) return;
+
+                        const dt = parseMatchDateTime(data.date, data.time);
+                        if (!dt) return;
+
+                        // Resolve age group accurately
+                        let age = data.ageGroup ? String(data.ageGroup).trim() : "";
+                        const teams2016 = (CUP_DATA.seasons["2026_2027"] && CUP_DATA.seasons["2026_2027"].ageGroups["2016"]) 
+                            ? CUP_DATA.seasons["2026_2027"].ageGroups["2016"].teams : {};
+                        const teams2014 = (CUP_DATA.seasons["2026_2027"] && CUP_DATA.seasons["2026_2027"].ageGroups["2014"]) 
+                            ? CUP_DATA.seasons["2026_2027"].ageGroups["2014"].teams : {};
+
+                        if (age !== "2014" && age !== "2016") {
+                            if (teams2016[data.team1] && !teams2014[data.team1]) {
+                                age = "2016";
+                            } else if (teams2014[data.team1] && !teams2016[data.team1]) {
+                                age = "2014";
+                            } else if (teams2016[data.team2] && !teams2014[data.team2]) {
+                                age = "2016";
+                            } else if (teams2014[data.team2] && !teams2016[data.team2]) {
+                                age = "2014";
+                            } else {
+                                age = "2014";
+                            }
+                        }
+
+                        const matchKey = `${data.team1}_${data.team2}`;
+                        const playedResult = resultsMap.get(matchKey);
+                        const isPlayed = !!(playedResult && (
+                            (Array.isArray(playedResult.ergebnis81) && playedResult.ergebnis81.length >= 2) ||
+                            (Array.isArray(playedResult.ergebnis41) && playedResult.ergebnis41.length >= 2) ||
+                            (typeof playedResult.ergebnis81 === 'string' && playedResult.ergebnis81.trim()) ||
+                            (typeof playedResult.ergebnis41 === 'string' && playedResult.ergebnis41.trim())
+                        ));
+
+                        let matchDt = dt;
+                        let matchDateStr = data.date;
+                        let matchTimeStr = data.time || "12:00";
+
+                        if (isPlayed && dt > new Date() && playedResult && playedResult.datum) {
+                            matchDt = playedResult.datum;
+                            matchDateStr = `${String(matchDt.getDate()).padStart(2, '0')}.${String(matchDt.getMonth() + 1).padStart(2, '0')}.${matchDt.getFullYear()}`;
+                            matchTimeStr = `${String(matchDt.getHours()).padStart(2, '0')}:${String(matchDt.getMinutes()).padStart(2, '0')}`;
+                        }
+
+                        matchesMap.set(matchKey, {
+                            id: doc.id,
+                            team1: data.team1,
+                            team2: data.team2,
+                            dateStr: matchDateStr,
+                            timeStr: matchTimeStr,
+                            location: data.location || "",
+                            ageGroup: age,
+                            dateTime: matchDt,
+                            isPlayed: isPlayed,
+                            result: playedResult || null
+                        });
+                    });
+                }
+
+                // Also include played games from spiele without match_dates
+                resultsMap.forEach((result, key) => {
+                    if (!matchesMap.has(key)) {
+                        const parts = key.split('_');
+                        if (parts.length === 2) {
+                            const [h, a] = parts;
+                            const d = result.datum ? (result.datum.toDate ? result.datum.toDate() : new Date(result.datum)) : new Date(0);
+                            const dateStr = d.getTime() > 0 ? `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}` : "Gespielt";
+                            const timeStr = d.getTime() > 0 ? `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : "";
+
+                            matchesMap.set(key, {
+                                id: key,
+                                team1: h,
+                                team2: a,
+                                dateStr: dateStr,
+                                timeStr: timeStr,
+                                location: `Heimspiel ${h}`,
+                                ageGroup: result.jahrgang || "2014",
+                                dateTime: d,
+                                isPlayed: true,
+                                result: result
+                            });
+                        }
+                    }
+                });
+
+                // Filter matches of current club
+                clubMatches = [];
+                matchesMap.forEach(m => {
+                    const isHome = isSameClub(m.team1, club.displayName);
+                    const isAway = isSameClub(m.team2, club.displayName);
+                    if (isHome || isAway) {
+                        clubMatches.push({
+                            ...m,
+                            isHome: isHome,
+                            oppName: isHome ? m.team2 : m.team1
+                        });
+                    }
+                });
+
+                // Sort chronologically
+                clubMatches.sort((a, b) => a.dateTime - b.dateTime);
+
+                // Apply current age filter & render
+                applyAgeFilterAndRender();
+            }).catch(err => {
+                console.error("Fehler beim Laden der Spieldaten:", err);
+            });
+        }
+
+        function applyAgeFilterAndRender() {
+            if (!currentClub) return;
+
+            // Filter clubMatches by currentAgeFilter
+            const filtered = clubMatches.filter(m => {
+                if (currentAgeFilter === "all") return true;
+                return m.ageGroup === currentAgeFilter;
+            });
+
+            renderHeroSpotlight(currentClub, filtered);
+            renderRecentGames(currentClub, filtered);
+            renderNextGames(currentClub, filtered);
+            renderTimeline(currentClub, filtered);
+            renderStats(currentClub, filtered);
+        }
+
+        // Helper: Parse score from array [4, 2] or string "4:2" into [4, 2]
+        function parseScore(val) {
+            if (!val && val !== 0) return null;
+            if (Array.isArray(val)) {
+                if (val.length >= 2) {
+                    const h = parseInt(val[0], 10);
+                    const a = parseInt(val[1], 10);
+                    if (!isNaN(h) && !isNaN(a)) return [h, a];
+                }
+                return null;
+            }
+            if (typeof val === 'string') {
+                const clean = val.replace(/\s+/g, '');
+                const sep = clean.includes(':') ? ':' : (clean.includes('-') ? '-' : null);
+                if (sep) {
+                    const parts = clean.split(sep).map(x => parseInt(x, 10));
+                    if (!isNaN(parts[0]) && !isNaN(parts[1])) return parts;
+                }
+            }
+            return null;
+        }
+
+        // Calculate result for our club: 'win', 'draw', 'loss'
+        function getMatchOutcome(m) {
+            if (!m.isPlayed || !m.result) return null;
+            const res = m.result;
+            const s81 = parseScore(res.ergebnis81);
+            const s41 = parseScore(res.ergebnis41);
+
+            const primaryScore = s81 || s41;
+            if (!primaryScore) return null;
+
+            const scoreStr = `${primaryScore[0]}:${primaryScore[1]}`;
+            const r81Str = s81 ? `${s81[0]}:${s81[1]}` : null;
+            const tgScoreStr = s41 ? `${s41[0]}:${s41[1]}` : null;
+
+            const myGoals = m.isHome ? primaryScore[0] : primaryScore[1];
+            const oppGoals = m.isHome ? primaryScore[1] : primaryScore[0];
+
+            let status = 'draw';
+            let label = 'U';
+            if (myGoals > oppGoals) {
+                status = 'win';
+                label = 'S';
+            } else if (myGoals < oppGoals) {
+                status = 'loss';
+                label = 'N';
+            }
+
+            return {
+                status,
+                label,
+                myGoals,
+                oppGoals,
+                scoreStr,
+                r81Str,
+                tgScoreStr
+            };
+        }
+
+        function renderHeroSpotlight(club, matches) {
+            const card = document.getElementById('hero-spotlight-card');
+            if (!card) return;
+
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            // Look for next scheduled upcoming match
+            const upcoming = matches.filter(m => !m.isPlayed && m.dateTime && m.dateTime >= now);
+
+            if (upcoming.length > 0) {
+                const nextM = upcoming[0];
+                const oppClub = getClubByQuery(nextM.oppName);
+                const oppLogo = oppClub ? oppClub.logo : "assets/logo.jpg";
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${nextM.ageGroup}&heim=${encodeURIComponent(nextM.team1)}&gast=${encodeURIComponent(nextM.team2)}`;
+                const dayName = WEEKDAYS_SHORT[nextM.dateTime.getDay()];
+                const homeAwayLabel = nextM.isHome ? "Heim" : "Auswärts";
+
+                card.innerHTML = `
+                    <div class="hero-spotlight-header">
+                        <span>Nächstes Spiel</span>
+                        <span class="hero-spotlight-badge">${homeAwayLabel} • Jg. ${nextM.ageGroup}</span>
+                    </div>
+                    <a href="${spielUrl}" class="hero-spotlight-body" title="Zur Spielansetzung">
+                        <img src="${oppLogo}" alt="${nextM.oppName}" class="hero-spotlight-crest">
+                        <div class="hero-spotlight-info">
+                            <div class="hero-spotlight-opp">${nextM.oppName}</div>
+                            <div class="hero-spotlight-meta">
+                                <strong>${dayName}, ${nextM.dateStr}</strong>
+                                <span>• ${nextM.timeStr ? nextM.timeStr + ' Uhr' : 'Termin offen'}</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            } else {
+                // If no upcoming matches (e.g. past season or break), show season summary record
+                const played = matches.filter(m => m.isPlayed);
+                let wins = 0, draws = 0, losses = 0, myGoals = 0, oppGoals = 0;
+                played.forEach(m => {
+                    const outcome = getMatchOutcome(m);
+                    if (outcome) {
+                        if (outcome.status === 'win') wins++;
+                        else if (outcome.status === 'draw') draws++;
+                        else if (outcome.status === 'loss') losses++;
+                        myGoals += outcome.myGoals || 0;
+                        oppGoals += outcome.oppGoals || 0;
+                    }
+                });
+
+                const diff = myGoals - oppGoals;
+                const diffSign = diff > 0 ? `+${diff}` : `${diff}`;
+                const pts = (wins * 3) + draws;
+                const seasonLabel = currentSeason === '2025_2026' ? 'Saison 25/26' : 'Saison 26/27';
+
+                if (played.length > 0) {
+                    card.innerHTML = `
+                        <div class="hero-spotlight-header">
+                            <span>Saison-Bilanz</span>
+                            <span class="hero-spotlight-badge">${seasonLabel}</span>
+                        </div>
+                        <div class="hero-spotlight-body">
+                            <div class="hero-spotlight-info">
+                                <div class="hero-spotlight-opp" style="font-size: 1.02rem;">
+                                    ${played.length} Spiele • ${pts} Pkt.
+                                </div>
+                                <div class="hero-spotlight-meta" style="margin-top: 3px;">
+                                    <span>${wins}S • ${draws}U • ${losses}N</span>
+                                    <span style="color: #64748b;">|</span>
+                                    <strong>${myGoals}:${oppGoals} (${diffSign})</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="hero-spotlight-header">
+                            <span>Saison-Status</span>
+                            <span class="hero-spotlight-badge">${seasonLabel}</span>
+                        </div>
+                        <div class="hero-spotlight-body">
+                            <div class="hero-spotlight-info">
+                                <div class="hero-spotlight-opp" style="font-size: 0.9rem; color: #94a3b8;">
+                                    Keine Spiele terminiert
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function renderRecentGames(club, matches) {
+            const played = matches.filter(m => m.isPlayed);
+
+            // Summary Pills (S 4, U 1, N 0)
+            let wins = 0, draws = 0, losses = 0;
+            let validMatches = 0;
+            played.forEach(m => {
+                const outcome = getMatchOutcome(m);
+                if (outcome) {
+                    validMatches++;
+                    if (outcome.status === 'win') wins++;
+                    else if (outcome.status === 'draw') draws++;
+                    else if (outcome.status === 'loss') losses++;
+                }
+            });
+
+            document.getElementById('form-summary-pills').innerHTML = `
+                <span class="form-summary-pill win">S ${wins}</span>
+                <span class="form-summary-pill draw">U ${draws}</span>
+                <span class="form-summary-pill loss">N ${losses}</span>
+            `;
+
+            // Recent Matches Strip (Horizontal Nodes)
+            const strip = document.getElementById('form-matches-strip');
+            if (played.length === 0 || validMatches === 0) {
+                strip.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem; padding: 10px 0;">Noch keine gespielten Partien in dieser Auswahl.</div>`;
+                return;
+            }
+
+            strip.innerHTML = '';
+            // Show last 6 played games
+            played.slice(-6).forEach(m => {
+                const outcome = getMatchOutcome(m);
+                if (!outcome) return;
+
+                const oppClub = getClubByQuery(m.oppName);
+                const oppLogo = oppClub ? oppClub.logo : "assets/logo.jpg";
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+
+                strip.innerHTML += `
+                    <a href="${spielUrl}" class="form-match-node" title="${m.dateStr}: ${outcome.label} ${outcome.scoreStr}${outcome.tgScoreStr ? ' (TG: ' + outcome.tgScoreStr + ')' : ''} gegen ${m.oppName} (Jg. ${m.ageGroup})">
+                        <span class="form-match-tag ${outcome.status}" style="background: ${outcome.status === 'win' ? '#10b981' : outcome.status === 'draw' ? '#64748b' : '#ef4444'};">${outcome.label}</span>
+                        <img src="${oppLogo}" alt="${m.oppName}" class="form-match-opp-logo">
+                        <span class="form-match-opp-name">${m.oppName}</span>
+                        <span class="form-match-score">${outcome.r81Str || outcome.scoreStr}</span>
+                        ${outcome.tgScoreStr ? `<span class="form-match-tg">TG: ${outcome.tgScoreStr}</span>` : ''}
+                    </a>
+                `;
+            });
+        }
+
+        function renderNextGames(club, matches) {
+            const nextList = document.getElementById('next-matches-list');
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            const upcoming = matches.filter(m => !m.isPlayed && m.dateTime >= now);
+
+            if (upcoming.length === 0) {
+                nextList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem; padding: 10px 0;">Derzeit keine weiteren anstehenden Partien terminiert.</div>`;
+                return;
+            }
+
+            nextList.innerHTML = '';
+            upcoming.slice(0, 4).forEach(m => {
+                const oppClub = getClubByQuery(m.oppName);
+                const oppLogo = oppClub ? oppClub.logo : "assets/logo.jpg";
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+
+                const dayName = WEEKDAYS_SHORT[m.dateTime.getDay()];
+                const homeAwayText = m.isHome ? "Heimspiel" : "Auswärtsspiel";
+
+                nextList.innerHTML += `
+                    <a href="${spielUrl}" class="next-match-row">
+                        <div class="next-match-date-col">
+                            <div>${dayName}, ${m.dateStr}</div>
+                            <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">${homeAwayText}</div>
+                        </div>
+                        <div class="next-match-teams-col">
+                            <img src="${oppLogo}" alt="${m.oppName}" class="next-match-crest">
+                            <span style="font-weight: 800; font-size: 0.92rem;">${m.oppName}</span>
+                            <span style="font-size: 0.72rem; background: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Jg. ${m.ageGroup}</span>
+                        </div>
+                        <div class="next-match-time-badge">${m.timeStr} Uhr</div>
+                    </a>
+                `;
+            });
+        }
+
+        function renderTimeline(club, matches) {
+            const container = document.getElementById('club-timeline-container');
+            document.getElementById('termine-count-badge').innerText = `${matches.length} Spiele`;
+
+            if (matches.length === 0) {
+                container.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--text-muted);">Keine Termine für diese Auswahl hinterlegt.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            // Group matches by Month
+            let currentMonth = null;
+
+            matches.forEach(m => {
+                const monthName = MONTHS_NAMES[m.dateTime.getMonth()];
+                const year = m.dateTime.getFullYear();
+                const monthKey = `${monthName} ${year}`;
+
+                if (monthKey !== currentMonth) {
+                    currentMonth = monthKey;
+                    container.innerHTML += `
+                        <div class="timeline-month-header">
+                            <div class="timeline-hex-node"></div>
+                            <h4 class="timeline-month-title">${currentMonth}</h4>
+                        </div>
+                    `;
+                }
+
+                const dayName = WEEKDAYS_SHORT[m.dateTime.getDay()];
+                const homeClub = getClubByQuery(m.team1);
+                const awayClub = getClubByQuery(m.team2);
+
+                const homeLogo = homeClub ? homeClub.logo : "assets/logo.jpg";
+                const awayLogo = awayClub ? awayClub.logo : "assets/logo.jpg";
+
+                const isHomeClub = isSameClub(m.team1, club.displayName);
+                const isAwayClub = isSameClub(m.team2, club.displayName);
+
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+                const homeUrl = `verein.html?team=${encodeURIComponent(m.team1)}&saison=${currentSeason}&jahrgang=${m.ageGroup}`;
+                const awayUrl = `verein.html?team=${encodeURIComponent(m.team2)}&saison=${currentSeason}&jahrgang=${m.ageGroup}`;
+
+                const outcome = getMatchOutcome(m);
+                let scoreDisplay = '';
+                let btnLabel = 'Spieldetails &rarr;';
+
+                if (m.isPlayed && outcome) {
+                    btnLabel = 'Spielbericht &rarr;';
+                    const mainScore = outcome.r81Str || outcome.scoreStr;
+                    scoreDisplay = `
+                        <a href="${spielUrl}" class="timeline-score-wrap" title="Zum Spielbericht">
+                            <div class="timeline-score-box">${mainScore}</div>
+                            ${outcome.tgScoreStr ? `<div class="timeline-tg-badge" title="Twin Games: ${outcome.tgScoreStr}">TG: ${outcome.tgScoreStr}</div>` : ''}
+                        </a>
+                    `;
+                } else {
+                    scoreDisplay = `
+                        <a href="${spielUrl}" class="timeline-score-wrap" title="Zu den Spieldetails">
+                            <div class="timeline-score-box scheduled">${m.timeStr ? m.timeStr + ' Uhr' : 'Termin offen'}</div>
+                        </a>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="timeline-match-card">
+                        <div class="timeline-match-meta">
+                            <div>${dayName}, ${m.dateStr}</div>
+                            <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Best of Cup Jg. ${m.ageGroup}</div>
+                        </div>
+
+                        <div class="timeline-match-teams">
+                            <a href="${homeUrl}" class="timeline-team-side home" title="${m.team1} – Vereinsseite öffnen">
+                                <span class="timeline-team-name ${isHomeClub ? 'highlight' : ''}">${m.team1}</span>
+                                <img src="${homeLogo}" alt="${m.team1}" class="timeline-team-crest">
+                            </a>
+
+                            ${scoreDisplay}
+
+                            <a href="${awayUrl}" class="timeline-team-side away" title="${m.team2} – Vereinsseite öffnen">
+                                <img src="${awayLogo}" alt="${m.team2}" class="timeline-team-crest">
+                                <span class="timeline-team-name ${isAwayClub ? 'highlight' : ''}">${m.team2}</span>
+                            </a>
+                        </div>
+
+                        <div>
+                            <a href="${spielUrl}" class="timeline-action-btn">${btnLabel}</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderStats(club, matches) {
+            const played = matches.filter(m => m.isPlayed);
+
+            let wins = 0, draws = 0, losses = 0;
+            let goalsFor = 0, goalsAgainst = 0;
+            let cleanSheets = 0;
+
+            let homeGames = 0, homeWins = 0, homeDraws = 0, homeLosses = 0, homeGF = 0, homeGA = 0;
+            let awayGames = 0, awayWins = 0, awayDraws = 0, awayLosses = 0, awayGF = 0, awayGA = 0;
+
+            played.forEach(m => {
+                const outcome = getMatchOutcome(m);
+                if (!outcome) return;
+
+                const { status, myGoals, oppGoals } = outcome;
+                goalsFor += myGoals;
+                goalsAgainst += oppGoals;
+
+                if (oppGoals === 0) cleanSheets++;
+
+                if (status === 'win') wins++;
+                else if (status === 'draw') draws++;
+                else if (status === 'loss') losses++;
+
+                if (m.isHome) {
+                    homeGames++;
+                    homeGF += myGoals;
+                    homeGA += oppGoals;
+                    if (status === 'win') homeWins++;
+                    else if (status === 'draw') homeDraws++;
+                    else homeLosses++;
+                } else {
+                    awayGames++;
+                    awayGF += myGoals;
+                    awayGA += oppGoals;
+                    if (status === 'win') awayWins++;
+                    else if (status === 'draw') awayDraws++;
+                    else awayLosses++;
+                }
+            });
+
+            const totalPlayed = played.length;
+            const points = (wins * 3) + draws;
+            const winRate = totalPlayed > 0 ? Math.round((wins / totalPlayed) * 100) : 0;
+            const goalsAvg = totalPlayed > 0 ? (goalsFor / totalPlayed).toFixed(1) : "0.0";
+            const goalsAgainstAvg = totalPlayed > 0 ? (goalsAgainst / totalPlayed).toFixed(1) : "0.0";
+            const diff = goalsFor - goalsAgainst;
+            const diffSign = diff > 0 ? `+${diff}` : `${diff}`;
+
+            // Update Ring Chart & Legend
+            document.getElementById('stats-total-played').innerText = totalPlayed;
+            document.getElementById('stats-won-text').innerText = wins === 1 ? '1 Sieg' : `${wins} Siege`;
+            document.getElementById('stats-drawn-text').innerText = `${draws} Unentschieden`;
+            document.getElementById('stats-lost-text').innerText = losses === 1 ? '1 Niederlage' : `${losses} Niederlagen`;
+
+            // SVG Circumference = 2 * PI * 40 ≈ 251.327
+            const C = 251.327;
+            const winCircle = document.getElementById('stats-ring-win');
+            const drawCircle = document.getElementById('stats-ring-draw');
+            const lossCircle = document.getElementById('stats-ring-loss');
+
+            if (winCircle && drawCircle && lossCircle) {
+                if (totalPlayed === 0) {
+                    winCircle.style.strokeDasharray = `0 ${C}`;
+                    winCircle.style.strokeDashoffset = '0';
+                    drawCircle.style.strokeDasharray = `0 ${C}`;
+                    drawCircle.style.strokeDashoffset = '0';
+                    lossCircle.style.strokeDasharray = `0 ${C}`;
+                    lossCircle.style.strokeDashoffset = '0';
+                } else {
+                    const lenWin = (wins / totalPlayed) * C;
+                    const lenDraw = (draws / totalPlayed) * C;
+                    const lenLoss = (losses / totalPlayed) * C;
+
+                    // Win segment: starts at 12 o'clock
+                    winCircle.style.strokeDasharray = `${lenWin} ${C}`;
+                    winCircle.style.strokeDashoffset = '0';
+
+                    // Draw segment: starts after Win
+                    drawCircle.style.strokeDasharray = `${lenDraw} ${C}`;
+                    drawCircle.style.strokeDashoffset = `-${lenWin}`;
+
+                    // Loss segment: starts after Win + Draw
+                    lossCircle.style.strokeDasharray = `${lenLoss} ${C}`;
+                    lossCircle.style.strokeDashoffset = `-${lenWin + lenDraw}`;
+                }
+            }
+
+            // Update Metrics Cards
+            document.getElementById('stat-goals-for').innerText = goalsFor;
+            document.getElementById('stat-goals-avg').innerText = `${goalsAvg} Ø pro Spiel`;
+
+            document.getElementById('stat-goals-against').innerText = goalsAgainst;
+            document.getElementById('stat-goals-against-avg').innerText = `${goalsAgainstAvg} Ø pro Spiel`;
+
+            document.getElementById('stat-goal-diff').innerText = diffSign;
+            document.getElementById('stat-points-sub').innerText = `${points} Punkte insgesamt`;
+
+            document.getElementById('stat-win-rate').innerText = `${winRate}%`;
+            document.getElementById('stat-clean-sheets').innerText = `${cleanSheets} Spiele zu Null`;
+
+            // Update Home / Away Breakdown
+            document.getElementById('ha-home-played').innerText = homeGames;
+            document.getElementById('ha-home-record').innerText = `${homeWins} / ${homeDraws} / ${homeLosses}`;
+            document.getElementById('ha-home-goals').innerText = `${homeGF}:${homeGA}`;
+            document.getElementById('ha-home-points').innerText = `${(homeWins * 3) + homeDraws} Pkt.`;
+
+            document.getElementById('ha-away-played').innerText = awayGames;
+            document.getElementById('ha-away-record').innerText = `${awayWins} / ${awayDraws} / ${awayLosses}`;
+            document.getElementById('ha-away-goals').innerText = `${awayGF}:${awayGA}`;
+            document.getElementById('ha-away-points').innerText = `${(awayWins * 3) + awayDraws} Pkt.`;
+        }
+
+        window.onload = initPage;
+    </script>
+
+</body>
+
+</html>
