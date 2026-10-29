@@ -522,8 +522,44 @@
                 return;
             }
 
-            // Update Back Link
-            document.getElementById('back-link').href = `saison.html?saison=${saison}&jahrgang=${jahrgang}`;
+            // Dynamic Back Link
+            const fromParam = urlParams.get('from');
+            const fromVerein = urlParams.get('verein');
+            const backLink = document.getElementById('back-link');
+
+            if (fromParam === 'verein' && fromVerein) {
+                backLink.href = `verein.html?team=${encodeURIComponent(fromVerein)}&saison=${saison}`;
+                backLink.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                    Zurück zu ${fromVerein}
+                `;
+            } else if (fromParam === 'termine' || (document.referrer && document.referrer.includes('termine.html'))) {
+                backLink.href = 'termine.html';
+                backLink.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                    Zurück zum Spielplan
+                `;
+            } else if (fromParam === 'startseite' || (document.referrer && (document.referrer.endsWith('index.html') || document.referrer.endsWith('/')))) {
+                backLink.href = 'index.html';
+                backLink.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                    Zurück zur Startseite
+                `;
+            } else {
+                backLink.href = `saison.html?saison=${saison}&jahrgang=${jahrgang}`;
+                backLink.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                    Zurück zur Saisonübersicht
+                `;
+            }
 
             const configSeason = CUP_DATA.seasons[saison];
             if(!configSeason) return;

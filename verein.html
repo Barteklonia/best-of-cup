@@ -790,7 +790,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius);
             padding: 16px 20px;
-            margin-bottom: 14px;
+            margin-bottom: 18px;
             box-shadow: var(--shadow-sm);
             display: flex;
             align-items: center;
@@ -1216,6 +1216,7 @@
                 gap: 12px;
                 width: 100%;
                 box-sizing: border-box;
+                margin-bottom: 18px;
             }
             .timeline-match-meta {
                 order: 1;
@@ -1538,9 +1539,11 @@
         <!-- TAB 2: TERMINE -->
         <div id="tab-termine" class="tab-content">
             <div class="info-card">
-                <div class="info-card-header">
-                    <h3 class="info-card-title">Saison-Terminplan &amp; Ergebnisse</h3>
-                    <span id="termine-count-badge" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); background: #f1f5f9; padding: 4px 10px; border-radius: 9999px;">0 Spiele</span>
+                <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 class="info-card-title">Saison-Terminplan &amp; Ergebnisse</h3>
+                        <div id="termine-count-badge" style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-top: 3px;">0 Spiele terminiert</div>
+                    </div>
                 </div>
                 <div id="club-timeline-container" class="club-timeline-section">
                     <div style="text-align: center; padding: 40px; color: var(--text-muted);">Lade Termine...</div>
@@ -2295,7 +2298,7 @@
 
                 const oppClub = getClubByQuery(m.oppName);
                 const oppLogo = oppClub ? oppClub.logo : "assets/logo.jpg";
-                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}&from=verein&verein=${encodeURIComponent(club.displayName)}`;
 
                 strip.innerHTML += `
                     <a href="${spielUrl}" class="form-match-node" title="${m.dateStr}: ${outcome.label} ${outcome.scoreStr}${outcome.tgScoreStr ? ' (TG: ' + outcome.tgScoreStr + ')' : ''} gegen ${m.oppName} (Jg. ${m.ageGroup})">
@@ -2325,7 +2328,7 @@
             upcoming.slice(0, 4).forEach(m => {
                 const oppClub = getClubByQuery(m.oppName);
                 const oppLogo = oppClub ? oppClub.logo : "assets/logo.jpg";
-                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}&from=verein&verein=${encodeURIComponent(club.displayName)}`;
 
                 const dayName = WEEKDAYS_SHORT[m.dateTime.getDay()];
                 const homeAwayText = m.isHome ? "Heimspiel" : "Auswärtsspiel";
@@ -2349,7 +2352,7 @@
 
         function renderTimeline(club, matches) {
             const container = document.getElementById('club-timeline-container');
-            document.getElementById('termine-count-badge').innerText = `${matches.length} Spiele`;
+            document.getElementById('termine-count-badge').innerText = matches.length === 1 ? '1 Spiel terminiert' : `${matches.length} Spiele terminiert`;
 
             if (matches.length === 0) {
                 container.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--text-muted);">Keine Termine für diese Auswahl hinterlegt.</div>`;
@@ -2386,7 +2389,7 @@
                 const isHomeClub = isSameClub(m.team1, club.displayName);
                 const isAwayClub = isSameClub(m.team2, club.displayName);
 
-                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}`;
+                const spielUrl = `spiel.html?saison=${currentSeason}&jahrgang=${m.ageGroup}&heim=${encodeURIComponent(m.team1)}&gast=${encodeURIComponent(m.team2)}&from=verein&verein=${encodeURIComponent(club.displayName)}`;
                 const homeUrl = `verein.html?team=${encodeURIComponent(m.team1)}&saison=${currentSeason}`;
                 const awayUrl = `verein.html?team=${encodeURIComponent(m.team2)}&saison=${currentSeason}`;
 
