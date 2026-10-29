@@ -320,6 +320,50 @@
                 justify-content: center;
             }
         }
+
+        @media (max-width: 540px) {
+            .match-hero {
+                padding: 24px 12px;
+                margin-bottom: 20px;
+            }
+            .match-hero-teams {
+                gap: 6px;
+            }
+            .match-team-logo-wrapper {
+                width: 70px;
+                height: 70px;
+                padding: 8px;
+                border-radius: 14px;
+                margin-bottom: 8px;
+            }
+            .match-team-name {
+                font-size: 0.88rem;
+                line-height: 1.25;
+            }
+            .match-score-col {
+                padding: 0 4px;
+            }
+            .match-score-main {
+                font-size: 2rem;
+                padding: 8px 12px;
+                gap: 6px;
+                border-radius: 10px;
+            }
+            .match-score-main .colon {
+                font-size: 1.6rem;
+            }
+            .match-score-sub {
+                font-size: 0.78rem;
+                padding: 3px 8px;
+                margin-top: 8px;
+            }
+            .match-hero-date {
+                font-size: 1rem;
+            }
+            .match-hero-header {
+                margin-bottom: 18px;
+            }
+        }
     </style>
 </head>
 
@@ -432,8 +476,9 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Best of Cup</p>
+        <p>&copy; 2026 Best of Cup</p>
         <p style="margin-top: 10px;">
+            <a href="verein.html" style="color: inherit; text-decoration: none; margin: 0 10px; font-weight: 700;">Vereinsinfos</a> |
             <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Termine</a> |
             <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
             <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
@@ -535,7 +580,8 @@
                 let matchFound = false;
                 
                 const isCancelled = typeof CANCELLED_MATCH_DATES !== 'undefined' && CANCELLED_MATCH_DATES.includes(matchId);
-                if (dateDoc.exists && dateDoc.data().ageGroup.toString() === jahrgang && !isCancelled) {
+                const docAge = (dateDoc.exists && dateDoc.data().ageGroup != null) ? String(dateDoc.data().ageGroup).trim() : "";
+                if (dateDoc.exists && (!docAge || docAge === String(jahrgang).trim()) && !isCancelled) {
                     const dData = dateDoc.data();
                     dateFixed = dData.date + ", " + dData.time;
                     matchLocation = dData.location;

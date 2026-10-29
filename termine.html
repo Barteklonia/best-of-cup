@@ -380,6 +380,24 @@
            Responsive Layout for Tablets & Mobile
            ========================================== */
         @media (max-width: 860px) {
+            .termine-filter-bar {
+                padding: 14px;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .filter-group {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 6px;
+            }
+
+            .search-input-wrapper {
+                min-width: 100%;
+                max-width: 100%;
+                margin-top: 2px;
+            }
+
             .hide-mobile-kicker {
                 display: none !important;
             }
@@ -389,29 +407,29 @@
             }
 
             .kicker-timeline {
-                padding-left: 24px;
+                padding-left: 20px;
             }
 
             .kicker-timeline::before {
-                left: 8px;
+                left: 7px;
             }
 
             .kicker-timeline-node {
-                left: -24px;
-                width: 18px;
-                height: 18px;
+                left: -20px;
+                width: 16px;
+                height: 16px;
             }
 
             .kicker-hexagon-svg {
-                width: 17px;
-                height: 17px;
+                width: 15px;
+                height: 15px;
             }
 
             .kicker-match-row {
                 display: flex;
                 flex-direction: column;
-                gap: 10px;
-                padding: 14px 16px;
+                gap: 8px;
+                padding: 12px 14px;
                 align-items: stretch;
             }
 
@@ -425,7 +443,7 @@
                 display: grid;
                 grid-template-columns: 1fr auto 1fr;
                 align-items: center;
-                gap: 8px;
+                gap: 6px;
             }
 
             .kicker-mobile-bottom {
@@ -433,7 +451,7 @@
                 justify-content: flex-end;
                 align-items: center;
                 border-top: 1px dashed #f1f5f9;
-                padding-top: 8px;
+                padding-top: 6px;
                 margin-top: 2px;
             }
         }
@@ -520,7 +538,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Best of Cup</p>
+        <p>&copy; 2026 Best of Cup</p>
         <p style="margin-top: 10px;">
             <a href="verein.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Vereinsinfos</a> |
             <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px; font-weight: 700;">Termine</a> |
@@ -625,14 +643,18 @@
                     const j = g.jahrgang || "2014";
 
                     if (s === selectedSeason) {
-                        const key = `${g.heim}_${g.gast}`;
-                        resultsMap.set(key, {
+                        const keyWithAge = `${j}_${g.heim}_${g.gast}`;
+                        const resObj = {
                             ergebnis81: g.ergebnis81,
                             ergebnis41: g.ergebnis41,
                             datum: g.datum ? (g.datum.toDate ? g.datum.toDate() : new Date(g.datum)) : null,
                             jahrgang: j,
                             saison: s
-                        });
+                        };
+                        resultsMap.set(keyWithAge, resObj);
+                        if (!resultsMap.has(`${g.heim}_${g.gast}`)) {
+                            resultsMap.set(`${g.heim}_${g.gast}`, resObj);
+                        }
                     }
                 });
 
@@ -671,8 +693,8 @@
                             }
                         }
 
-                        const matchKey = `${data.team1}_${data.team2}`;
-                        const playedResult = resultsMap.get(matchKey);
+                        const matchKeyWithAge = `${age}_${data.team1}_${data.team2}`;
+                        const playedResult = resultsMap.get(matchKeyWithAge) || resultsMap.get(`${data.team1}_${data.team2}`);
                         const isPlayed = !!(playedResult && (playedResult.ergebnis81 || playedResult.ergebnis41));
 
                         let matchDt = dt;
@@ -687,7 +709,7 @@
                             matchTimeStr = `${String(matchDt.getHours()).padStart(2, '0')}:${String(matchDt.getMinutes()).padStart(2, '0')}`;
                         }
 
-                        matchesMap.set(matchKey, {
+                        matchesMap.set(matchKeyWithAge, {
                             id: doc.id,
                             team1: data.team1,
                             team2: data.team2,
@@ -704,36 +726,43 @@
 
                 // Also include played games from spiele that were not in match_dates (for the selected season)
                 resultsMap.forEach((result, key) => {
-                    if (!matchesMap.has(key)) {
-                        const parts = key.split('_');
-                        if (parts.length === 2 && result.datum) {
-                            const [h, a] = parts;
-                            const age = result.jahrgang || "2014";
+                    const parts = key.split('_');
+                    let age = result.jahrgang || "2014";
+                    let h = "";
+                    let a = "";
+                    if (parts.length === 3) {
+                        age = parts[0];
+                        h = parts[1];
+                        a = parts[2];
+                    } else if (parts.length === 2) {
+                        h = parts[0];
+                        a = parts[1];
+                    }
+                    const fullKey = `${age}_${h}_${a}`;
+                    if (h && a && !matchesMap.has(fullKey)) {
+                        const d = result.datum ? (result.datum.toDate ? result.datum.toDate() : new Date(result.datum)) : new Date(0);
+                        let dateStr = d.getTime() > 0 ? `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}` : "Gespielt";
+                        let timeStr = d.getTime() > 0 ? `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : "";
+                        let loc = `Heimspiel ${h}`;
 
-                            const d = new Date(result.datum);
-                            let dateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
-                            let timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-                            let loc = `Heimspiel ${h}`;
-
-                            if (key === "SG Unterrath_DSC Düsseldorf") {
-                                timeStr = "13:30";
-                                d.setHours(13, 30, 0, 0);
-                                loc = "Kunstrasenplatz, HR-Schrott-Arena (oberer Platz), Franz-Rennefeld-Weg 13, 40472 Düsseldorf";
-                            }
-
-                            matchesMap.set(key, {
-                                id: key,
-                                team1: h,
-                                team2: a,
-                                dateStr: dateStr,
-                                timeStr: timeStr,
-                                location: loc,
-                                ageGroup: age,
-                                dateTime: d,
-                                isPlayed: true,
-                                result: result
-                            });
+                        if (key.includes("SG Unterrath_DSC Düsseldorf")) {
+                            timeStr = "13:30";
+                            d.setHours(13, 30, 0, 0);
+                            loc = "Kunstrasenplatz, HR-Schrott-Arena (oberer Platz), Franz-Rennefeld-Weg 13, 40472 Düsseldorf";
                         }
+
+                        matchesMap.set(fullKey, {
+                            id: key,
+                            team1: h,
+                            team2: a,
+                            dateStr: dateStr,
+                            timeStr: timeStr,
+                            location: loc,
+                            ageGroup: age,
+                            dateTime: d,
+                            isPlayed: true,
+                            result: result
+                        });
                     }
                 });
 

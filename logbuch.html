@@ -114,6 +114,21 @@
 
             <div class="log-entry">
                 <div class="log-date">29. Oktober 2026</div>
+                <h3 class="log-title">Umfassende Logik-Fehlerbehebung &amp; Plattformweite Mobile-Optimierung</h3>
+                <ul class="log-list">
+                    <li><strong>Null-Safety &amp; Absturz-Pr&auml;vention (<code>spiel.html</code>):</strong> Behebung eines potenziellen <code>TypeError</code>-Absturzes beim Aufruf von <code>.toString()</code> auf nicht definierten <code>ageGroup</code>-Feldern in Firestore-Spieldokumenten. Sicheres Type-Casting und Fallback-Handling gew&auml;hrleisten einen robusten Seitenaufruf.</li>
+                    <li><strong>Schl&uuml;sselkollisionen &uuml;ber Jahrg&auml;nge behoben (<code>termine.html</code>):</strong> In der allgemeinen Termin- und Kalender&uuml;bersicht wurden Ergebnis- und Ansetzungsdaten zuvor nur mit <code>${team1}_${team2}</code> indiziert. Bei Vereinen mit paralleler Teilnahme in beiden Altersklassen (z.&nbsp;B. SF Vorst mit Teams in 2014 &amp; 2016) &uuml;berschrieben sich die Termine wechselseitig. Durch konsistente Schl&uuml;sself&uuml;hrung mit <code>${age}_${team1}_${team2}</code> werden s&auml;mtliche Begegnungen beider Jahrg&auml;nge fehlerfrei getrennt und vollst&auml;ndig dargestellt.</li>
+                    <li><strong>Tabellen-Raster-Isolation auf Mobilger&auml;ten (<code>css/style.css</code> &amp; <code>historie.html</code>):</strong> Das f&uuml;r die 6-spaltige Bundesliga-Tabelle definierte mobile CSS-Grid zwang zuvor auch die 5-spaltige Hall-of-Fame-Ehrentafel in ein unpassendes Spaltenraster mit stark verschobenen Werten. Durch Scoping auf <code>.bundesliga-table:not(.hof-table)</code> und Einf&uuml;hrung horizontaler Scrollf&auml;higkeit (<code>.hof-table</code> mit Mindestbreite) bleibt die Ehrentafel nun auf Smartphones gestochen scharf und exakt ausgerichtet.</li>
+                    <li><strong>Mobile Navigation &amp; Touch-Targets (<code>css/style.css</code>):</strong> Die mobile Hauptnavigation wurde von stark beengten Touch-Fl&auml;chen auf gro&szlig;z&uuml;gige, touchfreundliche Schaltfl&auml;chen (7px/10px Padding, 0.78rem Schriftgr&ouml;&szlig;e, abgerundete Ecken) sowie weiches horizontales Scrollen umgestellt, sodass alle Men&uuml;punkte auf Smartphones m&uuml;helos bedienbar sind.</li>
+                    <li><strong>Startseiten-Vorschau &amp; Teilnehmer-Raster (<code>css/style.css</code> &amp; <code>index.html</code>):</strong> Horizontales &Uuml;berlaufen auf Mobilger&auml;ten durch starre <code>minmax(310px, 1fr)</code>-Raster wurde vollst&auml;ndig eliminiert. Auf Smartphones schaltet die Spielevorschau nahtlos auf ein sauberes 1-Spalten-Layout mit Wappen-Skalierung und Textk&uuml;rzung um, w&auml;hrend die Teilnehmer-Raster in ein harmonisches, 2-spaltiges Kachelgitter wechseln.</li>
+                    <li><strong>Vereins-Detailseiten Mobile-Polish (<code>verein.html</code>):</strong> Schlankes Hero-Banner f&uuml;r Smartphones (skaliertes Wappen, proportionale H1-Typografie, vollfl&auml;chige Spotlight-Kachel), touchfreundliche Reiternavigation mit Scrollf&auml;higkeit, geschmeidiges Umbrechen n&auml;chster Spiele, optimierte Termin-Timeline und ein &uuml;bersichtliches 2x2-Statistik-Kachelgitter.</li>
+                    <li><strong>Spieldetails &amp; Sponsoring Mobile-Optimierung (<code>spiel.html</code> &amp; <code>sponsoring.html</code>):</strong> Skalierte Wappen- und Ergebnisboxen auf Smartphones unter 540px Breite sowie responsive Ausrichtung der Sponsoring-Pakete ohne Querscrollen.</li>
+                    <li><strong>Harmonisierung der Fu&szlig;zeilen &amp; Vereinslinks:</strong> Alle Seiten auf das einheitliche Copyright-Jahr 2026 aktualisiert und den Schnellzugriff auf <em>Vereinsinfos</em> l&uuml;ckenlos in alle Fu&szlig;zeilen integriert.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-date">29. Oktober 2026</div>
                 <h3 class="log-title">Fehlerbehebung Jahrgangs-Filterung &amp; Termin-Vollst&auml;ndigkeit (<code>verein.html</code>)</h3>
                 <ul class="log-list">
                     <li><strong>Schaltfl&auml;chen-Desynchronisierung behoben (<code>verein.html</code>):</strong> Bei Vereinen mit mehreren Altersklassen (z.&nbsp;B. SF Vorst mit Jahrgang 2014 &amp; 2016) war in der Leiste <em>&bdquo;Jahrgang filtern&ldquo;</em> optisch die Schaltfl&auml;che <em>&bdquo;Alle Teams&ldquo;</em> aktiv geschaltet, angezeigt wurden jedoch zun&auml;chst nur die Partien des Jahrgangs 2014. Die visuelle Kennzeichnung der Filter-Buttons wurde vollst&auml;ndig mit dem Anzeigestatus synchronisiert (<code>updateAgeFilterButtons</code>).</li>
@@ -401,8 +416,9 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Best of Cup</p>
+        <p>&copy; 2026 Best of Cup</p>
         <p style="margin-top: 10px;">
+            <a href="verein.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Vereinsinfos</a> |
             <a href="termine.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Termine</a> |
             <a href="historie.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Historie</a> |
             <a href="impressum.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Impressum</a> |
