@@ -23,6 +23,7 @@
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="stylesheet" href="css/style.css?v=1.1">
     <script src="js/config.js"></script>
+    <script src="js/nav.js" defer></script>
 
     <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
@@ -142,7 +143,7 @@
         <!-- Ehrentafel / Übersicht -->
         <div class="card">
             <h2>Ehrentafel der Best of Cup Meister</h2>
-            <div class="table-container" style="margin-top: 15px;">
+            <div class="table-container hof-desktop-table" style="margin-top: 15px;">
                 <table class="bundesliga-table hof-table">
                     <thead>
                         <tr>
@@ -156,11 +157,11 @@
                     <tbody>
                         <tr>
                             <td style="font-weight: 800; font-family: 'Outfit', sans-serif;">2025/2026</td>
-                            <td><span class="preview-age-pill">2014</span></td>
+                            <td><span class="preview-age-pill pill-2014">2014</span></td>
                             <td style="font-weight: 700;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <img src="assets/wappen-1fcmg.png" alt="1. FC Mönchengladbach" style="width: 28px; height: 28px; object-fit: contain;">
-                                    <span>1. FC Mönchengladbach &#127942;</span>
+                                    <span>1. FC Mönchengladbach</span>
                                 </div>
                             </td>
                             <td style="text-align: center; font-weight: 700; color: #16a34a;">16-0-0</td>
@@ -168,7 +169,7 @@
                         </tr>
                         <tr>
                             <td style="font-weight: 800; font-family: 'Outfit', sans-serif;">2026/2027</td>
-                            <td><span class="preview-age-pill">2014</span></td>
+                            <td><span class="preview-age-pill pill-2014">2014</span></td>
                             <td style="font-style: italic; color: var(--text-muted);">
                                 <em>Wettbewerb läuft</em>
                             </td>
@@ -177,7 +178,7 @@
                         </tr>
                         <tr>
                             <td style="font-weight: 800; font-family: 'Outfit', sans-serif;">2026/2027</td>
-                            <td><span class="preview-age-pill">2016</span></td>
+                            <td><span class="preview-age-pill pill-2016">2016</span></td>
                             <td style="font-style: italic; color: var(--text-muted);">
                                 <em>Wettbewerb läuft</em>
                             </td>
@@ -186,6 +187,58 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile-optimierte Ansicht ohne horizontales Scrollen -->
+            <div class="hof-mobile-cards">
+                <div class="hof-card-item">
+                    <div class="hof-card-header">
+                        <span class="hof-card-season">Saison 2025/2026</span>
+                        <span class="preview-age-pill pill-2014">Jg. 2014</span>
+                    </div>
+                    <div class="hof-card-team-row">
+                        <img src="assets/wappen-1fcmg.png" alt="1. FC Mönchengladbach" class="hof-card-crest">
+                        <div class="hof-card-team-info">
+                            <div class="hof-card-team-name">1. FC Mönchengladbach</div>
+                            <div class="hof-card-subtitle">Offizieller Meister</div>
+                        </div>
+                    </div>
+                    <div class="hof-card-stats">
+                        <div class="hof-card-stat-chip" style="color: #16a34a;">
+                            <span>Bilanz:</span> <strong>16-0-0</strong>
+                        </div>
+                        <div style="color: #cbd5e1;">&bull;</div>
+                        <div class="hof-card-stat-chip">
+                            <span>Punkte:</span> <strong>48 Pkt.</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hof-card-item">
+                    <div class="hof-card-header">
+                        <span class="hof-card-season">Saison 2026/2027</span>
+                        <span class="preview-age-pill pill-2014">Jg. 2014</span>
+                    </div>
+                    <div class="hof-card-team-row">
+                        <div class="hof-card-team-info">
+                            <div class="hof-card-team-name" style="color: #64748b; font-style: italic; font-size: 0.95rem;">Wettbewerb läuft</div>
+                            <div class="hof-card-subtitle">Meisterschaft noch nicht entschieden</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hof-card-item">
+                    <div class="hof-card-header">
+                        <span class="hof-card-season">Saison 2026/2027</span>
+                        <span class="preview-age-pill pill-2016">Jg. 2016</span>
+                    </div>
+                    <div class="hof-card-team-row">
+                        <div class="hof-card-team-info">
+                            <div class="hof-card-team-name" style="color: #64748b; font-style: italic; font-size: 0.95rem;">Wettbewerb läuft</div>
+                            <div class="hof-card-subtitle">Meisterschaft noch nicht entschieden</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>

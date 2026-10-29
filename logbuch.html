@@ -20,6 +20,7 @@
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="stylesheet" href="css/style.css?v=1.1">
     <script src="js/config.js"></script>
+    <script src="js/nav.js" defer></script>
 
     <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
@@ -111,6 +112,17 @@
     <main>
         <div class="container">
             <h1 style="text-align: center; margin-bottom: 40px;">Logbuch (Changelog)</h1>
+
+            <div class="log-entry">
+                <div class="log-date">29. Oktober 2026</div>
+                <h3 class="log-title">Echtes Burger-Men&uuml;, Startseiten-Karten-Reparatur, Ehrentafel-Mobile-Cards &amp; Vereins-Timeline-Neugestaltung</h3>
+                <ul class="log-list">
+                    <li><strong>Echtes Mobile Burger-Men&uuml; (<code>js/nav.js</code> &amp; <code>css/style.css</code>):</strong> Vollwertiges, animiertes Hamburger-Men&uuml; auf Mobilger&auml;ten eingef&uuml;hrt. Statt einer horizontal abgeschnittenen Navigationsleiste &ouml;ffnet sich auf Smartphones ein eleganter, abgedunkelter Drawer mit animiertem Drei-Strich/Kreuz-Icon, sanftem Blur-Backdrop, Barrierefreiheit (ARIA) und 48px hohen Touch-Fl&auml;chen.</li>
+                    <li><strong>Startseiten-Vorschaukarten Mobile-Overflow behoben (<code>css/style.css</code> &amp; <code>index.html</code>):</strong> Ursache f&uuml;r das horizontale &Uuml;berlaufen der Spielkarten auf der Startseite behoben (fehlende <code>min-width: 0</code>-Begrenzung bei langen Adresszeilen und CSS-Grid-Spalten f&uuml;hrte zu Kartenausdehnung &uuml;ber das Display hinaus, wodurch das Ausw&auml;rtsteam abgeschnitten wurde). Das Ausw&auml;rtsteam sowie der gesamte Inhalt sind nun auch auf kleinen Displays zu 100% sichtbar.</li>
+                    <li><strong>Ehrentafel ohne Horizontales Scrollen &amp; Pokal-Bereinigung (<code>historie.html</code> &amp; <code>css/style.css</code>):</strong> Das Pokal-Emoji neben dem 1. FC M&ouml;nchengladbach in der Meistertabelle entfernt. Auf Mobilger&auml;ten (&le; 640px) wird die breite Tabelle vollst&auml;ndig durch ein aufger&auml;umtes, natives Karten-Layout (Saison, Jahrgang, Meisterwappen, Bilanz- und Punkte-Badges) ersetzt, sodass keinerlei l&auml;stiges horizontales Hin- und Herschieben mehr n&ouml;tig ist.</li>
+                    <li><strong>Vereinsseite Termine-Timeline komplett repariert (<code>verein.html</code>):</strong> Die mobile Darstellung im Reiter &bdquo;Termine&ldquo; wurde von Grund auf neu aufgebaut. Bisherige Flex-Reihenfolgekollisionen und Text&uuml;berlagerungen zwischen Datum, Spielbericht-Button und Spielstandsbox wurden beseitigt. Jede Spielkarte ist nun als klar strukturierter, 3-reihiger Block formatiert (Kopfzeile mit Datum und Altersklassen-Pille, Mittelzeile mit Wappen und Spielstand, Fu&szlig;zeile mit vollfl&auml;chigem Bericht-/Detail-Button).</li>
+                </ul>
+            </div>
 
             <div class="log-entry">
                 <div class="log-date">29. Oktober 2026</div>

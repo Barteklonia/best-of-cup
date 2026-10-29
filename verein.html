@@ -19,6 +19,7 @@
     <!-- Project Config & Club Master Data -->
     <script src="js/config.js"></script>
     <script src="js/vereine_data.js"></script>
+    <script src="js/nav.js" defer></script>
 
     <style>
         /* --- VEREIN PAGE HERO (UEFA CHAMPIONS LEAGUE STYLE) --- */
@@ -811,6 +812,14 @@
             min-width: 140px;
         }
 
+        .timeline-meta-mobile-pill {
+            display: none;
+        }
+
+        .timeline-match-action {
+            flex-shrink: 0;
+        }
+
         .timeline-match-teams {
             display: flex;
             align-items: center;
@@ -1200,22 +1209,104 @@
                 gap: 10px;
             }
             .timeline-match-card {
-                padding: 12px 14px;
-                gap: 10px;
-            }
-            .timeline-match-teams {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 14px 16px;
+                gap: 12px;
                 width: 100%;
-                min-width: 0;
-                order: 1;
-                justify-content: space-between;
+                box-sizing: border-box;
             }
             .timeline-match-meta {
-                order: 2;
-                font-size: 0.75rem;
+                order: 1;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
                 min-width: 0;
+                font-size: 0.8rem;
+                font-weight: 700;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            .timeline-meta-desktop-sub {
+                display: none !important;
+            }
+            .timeline-meta-mobile-pill {
+                display: inline-block !important;
+            }
+            .timeline-match-teams {
+                order: 2;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                width: 100%;
+                min-width: 0;
+            }
+            .timeline-team-side {
+                width: auto;
+                flex: 1 1 0;
+                min-width: 0;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .timeline-team-side.home {
+                justify-content: flex-end;
+                text-align: right;
+            }
+            .timeline-team-side.away {
+                justify-content: flex-start;
+                text-align: left;
             }
             .timeline-team-name {
                 font-size: 0.82rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+            .timeline-team-crest {
+                width: 26px;
+                height: 26px;
+                flex-shrink: 0;
+            }
+            .timeline-score-wrap {
+                flex-shrink: 0;
+                min-width: 60px;
+            }
+            .timeline-score-box {
+                padding: 5px 10px;
+                font-size: 0.95rem;
+                min-width: 50px;
+            }
+            .timeline-score-box.scheduled {
+                padding: 4px 8px;
+                font-size: 0.78rem;
+                white-space: nowrap;
+            }
+            .timeline-match-action {
+                order: 3;
+                width: 100%;
+            }
+            .timeline-action-btn {
+                display: block;
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+                padding: 8px 12px;
+                font-size: 0.82rem;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                color: var(--primary);
+                font-weight: 700;
+            }
+            .timeline-action-btn:hover {
+                background: #0f172a;
+                color: #ffffff;
+                border-color: #0f172a;
             }
             .stats-overview-grid {
                 gap: 16px;
@@ -2323,8 +2414,11 @@
                 container.innerHTML += `
                     <div class="timeline-match-card">
                         <div class="timeline-match-meta">
-                            <div>${dayName}, ${m.dateStr}</div>
-                            <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Best of Cup Jg. ${m.ageGroup}</div>
+                            <div class="timeline-meta-left">
+                                <div>${dayName}, ${m.dateStr}</div>
+                                <div class="timeline-meta-desktop-sub" style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Best of Cup Jg. ${m.ageGroup}</div>
+                            </div>
+                            <span class="preview-age-pill pill-${m.ageGroup} timeline-meta-mobile-pill">Jg. ${m.ageGroup}</span>
                         </div>
 
                         <div class="timeline-match-teams">
@@ -2341,7 +2435,7 @@
                             </a>
                         </div>
 
-                        <div>
+                        <div class="timeline-match-action">
                             <a href="${spielUrl}" class="timeline-action-btn">${btnLabel}</a>
                         </div>
                     </div>
