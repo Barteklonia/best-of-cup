@@ -2,11 +2,11 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="color-scheme" content="light">
     <title>Best of Cup - Admin</title>
-	<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <link rel="stylesheet" href="css/style.css?v=1.5">
     
     <script src="js/config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -14,148 +14,1129 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
-        .login-container, .dashboard-container {
-            max-width: 600px;
-            margin: 50px auto;
+        body {
+            background-color: var(--bg-body, #f4f4f4);
+            color: var(--text-main, #222222);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- Header Navigation Link (bündig zum Standard-Seitenheader) --- */
+        .header-back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            padding: 6px 0;
+            transition: color 0.2s ease;
+        }
+        .header-back-link:hover {
+            color: var(--primary);
+        }
+
+        /* --- Main Page Container (exakt bündig zum Header-Raster 1070px / 1100px) --- */
+        main {
+            max-width: 1100px;
+            margin: 2.5rem auto 4rem auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .login-container {
+            max-width: 420px;
+            margin: 40px auto;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 32px 24px;
             text-align: center;
+            box-sizing: border-box;
         }
-        .hidden { display: none; }
-        
-        input, select, button {
+
+        .dashboard-container {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 24px 28px;
+            box-sizing: border-box;
         }
-        
-        button {
-            background-color: var(--primary);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+
+        /* --- 2-Spalten-Layout auf Desktop --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 32px;
+            align-items: start;
         }
-        
-        button:hover { background-color: var(--accent); }
 
-        /* Button Farben */
-        .btn-green { background-color: #2e7d32; } /* Speichern */
-        .btn-blue { background-color: #1976D2; }  /* Update */
-        .btn-red { background-color: #c62828; width: auto; padding: 5px 10px; font-size: 0.8rem; margin-left: 5px;}
-        .btn-edit { background-color: #FF9800; width: auto; padding: 5px 10px; font-size: 0.8rem;}
-
-        .score-input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            justify-content: center;
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
         }
-        .score-input-group input { width: 60px; text-align: center; }
-        label { display: block; text-align: left; font-weight: bold; margin-top: 15px;}
 
-        /* Liste der Spiele */
-        .game-list {
-            margin-top: 30px;
+        /* --- Login Section --- */
+        .login-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            object-fit: contain;
+        }
+        .login-brand h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+        .login-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 22px;
+        }
+        .login-form-group {
+            margin-bottom: 14px;
             text-align: left;
         }
-        .game-item {
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
+        .login-form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .password-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-wrap input {
+            padding-right: 80px;
+        }
+        .btn-toggle-pw {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+        .btn-toggle-pw:hover {
+            color: var(--primary);
+        }
+        .btn-login-submit {
+            width: 100%;
+            height: 46px;
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        .btn-login-submit:hover {
+            background: var(--primary-light);
+        }
+        .login-error-box {
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c53030;
+            font-size: 0.82rem;
+            text-align: left;
+        }
+
+        /* --- Dashboard Header --- */
+        .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 18px;
         }
-        .game-info { font-size: 0.9rem; }
-        .game-actions { display: flex; align-items: center; }
+        .dashboard-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+        .btn-logout {
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-logout:hover {
+            background: var(--primary-light);
+        }
+
+        /* --- Filter Box (Saison & Division) --- */
+        .filter-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .filter-field label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        .filter-field select,
+        .form-group select,
+        .form-group input,
+        .login-form-group input {
+            width: 100%;
+            height: 42px;
+            padding: 0 12px;
+            font-size: 16px; /* verhindert iOS Safari Auto-Zoom */
+            font-family: inherit;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .filter-field select:focus,
+        .form-group select:focus,
+        .form-group input:focus,
+        .login-form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        /* --- Edit Banner --- */
+        .edit-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            gap: 10px;
+        }
+        .edit-banner-label {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 6px;
+        }
+        .btn-cancel-edit {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-cancel-edit:hover {
+            background: #f4f4f4;
+        }
+
+        /* --- Form Section --- */
+        .form-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin: 0 0 16px 0;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* --- Match Preview (Schlicht & Klar) --- */
+        .match-preview-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin: 14px 0 20px 0;
+        }
+        .match-preview-team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            min-width: 0;
+        }
+        .match-preview-team img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-bottom: 4px;
+        }
+        .team-preview-name {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            line-height: 1.2;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .preview-role-sub {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        .match-preview-vs {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 0 12px;
+            flex-shrink: 0;
+        }
+
+        /* --- Score Input Cards --- */
+        .score-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+        .score-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+        }
+        .score-card-title {
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .score-card-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        .score-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .score-team-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            max-width: 170px;
+        }
+        .score-team-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .stepper-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            justify-content: center;
+        }
+        .stepper-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            background: #f4f4f4;
+            border: 1px solid var(--border-color);
+            color: var(--primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.15s ease;
+            line-height: 1;
+        }
+        .stepper-btn:hover { background: #e5e5e5; }
+        .stepper-btn:active {
+            transform: scale(0.94);
+            background: #d4d4d4;
+        }
+        .score-input-row input {
+            width: 52px;
+            height: 40px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #ffffff;
+            color: var(--primary);
+            padding: 0;
+            margin: 0;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .score-input-row input:focus {
+            border-color: var(--primary);
+        }
+        .score-colon {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+        .score-hint {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* --- Primary & Secondary Action Buttons --- */
+        .btn-save {
+            width: 100%;
+            height: 46px;
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .btn-save:hover {
+            background: var(--primary-light);
+        }
+        .btn-save:active { transform: scale(0.99); }
+        .btn-cancel {
+            width: 100%;
+            height: 42px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            margin-top: 8px;
+        }
+        .btn-cancel:hover {
+            background: #f4f4f4;
+        }
+
+        /* --- Game List --- */
+        .game-list {
+            text-align: left;
+        }
+        .game-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .game-list-title-wrap {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .game-list-title-wrap h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+        .count-badge {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .game-search-wrap {
+            flex: 1;
+            min-width: 140px;
+            max-width: 180px;
+        }
+        .game-search-wrap input {
+            width: 100%;
+            height: 36px;
+            padding: 0 10px;
+            font-size: 0.82rem;
+            font-family: inherit;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            background: #fafafa;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .game-search-wrap input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .games-scroll-wrap {
+            max-height: 640px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* --- Game Items (Schlichtes Best-of-Cup Design) --- */
+        .game-item {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.15s;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+        .game-item:hover {
+            border-color: #999999;
+        }
+        .game-item-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+            min-width: 0;
+            gap: 12px;
+        }
+        .game-item-teams {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+            flex: 1;
+        }
+        .game-team-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .game-crest {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .game-team-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .game-item-scores {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            flex-shrink: 0;
+            min-width: 70px;
+        }
+        .score-main {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--primary);
+            line-height: 1.1;
+        }
+        .score-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .game-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .btn-item-edit {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-item-edit:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            border-color: var(--primary);
+        }
+        .btn-item-delete {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-item-delete:hover {
+            color: #dc2626;
+            border-color: #dc2626;
+        }
+
+        /* --- Empty States --- */
+        .empty-state {
+            padding: 24px 16px;
+            text-align: center;
+            color: var(--text-muted);
+            background: #fafafa;
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+
+        /* --- Toast Notification (Minimalist) --- */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            z-index: 10000;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: #000000;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.25s ease;
+            max-width: 90%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .toast.toast-show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- Delete Confirmation Modal --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 380px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .modal-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .modal-body {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-modal-cancel {
+            flex: 1;
+            height: 40px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+        }
+        .btn-modal-confirm {
+            flex: 1;
+            height: 40px;
+            background: #000000;
+            border: none;
+            color: #ffffff;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+        }
+        .btn-modal-confirm:hover { background: #dc2626; }
+
+        /* --- Mobile Responsive Optimierung (< 900px / < 600px) --- */
+        @media (max-width: 900px) {
+            .game-list {
+                border-top: 1px solid var(--border-color);
+                padding-top: 24px;
+                margin-top: 8px;
+            }
+            .games-scroll-wrap {
+                max-height: none;
+                overflow-y: visible;
+            }
+        }
+
+        @media (max-width: 600px) {
+            main {
+                margin: 1.2rem auto 2.5rem auto;
+                padding: 0 12px;
+            }
+            .header-back-link {
+                font-size: 0.8rem;
+            }
+            .dashboard-container, .login-container {
+                padding: 16px 14px;
+            }
+            .filter-box {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 10px;
+            }
+            .teams-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .match-preview-card {
+                padding: 12px 8px;
+            }
+            .match-preview-team img {
+                width: 36px;
+                height: 36px;
+            }
+            .team-preview-name {
+                font-size: 0.82rem;
+            }
+            .score-card {
+                padding: 12px 10px;
+            }
+            .score-input-row {
+                gap: 8px;
+            }
+            .stepper-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.15rem;
+            }
+            .score-input-row input {
+                width: 48px;
+                height: 38px;
+                font-size: 1.15rem;
+            }
+            .game-search-wrap {
+                max-width: 100%;
+                width: 100%;
+            }
+            .game-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 12px;
+            }
+            .game-item-main {
+                justify-content: space-between;
+            }
+            .game-actions {
+                width: 100%;
+                border-top: 1px solid var(--border-color);
+                padding-top: 8px;
+                gap: 8px;
+            }
+            .btn-item-edit {
+                flex: 1;
+                text-align: center;
+                padding: 8px 10px;
+            }
+            .btn-item-delete {
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Standard Header (exakt wie auf index.html / saison.html) -->
     <header>
         <a href="index.html">
             <img src="assets/logo.jpg" alt="Best of Cup Logo" class="nav-logo">
         </a>        
-        <nav>
-            <ul>
-                <li><a href="index.html">Zurück zur Seite</a></li>
-            </ul>
-        </nav>
+        <a href="index.html" class="header-back-link">
+            Zurück zur Seite
+        </a>
     </header>
 
     <main>
+
+        <!-- Login Section -->
         <div id="login-section" class="card login-container">
-            <h2>Admin Login</h2>
-            <input type="email" id="email" placeholder="E-Mail Adresse">
-            <input type="password" id="password" placeholder="Passwort">
-            <button onclick="login()">Einloggen</button>
-            <p id="login-error" style="color: red;"></p>
+            <div class="login-brand">
+                <img src="assets/logo.jpg" alt="Logo" class="login-logo">
+                <h2>Admin Login</h2>
+                <p class="login-desc">Melde dich an, um Spielergebnisse der Best of Cup Liga zu verwalten.</p>
+            </div>
+            <form id="login-form" onsubmit="event.preventDefault(); login();">
+                <div class="login-form-group">
+                    <label for="email">E-Mail Adresse</label>
+                    <input type="email" id="email" placeholder="admin@bestofcup.de" autocomplete="username" required>
+                </div>
+                <div class="login-form-group">
+                    <label for="password">Passwort</label>
+                    <div class="password-wrap">
+                        <input type="password" id="password" placeholder="Passwort eingeben" autocomplete="current-password" required>
+                        <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility()" aria-label="Passwort anzeigen">Anzeigen</button>
+                    </div>
+                </div>
+                <button type="submit" id="loginBtn" class="btn-login-submit">Einloggen</button>
+                <div id="login-error" class="login-error-box hidden"></div>
+            </form>
         </div>
 
+        <!-- Dashboard Section (bündig im 1100px Layout wie index.html & termine.html) -->
         <div id="dashboard-section" class="card dashboard-container hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Ergebnisverwaltung</h2>
-                <button onclick="logout()" style="width:auto; background:#333;">Logout</button>
-            </div>
             
-            <hr style="margin: 20px 0;">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Ergebnisverwaltung</h1>
+                </div>
+                <button onclick="logout()" class="btn-logout" title="Abmelden">
+                    Logout
+                </button>
+            </div>
 
-            <!-- Selectors for Season and Yeargang -->
-            <div style="display:flex; gap:15px; flex-wrap:wrap; margin:20px 0; padding:15px; background:#f5f5f5; border-radius:4px; border:1px solid #ddd; text-align:left;">
-                <div style="flex:1; min-width:120px;">
-                    <label style="margin-top:0; font-size:0.85rem; color:#555;">Saison filtern/eintragen</label>
+            <!-- Season and Age Group Filter -->
+            <div class="filter-box">
+                <div class="filter-field">
+                    <label for="season-select">Saison filtern/eintragen</label>
                     <select id="season-select" onchange="onAdminSeasonChange()"></select>
                 </div>
-                <div style="flex:1; min-width:120px;">
-                    <label style="margin-top:0; font-size:0.85rem; color:#555;">Jahrgang filtern/eintragen</label>
+                <div class="filter-field">
+                    <label for="age-select">Jahrgang filtern/eintragen</label>
                     <select id="age-select" onchange="onAdminAgeGroupChange()"></select>
                 </div>
             </div>
 
+            <!-- Hidden input for edit mode -->
             <input type="hidden" id="editGameId">
 
-            <h3 id="form-title">Neues Ergebnis eintragen</h3>
-            
-            <label>Heimteam</label>
-            <select id="teamHome">
-                <!-- Dynamically populated -->
-            </select>
+            <!-- 2-Spalten-Bereich (Desktop nebeneinander, Mobile untereinander) -->
+            <div class="dashboard-grid">
+                
+                <!-- Spalte 1: Formular zur Ergebniseingabe -->
+                <div id="form-card">
+                    
+                    <!-- Edit mode banner (shown only during edit) -->
+                    <div id="edit-banner" class="edit-banner hidden">
+                        <div>
+                            <span class="edit-banner-label">Bearbeitung:</span>
+                            <strong id="edit-banner-match">Spiel bearbeiten</strong>
+                        </div>
+                        <button type="button" class="btn-cancel-edit" onclick="resetForm()">Abbrechen</button>
+                    </div>
 
-            <label>Auswärtsteam</label>
-            <select id="teamAway">
-                <!-- Dynamically populated -->
-            </select>
+                    <h3 id="form-title" class="form-title">
+                        Neues Ergebnis eintragen
+                    </h3>
 
-            <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
+                    <!-- Quick selection from official schedule -->
+                    <div class="form-group" id="schedule-quick-group">
+                        <label for="schedule-quick-select">Schnellauswahl aus Spielplan (optional)</label>
+                        <select id="schedule-quick-select" onchange="onScheduleQuickSelect(this.value)">
+                            <option value="">Spiel aus Spielplan wählen...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Team Pickers -->
+                    <div class="teams-grid">
+                        <div class="form-group">
+                            <label for="teamHome">Heimteam</label>
+                            <select id="teamHome" onchange="onTeamSelectChange('home')"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="teamAway">Auswärtsteam</label>
+                            <select id="teamAway" onchange="onTeamSelectChange('away')"></select>
+                        </div>
+                    </div>
 
-            <h4 id="label-part1">Teil 1: Großfeld (Endergebnis Tore)</h4>
-            <div class="score-input-group">
-                <input type="number" id="scoreHome81" placeholder="0">
-                <span>:</span>
-                <input type="number" id="scoreAway81" placeholder="0">
-            </div>
+                    <!-- Match Preview (schlichtes neutrales Design) -->
+                    <div class="match-preview-card">
+                        <div class="match-preview-team">
+                            <img id="preview-home-logo" src="assets/logo.jpg" alt="" onerror="this.src='assets/logo.jpg'">
+                            <span id="preview-home-name" class="team-preview-name">Heimteam</span>
+                            <span class="preview-role-sub">Heim</span>
+                        </div>
+                        <div class="match-preview-vs">vs</div>
+                        <div class="match-preview-team">
+                            <img id="preview-away-logo" src="assets/logo.jpg" alt="" onerror="this.src='assets/logo.jpg'">
+                            <span id="preview-away-name" class="team-preview-name">Auswärtsteam</span>
+                            <span class="preview-role-sub">Auswärts</span>
+                        </div>
+                    </div>
 
-            <h4 id="label-part2">Teil 2: TWIN GAMES (Anzahl Siege)</h4>
-            <div class="score-input-group">
-                <input type="number" id="scoreHome41" placeholder="0">
-                <span>:</span>
-                <input type="number" id="scoreAway41" placeholder="0">
-            </div>
+                    <!-- Part 1: Großfeld Score Card -->
+                    <div class="score-card">
+                        <div class="score-card-header">
+                            <span class="score-card-title" id="label-part1">Teil 1: Großfeld</span>
+                            <span class="score-card-sub">Endergebnis Tore</span>
+                        </div>
+                        <div class="score-input-row">
+                            <div class="score-team-box">
+                                <span class="score-team-label" id="score-label-home-81">Heim</span>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreHome81', -1)" aria-label="Tor abziehen">−</button>
+                                    <input type="number" id="scoreHome81" inputmode="numeric" pattern="[0-9]*" min="0" value="0">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreHome81', 1)" aria-label="Tor hinzufügen">+</button>
+                                </div>
+                            </div>
+                            <div class="score-colon">:</div>
+                            <div class="score-team-box">
+                                <span class="score-team-label" id="score-label-away-81">Gast</span>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreAway81', -1)" aria-label="Tor abziehen">−</button>
+                                    <input type="number" id="scoreAway81" inputmode="numeric" pattern="[0-9]*" min="0" value="0">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreAway81', 1)" aria-label="Tor hinzufügen">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <button id="saveBtn" onclick="saveResult()" class="btn-green">Ergebnis Speichern</button>
-            <button id="cancelBtn" onclick="resetForm()" style="background:#777; display:none;">Abbrechen</button>
+                    <!-- Part 2: TWIN GAMES Score Card -->
+                    <div class="score-card">
+                        <div class="score-card-header">
+                            <span class="score-card-title" id="label-part2">Teil 2: TWIN GAMES</span>
+                            <span class="score-card-sub">Anzahl Siege</span>
+                        </div>
+                        <div class="score-input-row">
+                            <div class="score-team-box">
+                                <span class="score-team-label" id="score-label-home-41">Heim</span>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreHome41', -1)" aria-label="Sieg abziehen">−</button>
+                                    <input type="number" id="scoreHome41" inputmode="numeric" pattern="[0-9]*" min="0" value="0" oninput="updateTwinGamesSum()">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreHome41', 1)" aria-label="Sieg hinzufügen">+</button>
+                                </div>
+                            </div>
+                            <div class="score-colon">:</div>
+                            <div class="score-team-box">
+                                <span class="score-team-label" id="score-label-away-41">Gast</span>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreAway41', -1)" aria-label="Sieg abziehen">−</button>
+                                    <input type="number" id="scoreAway41" inputmode="numeric" pattern="[0-9]*" min="0" value="0" oninput="updateTwinGamesSum()">
+                                    <button type="button" class="stepper-btn" onclick="changeScore('scoreAway41', 1)" aria-label="Sieg hinzufügen">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tg-sum-hint" class="score-hint">
+                            8 Einzelspiele (z.&nbsp;B. 5:3 oder 4:4)
+                        </div>
+                    </div>
 
-            <div class="game-list">
-                <h3>Bereits eingetragen:</h3>
-                <div id="games-container">
-                    <p style="text-align:center; color:#999;">Lade Daten...</p>
+                    <!-- Action Buttons -->
+                    <button id="saveBtn" onclick="saveResult()" class="btn-save">
+                        Ergebnis speichern
+                    </button>
+                    <button id="cancelBtn" onclick="resetForm()" class="btn-cancel" style="display:none;">
+                        Abbrechen
+                    </button>
+
                 </div>
+
+                <!-- Spalte 2: Liste der bereits eingetragenen Spiele -->
+                <div class="dashboard-col-list">
+                    <div class="game-list">
+                        <div class="game-list-header">
+                            <div class="game-list-title-wrap">
+                                <h3>Bereits eingetragen</h3>
+                                <span id="games-count-badge" class="count-badge">(0)</span>
+                            </div>
+                            <div class="game-search-wrap">
+                                <input type="search" id="game-search-input" placeholder="Team filtern..." oninput="filterGamesList()">
+                            </div>
+                        </div>
+
+                        <div id="search-empty-notice" class="empty-state hidden">
+                            Keine eingetragenen Spiele für diesen Suchbegriff gefunden.
+                        </div>
+
+                        <div id="games-container" class="games-scroll-wrap">
+                            <p style="text-align:center; color:var(--text-muted); padding: 16px;">Lade Daten...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h3>Spiel löschen?</h3>
+            <p id="delete-modal-text" class="modal-body">
+                Möchtest du dieses Ergebnis wirklich unwiderruflich löschen?
+            </p>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="cancelDelete()">Abbrechen</button>
+                <button type="button" class="btn-modal-confirm" onclick="confirmDelete()">Löschen</button>
             </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Minimalist Toast Notification -->
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
     <script>
         const firebaseConfig = {
@@ -171,19 +1152,18 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // WICHTIG: Hier speichern wir alle Spiele für den Duplikat-Check
         let allGamesData = [];
-
         let selectedSeason = "";
         let selectedAgeGroup = "";
         let activeConfig = null;
+        let gameToDeleteId = null;
 
-        // 1. Auth Logic
+        // --- 1. Auth Logic ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('dashboard-section').classList.remove('hidden');
-                initAdminSelectors(); // Initialise dropdowns and load games
+                initAdminSelectors();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('dashboard-section').classList.add('hidden');
@@ -191,13 +1171,83 @@
         });
 
         function login() {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(e => document.getElementById('login-error').innerText = e.message);
-        }
-        function logout() { auth.signOut(); }
+            const errBox = document.getElementById('login-error');
+            const btn = document.getElementById('loginBtn');
 
-        // Dropdown initialization
+            if (!email || !pass) {
+                errBox.innerText = "Bitte gib E-Mail und Passwort ein.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "Wird eingeloggt...";
+            }
+            errBox.classList.add('hidden');
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .catch(e => {
+                    let msg = e.message;
+                    if (e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+                        msg = "Falsche E-Mail-Adresse oder Passwort.";
+                    } else if (e.code === 'auth/invalid-email') {
+                        msg = "Ungültige E-Mail-Adresse.";
+                    } else if (e.code === 'auth/too-many-requests') {
+                        msg = "Zu viele fehlgeschlagene Versuche. Bitte kurz warten.";
+                    }
+                    errBox.innerText = msg;
+                    errBox.classList.remove('hidden');
+                })
+                .finally(() => {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = "Einloggen";
+                    }
+                });
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                showToast("Erfolgreich abgemeldet");
+            });
+        }
+
+        function togglePasswordVisibility() {
+            const pw = document.getElementById('password');
+            const btn = document.querySelector('.btn-toggle-pw');
+            if (!pw) return;
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                if (btn) btn.innerText = "Verbergen";
+            } else {
+                pw.type = 'password';
+                if (btn) btn.innerText = "Anzeigen";
+            }
+        }
+
+        // --- 2. Team Logo Helper ---
+        function getTeamLogo(teamName) {
+            if (!teamName) return "assets/logo.jpg";
+            if (activeConfig && activeConfig.teams && activeConfig.teams[teamName] && activeConfig.teams[teamName].logo) {
+                return activeConfig.teams[teamName].logo;
+            }
+            if (typeof CUP_DATA !== "undefined" && CUP_DATA.seasons) {
+                for (const sKey in CUP_DATA.seasons) {
+                    const ags = CUP_DATA.seasons[sKey].ageGroups;
+                    for (const agKey in ags) {
+                        if (ags[agKey].teams && ags[agKey].teams[teamName] && ags[agKey].teams[teamName].logo) {
+                            return ags[agKey].teams[teamName].logo;
+                        }
+                    }
+                }
+            }
+            return "assets/logo.jpg";
+        }
+
+        // --- 3. Dropdown initialization ---
         function initAdminSelectors() {
             const seasonSelect = document.getElementById('season-select');
             seasonSelect.innerHTML = "";
@@ -209,13 +1259,6 @@
                 seasonSelect.appendChild(opt);
             });
 
-            if (seasons.length <= 1) {
-                seasonSelect.classList.add('no-arrow');
-            } else {
-                seasonSelect.classList.remove('no-arrow');
-            }
-
-            // Default to Saison 26/27 if available, otherwise fall back to the first season
             selectedSeason = seasons.includes("2026_2027") ? "2026_2027" : seasons[0];
             seasonSelect.value = selectedSeason;
 
@@ -233,12 +1276,6 @@
                 ageSelect.appendChild(opt);
             });
 
-            if (ageGroups.length <= 1) {
-                ageSelect.classList.add('no-arrow');
-            } else {
-                ageSelect.classList.remove('no-arrow');
-            }
-
             selectedAgeGroup = ageGroups[0];
             ageSelect.value = selectedAgeGroup;
 
@@ -248,15 +1285,18 @@
         function updateAdminActiveConfig() {
             activeConfig = CUP_DATA.seasons[selectedSeason].ageGroups[selectedAgeGroup];
             populateTeams();
-            
+
             const labelPart1 = document.getElementById('label-part1');
             const labelPart2 = document.getElementById('label-part2');
             if (labelPart1 && labelPart2) {
-                labelPart1.innerText = `Teil 1: Großfeld (Endergebnis Tore)`;
-                labelPart2.innerText = `Teil 2: TWIN GAMES (Anzahl Siege)`;
+                labelPart1.innerText = `Teil 1: Großfeld`;
+                labelPart2.innerText = `Teil 2: TWIN GAMES`;
             }
 
-            loadGames(); // Refresh the list of games
+            updateScheduleQuickSelect();
+            updateMatchPreview();
+            updateTwinGamesSum();
+            loadGames();
         }
 
         function populateTeams() {
@@ -265,7 +1305,7 @@
             homeSelect.innerHTML = "";
             awaySelect.innerHTML = "";
 
-            const teams = Object.keys(activeConfig.teams);
+            const teams = Object.keys(activeConfig.teams || {});
             
             teams.forEach(team => {
                 let optHome = document.createElement('option');
@@ -279,9 +1319,153 @@
                 awaySelect.appendChild(optAway);
             });
 
-            // Set default away team to second team if possible
             if (teams.length > 1) {
                 awaySelect.value = teams[1];
+            }
+
+            updateMatchPreview();
+        }
+
+        function onTeamSelectChange(changed) {
+            const home = document.getElementById('teamHome').value;
+            const away = document.getElementById('teamAway').value;
+            if (home === away) {
+                const otherSelectId = (changed === 'home') ? 'teamAway' : 'teamHome';
+                const otherSelect = document.getElementById(otherSelectId);
+                for (let i = 0; i < otherSelect.options.length; i++) {
+                    if (otherSelect.options[i].value !== (changed === 'home' ? home : away)) {
+                        otherSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            updateMatchPreview();
+        }
+
+        function updateMatchPreview() {
+            const homeTeam = document.getElementById('teamHome').value;
+            const awayTeam = document.getElementById('teamAway').value;
+
+            const homeLogo = document.getElementById('preview-home-logo');
+            const awayLogo = document.getElementById('preview-away-logo');
+            const homeName = document.getElementById('preview-home-name');
+            const awayName = document.getElementById('preview-away-name');
+
+            if (homeLogo) homeLogo.src = getTeamLogo(homeTeam);
+            if (awayLogo) awayLogo.src = getTeamLogo(awayTeam);
+            if (homeName) homeName.textContent = homeTeam || "Heimteam";
+            if (awayName) awayName.textContent = awayTeam || "Auswärtsteam";
+
+            const labelHome81 = document.getElementById('score-label-home-81');
+            const labelAway81 = document.getElementById('score-label-away-81');
+            const labelHome41 = document.getElementById('score-label-home-41');
+            const labelAway41 = document.getElementById('score-label-away-41');
+
+            if (labelHome81) labelHome81.textContent = homeTeam || "Heim";
+            if (labelAway81) labelAway81.textContent = awayTeam || "Gast";
+            if (labelHome41) labelHome41.textContent = homeTeam || "Heim";
+            if (labelAway41) labelAway41.textContent = awayTeam || "Gast";
+        }
+
+        // --- 4. Schnellauswahl aus Spielplan ---
+        function updateScheduleQuickSelect() {
+            const select = document.getElementById('schedule-quick-select');
+            const group = document.getElementById('schedule-quick-group');
+            if (!select || !group) return;
+
+            select.innerHTML = '<option value="">Spiel aus Spielplan wählen...</option>';
+
+            if (!activeConfig || !activeConfig.schedule || !activeConfig.schedule.length) {
+                group.style.display = 'none';
+                return;
+            }
+            group.style.display = 'block';
+
+            activeConfig.schedule.forEach((round, rIdx) => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = round.name || `${rIdx + 1}. Spieltag`;
+                
+                round.matches.forEach(m => {
+                    const [h, a] = m;
+                    if (!h || !a) return;
+
+                    const alreadyPlayed = allGamesData.find(g => 
+                        g.saison === selectedSeason && 
+                        g.jahrgang === selectedAgeGroup && 
+                        ((g.heim === h && g.gast === a) || (g.heim === a && g.gast === h))
+                    );
+
+                    const opt = document.createElement('option');
+                    opt.value = `${h}__VS__${a}`;
+                    if (alreadyPlayed) {
+                        const s81 = alreadyPlayed.ergebnis81 ? alreadyPlayed.ergebnis81.join(':') : '';
+                        opt.textContent = `${h} vs ${a} (bereits eingetragen: ${s81})`;
+                    } else {
+                        opt.textContent = `${h} vs ${a}`;
+                    }
+                    optgroup.appendChild(opt);
+                });
+
+                if (optgroup.children.length > 0) {
+                    select.appendChild(optgroup);
+                }
+            });
+        }
+
+        function onScheduleQuickSelect(val) {
+            if (!val) return;
+            const parts = val.split('__VS__');
+            if (parts.length !== 2) return;
+            const [h, a] = parts;
+
+            document.getElementById('teamHome').value = h;
+            document.getElementById('teamAway').value = a;
+            updateMatchPreview();
+
+            const existing = allGamesData.find(g => 
+                g.saison === selectedSeason && 
+                g.jahrgang === selectedAgeGroup && 
+                g.heim === h && g.gast === a
+            );
+
+            if (existing) {
+                showToast(`Spiel wurde bereits eingetragen (${existing.ergebnis81 ? existing.ergebnis81.join(':') : ''}).`);
+            } else {
+                document.getElementById('scoreHome81').value = "0";
+                document.getElementById('scoreAway81').value = "0";
+                document.getElementById('scoreHome41').value = "0";
+                document.getElementById('scoreAway41').value = "0";
+                updateTwinGamesSum();
+                showToast(`Ausgewählt: ${h} vs ${a}`);
+            }
+        }
+
+        // --- 5. Stepper & Score Controls ---
+        function changeScore(inputId, delta) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            let val = parseInt(input.value);
+            if (isNaN(val)) val = 0;
+            val = Math.max(0, val + delta);
+            input.value = val;
+            updateTwinGamesSum();
+        }
+
+        function updateTwinGamesSum() {
+            const h = parseInt(document.getElementById('scoreHome41').value) || 0;
+            const a = parseInt(document.getElementById('scoreAway41').value) || 0;
+            const sum = h + a;
+            const hint = document.getElementById('tg-sum-hint');
+            if (!hint) return;
+
+            if (sum === 8) {
+                hint.innerHTML = `<span style="color:#000000; font-weight:700;">Summe: ${sum} von 8 Spielen</span>`;
+            } else if (sum === 0) {
+                hint.innerHTML = `8 Einzelspiele (z.&nbsp;B. 5:3 oder 4:4)`;
+            } else if (sum < 8) {
+                hint.innerHTML = `Summe: ${sum} von 8 Spielen (${8 - sum} offen/Remis)`;
+            } else {
+                hint.innerHTML = `<span style="color:#c53030; font-weight:700;">Summe: ${sum} Spiele (mehr als 8)</span>`;
             }
         }
 
@@ -295,16 +1479,19 @@
             updateAdminActiveConfig();
         }
 
-        // 2. Liste laden (Live-Update)
+        // --- 6. Spieleliste laden ---
         function loadGames() {
-            // Sortiert nach Datum (neueste zuerst)
-            db.collection("spiele").orderBy("datum", "desc").onSnapshot(snapshot => {
-                const container = document.getElementById("games-container");
-                container.innerHTML = "";
-                allGamesData = []; // Liste leeren beim Neuladen
+            const container = document.getElementById("games-container");
+            const countBadge = document.getElementById("games-count-badge");
 
-                if(snapshot.empty) {
-                    container.innerHTML = "<p style='text-align:center; color:#999;'>Noch keine Spiele eingetragen.</p>";
+            db.collection("spiele").orderBy("datum", "desc").onSnapshot(snapshot => {
+                container.innerHTML = "";
+                allGamesData = [];
+
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="empty-state">Noch keine Spiele in der Datenbank.</div>`;
+                    if (countBadge) countBadge.textContent = "(0)";
+                    updateScheduleQuickSelect();
                     return;
                 }
 
@@ -317,52 +1504,96 @@
                     const s = game.saison || "2025_2026";
                     const j = game.jahrgang || "2014";
 
-                    // WICHTIG: Spiel in die Liste für den Check aufnehmen
                     allGamesData.push({ id: id, ...game, saison: s, jahrgang: j });
                     
-                    // Nur anzeigen, wenn es zur ausgewählten Saison/Jahrgang passt
                     if (s === selectedSeason && j === selectedAgeGroup) {
                         gameCount++;
 
-                        // Daten für Javascript vorbereiten (zum Bearbeiten)
                         const dataString = JSON.stringify({
                             id: id,
                             saison: s,
                             jahrgang: j,
                             h: game.heim, a: game.gast,
-                            h81: game.ergebnis81[0], a81: game.ergebnis81[1],
-                            h41: game.ergebnis41[0], a41: game.ergebnis41[1]
+                            h81: (game.ergebnis81 && game.ergebnis81[0] !== undefined) ? game.ergebnis81[0] : 0,
+                            a81: (game.ergebnis81 && game.ergebnis81[1] !== undefined) ? game.ergebnis81[1] : 0,
+                            h41: (game.ergebnis41 && game.ergebnis41[0] !== undefined) ? game.ergebnis41[0] : 0,
+                            a41: (game.ergebnis41 && game.ergebnis41[1] !== undefined) ? game.ergebnis41[1] : 0
                         }).replace(/"/g, '&quot;');
 
-                        const html = `
-                            <div class="game-item">
-                                <div class="game-info">
-                                    <strong>${game.heim} vs ${game.gast}</strong><br>
-                                    ${game.ergebnis81[0]}:${game.ergebnis81[1]} | TG: ${game.ergebnis41[0]}:${game.ergebnis41[1]}
+                        const homeLogo = getTeamLogo(game.heim);
+                        const awayLogo = getTeamLogo(game.gast);
+
+                        const item = document.createElement('div');
+                        item.className = 'game-item';
+                        item.setAttribute('data-search', `${game.heim.toLowerCase()} ${game.gast.toLowerCase()}`);
+                        item.innerHTML = `
+                            <div class="game-item-main">
+                                <div class="game-item-teams">
+                                    <div class="game-team-row">
+                                        <img src="${homeLogo}" class="game-crest" alt="" onerror="this.src='assets/logo.jpg'">
+                                        <span class="game-team-name">${game.heim}</span>
+                                    </div>
+                                    <div class="game-team-row">
+                                        <img src="${awayLogo}" class="game-crest" alt="" onerror="this.src='assets/logo.jpg'">
+                                        <span class="game-team-name">${game.gast}</span>
+                                    </div>
                                 </div>
-                                <div class="game-actions">
-                                    <button class="btn-edit" onclick="editGame(${dataString})">✏️</button>
-                                    <button class="btn-red" onclick="deleteGame('${id}')">🗑️</button>
+                                <div class="game-item-scores">
+                                    <span class="score-main">${game.ergebnis81[0]}:${game.ergebnis81[1]}</span>
+                                    <span class="score-sub">TG ${game.ergebnis41[0]}:${game.ergebnis41[1]}</span>
                                 </div>
                             </div>
+                            <div class="game-actions">
+                                <button type="button" class="btn-item-edit" onclick="editGame(${dataString})" title="Ergebnis bearbeiten">
+                                    Bearbeiten
+                                </button>
+                                <button type="button" class="btn-item-delete" onclick="deleteGame('${id}')" title="Ergebnis löschen">
+                                    Löschen
+                                </button>
+                            </div>
                         `;
-                        container.innerHTML += html;
+                        container.appendChild(item);
                     }
                 });
 
+                if (countBadge) countBadge.textContent = `(${gameCount})`;
+
                 if (gameCount === 0) {
-                    container.innerHTML = "<p style='text-align:center; color:#999; font-style:italic;'>Noch keine Spiele für diesen Jahrgang/Saison eingetragen.</p>";
+                    container.innerHTML = `<div class="empty-state">Noch keine Spiele für diesen Jahrgang / diese Saison eingetragen.</div>`;
                 }
+
+                updateScheduleQuickSelect();
+                filterGamesList();
             });
         }
 
-        // 3. Bearbeiten starten
+        // --- 7. Spieleliste Filter / Suche ---
+        function filterGamesList() {
+            const query = (document.getElementById('game-search-input')?.value || "").toLowerCase().trim();
+            const items = document.querySelectorAll('#games-container .game-item');
+            let visibleCount = 0;
+
+            items.forEach(item => {
+                const searchData = item.getAttribute('data-search') || item.innerText.toLowerCase();
+                if (!query || searchData.includes(query)) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            const emptyNotice = document.getElementById('search-empty-notice');
+            if (emptyNotice) {
+                emptyNotice.classList.toggle('hidden', visibleCount > 0 || items.length === 0);
+            }
+        }
+
+        // --- 8. Bearbeiten starten ---
         function editGame(data) {
-            // Zuerst Filter-Dropdowns auf die Werte dieses Spiels einstellen
             selectedSeason = data.saison || "2025_2026";
             document.getElementById('season-select').value = selectedSeason;
 
-            // Re-populate and select the correct age group
             const ageSelect = document.getElementById('age-select');
             ageSelect.innerHTML = "";
             const ageGroups = Object.keys(CUP_DATA.seasons[selectedSeason].ageGroups);
@@ -375,11 +1606,9 @@
             selectedAgeGroup = data.jahrgang || "2014";
             ageSelect.value = selectedAgeGroup;
 
-            // Active Config und Teamlisten updaten
             activeConfig = CUP_DATA.seasons[selectedSeason].ageGroups[selectedAgeGroup];
             populateTeams();
 
-            // Werte in die Felder schreiben
             document.getElementById('editGameId').value = data.id;
             document.getElementById('teamHome').value = data.h;
             document.getElementById('teamAway').value = data.a;
@@ -390,41 +1619,77 @@
             document.getElementById('scoreHome41').value = data.h41;
             document.getElementById('scoreAway41').value = data.a41;
 
-            // Design ändern (damit man merkt, dass man bearbeitet)
-            document.getElementById('saveBtn').innerText = "Änderung speichern";
-            document.getElementById('saveBtn').className = "btn-blue"; // Blau statt Grün
+            updateMatchPreview();
+            updateTwinGamesSum();
+
+            const editBanner = document.getElementById('edit-banner');
+            if (editBanner) {
+                document.getElementById('edit-banner-match').textContent = `${data.h} vs ${data.a}`;
+                editBanner.classList.remove('hidden');
+            }
+
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = "Änderung speichern";
+
             document.getElementById('form-title').innerText = "Spiel bearbeiten";
-            document.getElementById('cancelBtn').style.display = "inline-block";
-            
-            // Nach oben scrollen
-            document.getElementById('dashboard-section').scrollIntoView({behavior: "smooth"});
+            document.getElementById('cancelBtn').style.display = "block";
+
+            document.getElementById('form-card').scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        // 4. Formular zurücksetzen
+        // --- 9. Formular zurücksetzen ---
         function resetForm() {
-            document.getElementById('editGameId').value = ""; // ID löschen
-            document.getElementById('scoreHome81').value = "";
-            document.getElementById('scoreAway81').value = "";
-            document.getElementById('scoreHome41').value = "";
-            document.getElementById('scoreAway41').value = "";
+            document.getElementById('editGameId').value = "";
+            document.getElementById('scoreHome81').value = "0";
+            document.getElementById('scoreAway81').value = "0";
+            document.getElementById('scoreHome41').value = "0";
+            document.getElementById('scoreAway41').value = "0";
             
-            // Design zurücksetzen
-            document.getElementById('saveBtn').innerText = "Ergebnis Speichern";
-            document.getElementById('saveBtn').className = "btn-green";
+            const editBanner = document.getElementById('edit-banner');
+            if (editBanner) editBanner.classList.add('hidden');
+
+            const scheduleQuick = document.getElementById('schedule-quick-select');
+            if (scheduleQuick) scheduleQuick.value = "";
+
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = "Ergebnis speichern";
+
             document.getElementById('form-title').innerText = "Neues Ergebnis eintragen";
             document.getElementById('cancelBtn').style.display = "none";
+
+            updateMatchPreview();
+            updateTwinGamesSum();
         }
 
-        // 5. Löschen
+        // --- 10. Löschen (mit Modal) ---
         function deleteGame(id) {
-            if(confirm("Möchtest du dieses Spiel wirklich löschen?")) {
-                db.collection("spiele").doc(id).delete()
-                    .then(() => alert("Gelöscht!"))
-                    .catch(e => alert("Fehler: " + e.message));
-            }
+            const game = allGamesData.find(g => g.id === id);
+            const title = game ? `${game.heim} vs ${game.gast}` : "dieses Spiel";
+            gameToDeleteId = id;
+
+            const modal = document.getElementById('delete-modal');
+            const text = document.getElementById('delete-modal-text');
+            if (text) text.innerHTML = `Möchtest du das Spiel <strong>${title}</strong> wirklich löschen?`;
+            if (modal) modal.classList.remove('hidden');
         }
 
-        // 6. Speichern (MIT DUPLIKAT CHECK)
+        function cancelDelete() {
+            gameToDeleteId = null;
+            const modal = document.getElementById('delete-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function confirmDelete() {
+            if (!gameToDeleteId) return;
+            const id = gameToDeleteId;
+            cancelDelete();
+
+            db.collection("spiele").doc(id).delete()
+                .then(() => showToast("Spiel gelöscht."))
+                .catch(e => showToast("Fehler beim Löschen: " + e.message));
+        }
+
+        // --- 11. Speichern ---
         function saveResult() {
             const editId = document.getElementById('editGameId').value;
             const home = document.getElementById('teamHome').value;
@@ -435,23 +1700,38 @@
             const h41 = parseInt(document.getElementById('scoreHome41').value) || 0;
             const a41 = parseInt(document.getElementById('scoreAway41').value) || 0;
 
-            if(home === away) {
-                alert("Heim und Auswärts darf nicht gleich sein!");
-                return;
-            }
-            if(h41 === 0 && a41 === 0) {
-                alert("Fehler im 4+1: Ein 0:0 ist bei 8 Spielen nicht möglich.");
+            if (!home || !away) {
+                showToast("Bitte wähle Heim- und Auswärtsteam aus.");
                 return;
             }
 
-            // --- DUPLIKAT CHECK (nur innerhalb derselben Saison und desselben Jahrgangs) ---
-            const duplicate = allGamesData.find(g => g.heim === home && g.gast === away && g.saison === selectedSeason && g.jahrgang === selectedAgeGroup && g.id !== editId);
-            
-            if(duplicate) {
-                alert("STOP: Dieses Spiel (" + home + " vs " + away + ") existiert bereits in dieser Division! Bitte bearbeite das vorhandene Spiel unten in der Liste, statt es neu anzulegen.");
+            if (home === away) {
+                showToast("Heim- und Auswärtsteam dürfen nicht identisch sein.");
                 return;
             }
-            // ---------------------------------------------------------------------------------
+            if (h41 === 0 && a41 === 0) {
+                showToast("Fehler: Ein 0:0 ist bei 8 TWIN GAMES Spielen nicht möglich.");
+                return;
+            }
+
+            // DUPLIKAT CHECK
+            const duplicate = allGamesData.find(g => 
+                g.heim === home && 
+                g.gast === away && 
+                g.saison === selectedSeason && 
+                g.jahrgang === selectedAgeGroup && 
+                g.id !== editId
+            );
+            
+            if (duplicate) {
+                showToast(`STOP: ${home} vs ${away} existiert bereits in dieser Division.`);
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveBtn');
+            const origText = saveBtn.innerText;
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Wird gespeichert...";
 
             const gameData = {
                 datum: new Date(),
@@ -465,13 +1745,41 @@
 
             if (editId) {
                 db.collection("spiele").doc(editId).update(gameData)
-                    .then(() => { alert("Erfolgreich geändert! ✅"); resetForm(); })
-                    .catch(e => alert("Fehler: " + e.message));
+                    .then(() => {
+                        showToast("Änderungen erfolgreich gespeichert.");
+                        resetForm();
+                    })
+                    .catch(e => showToast("Fehler: " + e.message))
+                    .finally(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.innerText = origText;
+                    });
             } else {
                 db.collection("spiele").add(gameData)
-                    .then(() => { alert("Gespeichert! ⚽"); resetForm(); })
-                    .catch(e => alert("Fehler: " + e.message));
+                    .then(() => {
+                        showToast("Ergebnis erfolgreich gespeichert.");
+                        resetForm();
+                    })
+                    .catch(e => showToast("Fehler: " + e.message))
+                    .finally(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.innerText = origText;
+                    });
             }
+        }
+
+        // --- 12. Toast Feedback Notification ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+
+            toast.textContent = message;
+            toast.className = 'toast toast-show';
+
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.className = 'toast hidden';
+            }, 3000);
         }
     </script>
 </body>
