@@ -1759,6 +1759,16 @@ select.no-arrow {
         padding: 3px 6px;
         font-size: 0.7rem;
     }
+    .preview-score-badge {
+        padding: 3px 6px;
+        min-width: 58px;
+    }
+    .preview-score-main {
+        font-size: 0.95rem;
+    }
+    .preview-score-sub {
+        font-size: 0.65rem;
+    }
 }
 
 .preview-match-card {
@@ -1927,6 +1937,84 @@ select.no-arrow {
     color: #fff;
     border-color: #000;
     transform: translateY(-1px);
+}
+
+/* Vorschau Ergebnis-Badges & Gruppen-Header */
+.preview-match-card--result {
+    border-color: #cbd5e1;
+}
+
+.preview-score-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    padding: 4px 10px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    min-width: 72px;
+    box-sizing: border-box;
+}
+
+.preview-score-main {
+    font-size: 1.15rem;
+    font-weight: 900;
+    font-family: 'Outfit', sans-serif;
+    color: #0f172a;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+}
+
+.preview-score-sub {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #64748b;
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+}
+
+.preview-date-badge--finished {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.preview-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.preview-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 18px 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.preview-group-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.preview-group-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
 /* ==========================================

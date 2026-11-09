@@ -152,7 +152,9 @@ const IGNORED_OR_CANCELLED_MATCH_IDS = [
     "TSV Meerbusch_DSC 99 Düsseldorf",
     "DSC 99 Düsseldorf_TSV Meerbusch",
     "SG Unterrath_DSC Düsseldorf",
-    "SGS Essen_SGS Essen"
+    "SGS Essen_SGS Essen",
+    "ETB Essen_VfB Hilden",
+    "SV Wersten 04_DSC Düsseldorf"
 ];
 
 exports.scrapeMatches = onSchedule({

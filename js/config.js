@@ -222,7 +222,9 @@ const CANCELLED_MATCH_DATES = [
     "TSV Meerbusch_DSC 99 Düsseldorf",
     "DSC 99 Düsseldorf_TSV Meerbusch",
     "SG Unterrath_DSC Düsseldorf", // 12.12.2026 ist Kreisliga A; Best of Cup Hinspiel wurde bereits am 04.10.2026 ausgetragen
-    "SGS Essen_SGS Essen"
+    "SGS Essen_SGS Essen",
+    "ETB Essen_VfB Hilden", // Nicht auf fussball.de / veralteter Eintrag vom 07.11.2026
+    "SV Wersten 04_DSC Düsseldorf" // Nicht auf fussball.de / am 07.11.2026 spielten beide Teams Meisterschaftsspiele
 ];
 
 // Manuelle Terminierungen eintragen

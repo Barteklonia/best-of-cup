@@ -114,6 +114,16 @@
             <h1 style="text-align: center; margin-bottom: 40px;">Logbuch (Changelog)</h1>
 
             <div class="log-entry">
+                <div class="log-date">9. November 2026</div>
+                <h3 class="log-title">Ergebnis-Persistenz auf der Startseite (3 Tage) &amp; Spielplan-Bereinigung</h3>
+                <ul class="log-list">
+                    <li><strong>3-t&auml;gige Ergebnis-Anzeige auf der Startseite (<code>index.html</code>):</strong> Frisch eingetragene Spielergebnisse verschwinden nicht mehr unmittelbar nach der Ergebniseingabe von der Startseite. Sie bleiben 3 Tage lang als &bdquo;Aktuelle Ergebnisse&ldquo; mit Endergebnis (Gro&szlig;feld &amp; TWIN GAMES), Status-Badge und direktem Link zum Spielbericht prominent sichtbar.</li>
+                    <li><strong>Strukturierte Spieltags-Vorschau:</strong> Auf der Startseite werden aktuelle Ergebnisse der vergangenen 3 Tage und anstehende Begegnungen des kommenden 2-Wochen-Fensters sauber getrennt oder gemeinsam dargestellt. Die Jahrgangsfilter (Alle / Jahrgang 2014 / Jahrgang 2016) greifen nahtlos auf beide Bl&ouml;cke.</li>
+                    <li><strong>Live-Pr&uuml;fung fussball.de &amp; Phantomspiel-Bereinigung (<code>js/config.js</code>, <code>functions/index.js</code>):</strong> Die beiden Partien <em>ETB Essen vs VfB Hilden</em> (2016) und <em>SV Wersten 04 vs DSC D&uuml;sseldorf</em> (2014) vom 07.11.2026 wurden via fussball.de-Liveabgleich gepr&uuml;ft (beide existieren nicht auf fussball.de / Meisterschaftsspiele statt Best of Cup). Beide wurden in <code>CANCELLED_MATCH_DATES</code> und die Cloud Function <code>IGNORED_OR_CANCELLED_MATCH_IDS</code> eingepflegt und sind damit vollst&auml;ndig aus allen Ansichten entfernt.</li>
+                </ul>
+            </div>
+
+            <div class="log-entry">
                 <div class="log-date">5. November 2026</div>
                 <h3 class="log-title">Schlichtes Monochrome-Design &amp; Bündige Header-Ausrichtung im Admin-Bereich</h3>
                 <ul class="log-list">
